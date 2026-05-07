@@ -1,0 +1,109 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.dashboard {
+  // KPI grid
+  &__kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: t.$sp-4;
+    margin-bottom: t.$sp-6;
+
+    @include m.below(lg) { grid-template-columns: repeat(2, 1fr); }
+    @include m.below(sm) { grid-template-columns: 1fr; }
+  }
+
+  .stat-card__header {
+    @include m.flex-between;
+    margin-bottom: t.$sp-2;
+  }
+
+  // Main grid
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: t.$sp-4;
+
+    @include m.below(lg) { grid-template-columns: 1fr; }
+  }
+
+  // Today's queue
+  &__queue {
+    overflow: hidden;
+  }
+
+  &__queue-list {
+    @include m.flex-col;
+    padding: t.$sp-3 0;
+  }
+
+  &__queue-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-3 t.$sp-6;
+    transition: background t.$t-fast t.$ease;
+    cursor: pointer;
+
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__queue-info {
+    @include m.flex-col(2px);
+    flex: 1;
+  }
+
+  &__queue-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__queue-meta {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+  }
+
+  // Stats panel
+  &__appt-stats {
+    align-self: start;
+  }
+
+  &__stats-list {
+    @include m.flex-col(t.$sp-3);
+    margin-top: t.$sp-4;
+  }
+
+  &__stat-row {
+    @include m.flex(center, flex-start, t.$sp-3);
+  }
+
+  &__stat-label {
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    width: 84px;
+    flex-shrink: 0;
+  }
+
+  &__stat-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--surface-input);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  &__stat-bar {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 600ms t.$ease-out;
+    min-width: 2px;
+  }
+
+  &__stat-value {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 28px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}

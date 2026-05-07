@@ -1,0 +1,233 @@
+<div class="topbar">
+
+  <!-- ── Search ── -->
+  <div class="topbar__search">
+    <div class="input-group">
+      <span class="input-icon">
+        @if (searchLoading()) {
+          <span class="spinner spinner--sm" style="width:14px;height:14px;border-width:1.5px"></span>
+        } @else {
+          <lucide-icon name="search" [size]="16" />
+        }
+      </span>
+      <input class="input topbar__search-input"
+             type="search"
+             placeholder="Search patients…"
+             [value]="searchQuery()"
+             (input)="onSearch($event)"
+             (focus)="searchQuery() && activePanel.set('search')" />
+      @if (searchQuery()) {
+        <button class="input-icon btn btn--ghost topbar__search-clear"
+                style="pointer-events:auto;right:8px;left:auto"
+                (click)="clearSearch()">
+          <lucide-icon name="x" [size]="14" />
+        </button>
+      }
+    </div>
+
+    <!-- Search results dropdown -->
+    @if (activePanel() === 'search') {
+      <div class="topbar__dropdown topbar__search-results">
+        @if (searchPatients().length > 0) {
+          <p class="topbar__dropdown-label">Patients</p>
+          @for (p of searchPatients(); track p.id) {
+            <button class="topbar__search-item" (click)="goToPatient(p.id)">
+              <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+              <div class="topbar__search-item-info">
+                <span class="topbar__search-item-name">{{ p.firstName }} {{ p.lastName }}</span>
+                <span class="topbar__search-item-meta">{{ p.phone }} · {{ p.patientCode }}</span>
+              </div>
+            </button>
+          }
+        } @else if (!searchLoading() && searchQuery().length > 1) {
+          <div class="topbar__dropdown-empty">
+            <lucide-icon name="search" [size]="16" />
+            No patients found for "{{ searchQuery() }}"
+          </div>
+        }
+        @if (searchQuery()) {
+          <div class="topbar__dropdown-footer">
+            <button class="btn btn--ghost btn--sm w-full" (click)="goToAppointments()">
+              View all patients
+              <lucide-icon name="arrow-up-right" [size]="14" />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Action buttons ── -->
+  <div class="topbar__actions">
+
+    <!-- Notifications -->
+    <div class="topbar__panel-anchor">
+      <button class="btn btn--ghost btn--icon topbar__action-btn"
+              title="Notifications"
+              (click)="toggle('notifications')">
+        <lucide-icon name="bell" [size]="18" />
+        @if (unreadCount() > 0) {
+          <span class="topbar__badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+        }
+      </button>
+
+      @if (activePanel() === 'notifications') {
+        <div class="topbar__dropdown topbar__notifications">
+          <div class="topbar__dropdown-header">
+            <span class="topbar__dropdown-title">Notifications</span>
+            @if (unreadCount() > 0) {
+              <button class="btn btn--ghost btn--sm" (click)="markAllRead()">Mark all read</button>
+            }
+          </div>
+
+          @if (notifications().length === 0) {
+            <div class="topbar__dropdown-empty">
+              <lucide-icon name="check-circle" [size]="20" />
+              All caught up!
+            </div>
+          } @else {
+            @for (n of notifications(); track n.id) {
+              <div class="topbar__notif-item" [class.topbar__notif-item--unread]="!n.read">
+                <div class="topbar__notif-icon"
+                     [class.topbar__notif-icon--appt]="n.type === 'appointment'"
+                     [class.topbar__notif-icon--invoice]="n.type === 'invoice'">
+                  @if (n.type === 'appointment') {
+                    <lucide-icon name="calendar" [size]="14" />
+                  } @else {
+                    <lucide-icon name="receipt" [size]="14" />
+                  }
+                </div>
+                <div class="topbar__notif-body">
+                  <p class="topbar__notif-title">{{ n.title }}</p>
+                  <p class="topbar__notif-text">{{ n.body }}</p>
+                  <p class="topbar__notif-time">{{ n.time }}</p>
+                </div>
+                <button class="btn btn--ghost topbar__notif-dismiss"
+                        (click)="dismissNotification(n.id)">
+                  <lucide-icon name="x" [size]="14" />
+                </button>
+              </div>
+            }
+          }
+
+          <div class="topbar__dropdown-footer">
+            <button class="btn btn--ghost btn--sm w-full" routerLink="/appointments"
+                    (click)="activePanel.set(null)">
+              View all appointments
+              <lucide-icon name="arrow-up-right" [size]="14" />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Settings shortcut -->
+    <button class="btn btn--ghost btn--icon topbar__action-btn"
+            title="Settings"
+            (click)="goToSettings()">
+      <lucide-icon name="settings" [size]="18" />
+    </button>
+
+    <!-- User profile -->
+    <div class="topbar__panel-anchor">
+      <button class="topbar__user-btn" (click)="toggle('profile')">
+        <div class="avatar avatar--sm">{{ initials() }}</div>
+        <div class="topbar__user-meta">
+          <span class="topbar__user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+          <span class="topbar__user-role">{{ user()?.role }}</span>
+        </div>
+        <lucide-icon name="chevron-down" [size]="14"
+                     class="topbar__chevron"
+                     [class.topbar__chevron--open]="activePanel() === 'profile'" />
+      </button>
+
+      @if (activePanel() === 'profile') {
+        <div class="topbar__dropdown topbar__profile">
+          <!-- Tabs -->
+          <div class="topbar__profile-tabs">
+            <button class="topbar__profile-tab"
+                    [class.topbar__profile-tab--active]="profileTab() === 'info'"
+                    (click)="profileTab.set('info')">
+              <lucide-icon name="user" [size]="14" /> Profile
+            </button>
+            <button class="topbar__profile-tab"
+                    [class.topbar__profile-tab--active]="profileTab() === 'password'"
+                    (click)="profileTab.set('password')">
+              <lucide-icon name="key-round" [size]="14" /> Password
+            </button>
+          </div>
+
+          <!-- Profile info tab -->
+          @if (profileTab() === 'info') {
+            <div class="topbar__profile-info">
+              <div class="topbar__profile-avatar">{{ initials() }}</div>
+              <div>
+                <p class="topbar__profile-name">{{ user()?.firstName }} {{ user()?.lastName }}</p>
+                <p class="topbar__profile-email">{{ user()?.email }}</p>
+                <span class="badge badge--primary" style="margin-top:6px">{{ user()?.role }}</span>
+              </div>
+            </div>
+
+            <div class="topbar__dropdown-divider"></div>
+
+            <button class="topbar__menu-item" (click)="goToSettings()">
+              <lucide-icon name="settings" [size]="15" />
+              Settings
+            </button>
+            <button class="topbar__menu-item topbar__menu-item--danger" (click)="logout()">
+              <lucide-icon name="log-out" [size]="15" />
+              Sign out
+            </button>
+          }
+
+          <!-- Change password tab -->
+          @if (profileTab() === 'password') {
+            <form [formGroup]="pwForm" (ngSubmit)="changePassword()" class="topbar__pw-form">
+              <div class="field">
+                <label class="field__label">Current Password</label>
+                <div class="input-group input-group--right">
+                  <input class="input"
+                         [type]="showCurrent() ? 'text' : 'password'"
+                         formControlName="currentPassword"
+                         placeholder="Current password" />
+                  <button type="button" class="input-icon btn btn--ghost"
+                          style="pointer-events:auto"
+                          (click)="showCurrent.update(v => !v)">
+                    <lucide-icon [name]="showCurrent() ? 'eye-off' : 'eye'" [size]="14" />
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label">New Password</label>
+                <div class="input-group input-group--right">
+                  <input class="input"
+                         [type]="showNew() ? 'text' : 'password'"
+                         formControlName="newPassword"
+                         placeholder="Min 8 characters" />
+                  <button type="button" class="input-icon btn btn--ghost"
+                          style="pointer-events:auto"
+                          (click)="showNew.update(v => !v)">
+                    <lucide-icon [name]="showNew() ? 'eye-off' : 'eye'" [size]="14" />
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label">Confirm Password</label>
+                <input class="input" type="password"
+                       formControlName="confirmPassword"
+                       placeholder="Repeat new password" />
+              </div>
+              <button type="submit" class="btn btn--primary w-full"
+                      [disabled]="pwForm.invalid || pwLoading()">
+                @if (pwLoading()) {
+                  <span class="spinner spinner--sm spinner--white"></span>
+                }
+                Update Password
+              </button>
+            </form>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

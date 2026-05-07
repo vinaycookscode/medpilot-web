@@ -1,0 +1,352 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.topbar {
+  @include m.flex-between;
+  height: 100%;
+  padding: 0 t.$sp-6;
+  gap: t.$sp-4;
+
+  // ── Search ──
+  &__search {
+    flex: 1;
+    max-width: 440px;
+    position: relative;
+  }
+
+  &__search-input {
+    height: 36px;
+    font-size: t.$text-sm;
+    padding-right: t.$sp-8;
+  }
+
+  &__search-clear {
+    height: 28px;
+    width: 28px;
+    color: var(--text-tertiary);
+    &:hover { color: var(--text-primary); }
+  }
+
+  // ── Actions row ──
+  &__actions {
+    @include m.flex(center, flex-end, t.$sp-1);
+    flex-shrink: 0;
+  }
+
+  &__action-btn {
+    position: relative;
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    &:hover { color: var(--text-primary); background: var(--surface-input); }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    background: var(--color-danger);
+    color: white;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--surface-topbar);
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+  }
+
+  // ── Panel anchor (positions dropdown) ──
+  &__panel-anchor {
+    position: relative;
+  }
+
+  // ── Shared dropdown shell ──
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + t.$sp-2);
+    right: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    z-index: var(--z-dropdown);
+    animation: scale-in 140ms t.$ease-out both;
+    transform-origin: top right;
+    overflow: hidden;
+  }
+
+  &__dropdown-header {
+    @include m.flex-between;
+    padding: t.$sp-4 t.$sp-4 t.$sp-3;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__dropdown-title {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__dropdown-label {
+    font-size: t.$text-xs;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: t.$sp-3 t.$sp-4 t.$sp-1;
+  }
+
+  &__dropdown-empty {
+    @include m.flex(center, center, t.$sp-2);
+    flex-direction: column;
+    padding: t.$sp-8 t.$sp-6;
+    color: var(--text-tertiary);
+    font-size: t.$text-sm;
+  }
+
+  &__dropdown-footer {
+    border-top: 1px solid var(--border);
+    padding: t.$sp-2 t.$sp-3;
+  }
+
+  &__dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: t.$sp-2 0;
+  }
+
+  // ── Search results ──
+  &__search-results {
+    width: 380px;
+    max-height: 400px;
+    overflow-y: auto;
+    left: 0;
+    right: auto;
+    transform-origin: top left;
+  }
+
+  &__search-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    width: 100%;
+    padding: t.$sp-3 t.$sp-4;
+    cursor: pointer;
+    transition: background t.$t-fast t.$ease;
+    text-align: left;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__search-item-info {
+    @include m.flex-col(2px);
+    min-width: 0;
+  }
+
+  &__search-item-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__search-item-meta {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+  }
+
+  // ── Notifications ──
+  &__notifications {
+    width: 340px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  &__notif-item {
+    @include m.flex(flex-start, flex-start, t.$sp-3);
+    padding: t.$sp-3 t.$sp-4;
+    border-bottom: 1px solid var(--border);
+    transition: background t.$t-fast t.$ease;
+    position: relative;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--surface-input); }
+
+    &--unread { background: var(--color-primary-subtle); }
+  }
+
+  &__notif-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    @include m.flex-center;
+    flex-shrink: 0;
+    margin-top: 2px;
+
+    &--appt    { background: var(--color-primary-subtle); color: var(--color-primary); }
+    &--invoice { background: var(--color-warning-subtle); color: var(--color-warning); }
+  }
+
+  &__notif-body { flex: 1; min-width: 0; }
+
+  &__notif-title {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+    @include m.truncate;
+  }
+
+  &__notif-text {
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  &__notif-time {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  &__notif-dismiss {
+    width: 24px;
+    height: 24px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    &:hover { color: var(--color-danger); }
+  }
+
+  // ── User button ──
+  &__user-btn {
+    @include m.flex(center, flex-start, t.$sp-2);
+    padding: t.$sp-1 t.$sp-2;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background t.$t-fast t.$ease;
+    max-width: 200px;
+
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__user-meta {
+    @include m.flex-col(1px);
+    min-width: 0;
+    text-align: left;
+
+    @include m.below(md) { display: none; }
+  }
+
+  &__user-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+    @include m.truncate;
+    max-width: 120px;
+  }
+
+  &__user-role {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    text-transform: capitalize;
+  }
+
+  &__chevron {
+    color: var(--text-tertiary);
+    transition: transform t.$t-fast t.$ease;
+    flex-shrink: 0;
+
+    &--open { transform: rotate(180deg); }
+  }
+
+  // ── Profile dropdown ──
+  &__profile {
+    width: 300px;
+    min-width: 280px;
+  }
+
+  &__profile-tabs {
+    @include m.flex(center, flex-start, t.$sp-1);
+    padding: t.$sp-3 t.$sp-3 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__profile-tab {
+    @include m.flex(center, flex-start, t.$sp-1);
+    padding: t.$sp-2 t.$sp-3;
+    border-radius: var(--radius-md);
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: all t.$t-fast t.$ease;
+
+    &--active {
+      color: var(--color-primary);
+      background: var(--color-primary-subtle);
+      font-weight: 600;
+    }
+
+    &:not(&--active):hover { background: var(--surface-input); color: var(--text-primary); }
+  }
+
+  &__profile-info {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-4;
+  }
+
+  &__profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: white;
+    @include m.flex-center;
+    font-size: t.$text-md;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__profile-name {
+    font-size: t.$text-base;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__profile-email {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  &__menu-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    width: 100%;
+    padding: t.$sp-3 t.$sp-4;
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: background t.$t-fast t.$ease;
+    text-align: left;
+
+    &:hover { background: var(--surface-input); }
+
+    &--danger { color: var(--color-danger); }
+    &--danger:hover { background: var(--color-danger-subtle); }
+  }
+
+  &__pw-form {
+    @include m.flex-col(t.$sp-3);
+    padding: t.$sp-4;
+
+    .input { height: 40px; font-size: t.$text-sm; }
+    .field__label { font-size: t.$text-xs; }
+  }
+}

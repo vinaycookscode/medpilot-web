@@ -1,0 +1,110 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.sidebar {
+  @include m.flex-col;
+  height: 100%;
+  padding: t.$sp-4 0;
+
+  // ── Brand ──
+  &__brand {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-2 t.$sp-4 t.$sp-4;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: t.$sp-2;
+  }
+
+  &__brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: white;
+    @include m.flex-center;
+    flex-shrink: 0;
+  }
+
+  &__brand-text {
+    @include m.flex-col(2px);
+    min-width: 0;
+  }
+
+  &__brand-name {
+    font-size: t.$text-md;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  &__brand-clinic {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+  }
+
+  // ── Nav ──
+  &__nav {
+    @include m.flex-col(2px);
+    flex: 1;
+    padding: 0 t.$sp-3;
+    overflow-y: auto;
+  }
+
+  &__nav-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-2 t.$sp-3;
+    border-radius: var(--radius-md);
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all t.$t-fast t.$ease;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-input);
+      color: var(--text-primary);
+    }
+
+    &--active {
+      background: var(--color-primary-subtle);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+  }
+
+  // ── Footer ──
+  &__footer {
+    @include m.flex-between;
+    padding: t.$sp-3 t.$sp-3 0;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    padding-top: t.$sp-4;
+  }
+
+  &__user {
+    @include m.flex(center, flex-start, t.$sp-2);
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__user-info {
+    @include m.flex-col(1px);
+  }
+
+  &__user-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+  }
+
+  &__user-role {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    text-transform: capitalize;
+  }
+
+  &__logout {
+    color: var(--text-tertiary);
+    &:hover { color: var(--color-danger); }
+  }
+}

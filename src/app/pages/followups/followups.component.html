@@ -1,0 +1,151 @@
+<div class="page followups">
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">Follow-ups</h2>
+      <p class="page__subtitle">Patients due for a return visit</p>
+    </div>
+    <button class="btn btn--secondary btn--sm" (click)="load()">
+      <lucide-icon name="refresh-cw" [size]="14" /> Refresh
+    </button>
+  </div>
+
+  @if (loading()) {
+    <!-- Skeleton -->
+    <div class="followups__skeleton-wrap">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton followups__skeleton-card"></div>
+      }
+    </div>
+  } @else if (total() === 0) {
+    <div class="card">
+      <div class="empty-state" style="padding:64px 24px">
+        <div class="empty-state__icon"><lucide-icon name="calendar-check" [size]="28" /></div>
+        <p class="empty-state__title">No follow-ups scheduled</p>
+        <p class="empty-state__subtitle">Patients with follow-up dates will appear here</p>
+      </div>
+    </div>
+  } @else {
+
+    <!-- Summary strip -->
+    <div class="followups__summary">
+      <div class="followups__summary-card followups__summary-card--danger">
+        <lucide-icon name="alert-circle" [size]="18" />
+        <div>
+          <p class="followups__summary-num">{{ overdue().length }}</p>
+          <p class="followups__summary-label">Overdue</p>
+        </div>
+      </div>
+      <div class="followups__summary-card followups__summary-card--primary">
+        <lucide-icon name="calendar" [size]="18" />
+        <div>
+          <p class="followups__summary-num">{{ today().length }}</p>
+          <p class="followups__summary-label">Today</p>
+        </div>
+      </div>
+      <div class="followups__summary-card followups__summary-card--neutral">
+        <lucide-icon name="clock" [size]="18" />
+        <div>
+          <p class="followups__summary-num">{{ upcoming().length }}</p>
+          <p class="followups__summary-label">Upcoming (60 days)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue -->
+    @if (overdue().length > 0) {
+      <div class="followups__group">
+        <div class="followups__group-header followups__group-header--danger">
+          <lucide-icon name="alert-circle" [size]="15" />
+          <span>Overdue</span>
+          <span class="followups__group-count">{{ overdue().length }}</span>
+        </div>
+        <div class="followups__cards">
+          @for (rx of overdue(); track rx.id) {
+            <ng-container *ngTemplateOutlet="rxCard; context: { rx: rx }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Today -->
+    @if (today().length > 0) {
+      <div class="followups__group">
+        <div class="followups__group-header followups__group-header--primary">
+          <lucide-icon name="calendar" [size]="15" />
+          <span>Today — {{ today()[0].followUpDate | date:'dd MMMM yyyy' }}</span>
+          <span class="followups__group-count">{{ today().length }}</span>
+        </div>
+        <div class="followups__cards">
+          @for (rx of today(); track rx.id) {
+            <ng-container *ngTemplateOutlet="rxCard; context: { rx: rx }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Upcoming grouped by week -->
+    @if (upcoming().length > 0) {
+      <div class="followups__group">
+        <div class="followups__group-header followups__group-header--neutral">
+          <lucide-icon name="clock" [size]="15" />
+          <span>Upcoming</span>
+          <span class="followups__group-count">{{ upcoming().length }}</span>
+        </div>
+        <div class="followups__cards">
+          @for (rx of upcoming(); track rx.id) {
+            <ng-container *ngTemplateOutlet="rxCard; context: { rx: rx }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+  }
+</div>
+
+<!-- ── Reusable card template ── -->
+<ng-template #rxCard let-rx="rx">
+  <div class="followups__card">
+    <!-- Left: avatar + patient info -->
+    <div class="followups__card-left">
+      <div class="avatar avatar--md">
+        {{ rx.patient?.firstName?.[0] }}{{ rx.patient?.lastName?.[0] }}
+      </div>
+      <div class="followups__card-info">
+        <p class="followups__patient-name">
+          {{ rx.patient?.firstName }} {{ rx.patient?.lastName }}
+        </p>
+        <div class="d-flex items-center gap-3 flex-wrap">
+          @if (rx.patient?.phone) {
+            <a [href]="'tel:' + rx.patient.phone" class="followups__phone"
+               (click)="$event.stopPropagation()">
+              <lucide-icon name="phone" [size]="12" />
+              {{ rx.patient.phone }}
+            </a>
+          }
+          @if (rx.patient?.patientCode) {
+            <span class="followups__code">{{ rx.patient.patientCode }}</span>
+          }
+        </div>
+        <p class="followups__diagnosis">{{ rx.diagnosis }}</p>
+        @if (rx.followUpNotes) {
+          <p class="followups__notes">
+            <lucide-icon name="info" [size]="11" style="vertical-align:-1px" />
+            {{ rx.followUpNotes }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- Right: date badge + doctor -->
+    <div class="followups__card-right">
+      <span class="followups__badge" [ngClass]="daysClass(rx.followUpDate)">
+        {{ daysLabel(rx.followUpDate) }}
+      </span>
+      <p class="followups__date">{{ rx.followUpDate | date:'dd MMM yyyy' }}</p>
+      <p class="followups__doctor">
+        Dr. {{ rx.doctor?.lastName }}
+        @if (rx.doctor?.specialization) {<span class="text-tertiary"> · {{ rx.doctor.specialization }}</span>}
+      </p>
+    </div>
+  </div>
+</ng-template>

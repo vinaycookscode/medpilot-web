@@ -1,0 +1,46 @@
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+
+export const routes: Routes = [
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+  },
+  {
+    path: '',
+    loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
+      },
+      {
+        path: 'patients',
+        loadComponent: () => import('./pages/patients/patients.component').then(m => m.PatientsComponent),
+      },
+      {
+        path: 'appointments',
+        loadComponent: () => import('./pages/appointments/appointments.component').then(m => m.AppointmentsComponent),
+      },
+      {
+        path: 'billing',
+        loadComponent: () => import('./pages/billing/billing.component').then(m => m.BillingComponent),
+      },
+      {
+        path: 'prescriptions',
+        loadComponent: () => import('./pages/prescriptions/prescriptions.component').then(m => m.PrescriptionsComponent),
+      },
+      {
+        path: 'followups',
+        loadComponent: () => import('./pages/followups/followups.component').then(m => m.FollowupsComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent),
+      },
+    ],
+  },
+  { path: '**', redirectTo: '' },
+];

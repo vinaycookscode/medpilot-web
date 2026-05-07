@@ -1,0 +1,109 @@
+// ── MedPilot Global Styles ──
+// Import order matters: tokens first (variables), then reset, then typography,
+// then animations (keyframes), then component classes.
+
+@use 'styles/tokens';       // CSS custom properties + SCSS vars
+@use 'styles/reset';        // Box-model and browser defaults reset
+@use 'styles/typography';   // Body, headings, text utility classes
+@use 'styles/animations';   // @keyframes + animation utilities
+@use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
+
+// ── Layout scaffold ──
+// Applied once at the app-root level; components fill inside this.
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--topbar-height) 1fr;
+  min-height: 100vh;
+  background: var(--surface-page);
+
+  .app-topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-topbar);
+    height: var(--topbar-height);
+    background: var(--surface-topbar);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .app-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    position: sticky;
+    top: var(--topbar-height);
+    height: calc(100vh - var(--topbar-height));
+    overflow-y: auto;
+    background: var(--surface-sidebar);
+    border-right: 1px solid var(--border);
+    z-index: var(--z-sidebar);
+  }
+
+  .app-content {
+    grid-column: 2;
+    grid-row: 2;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
+// ── Scrollbar (WebKit) ──
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 99px;
+  &:hover { background: var(--text-tertiary); }
+}
+
+// ── Focus outline: only keyboard nav shows the ring ──
+:focus        { outline: none; }
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+// ── Utility: spacing ──
+.mt-0 { margin-top: 0; }           .mb-0 { margin-bottom: 0; }
+.mt-1 { margin-top: var(--sp-1); } .mb-1 { margin-bottom: var(--sp-1); }
+.mt-2 { margin-top: var(--sp-2); } .mb-2 { margin-bottom: var(--sp-2); }
+.mt-3 { margin-top: var(--sp-3); } .mb-3 { margin-bottom: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); } .mb-4 { margin-bottom: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); } .mb-6 { margin-bottom: var(--sp-6); }
+.mt-8 { margin-top: var(--sp-8); } .mb-8 { margin-bottom: var(--sp-8); }
+
+.gap-1 { gap: var(--sp-1); } .gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); } .gap-4 { gap: var(--sp-4); }
+.gap-6 { gap: var(--sp-6); } .gap-8 { gap: var(--sp-8); }
+
+// ── Utility: display ──
+.d-flex    { display: flex; }
+.d-grid    { display: grid; }
+.d-block   { display: block; }
+.d-none    { display: none; }
+.flex-col  { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center    { align-items: center; }
+.items-start     { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: flex-end; }
+.flex-1   { flex: 1; }
+.shrink-0 { flex-shrink: 0; }
+
+// ── Utility: sizing ──
+.w-full  { width: 100%; }
+.h-full  { height: 100%; }
+.min-w-0 { min-width: 0; }
+
+// ── Utility: overflow ──
+.overflow-hidden { overflow: hidden; }
+.overflow-auto   { overflow: auto; }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

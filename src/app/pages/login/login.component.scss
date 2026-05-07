@@ -1,0 +1,81 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.login-page {
+  min-height: 100vh;
+  background: var(--surface-page);
+  @include m.flex-center;
+  padding: t.$sp-6;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  @include m.card;
+  padding: t.$sp-8;
+  animation: slide-up 280ms t.$ease-out both;
+
+  // ── Brand ──
+  &__brand {
+    text-align: center;
+    margin-bottom: t.$sp-8;
+  }
+
+  &__brand-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: white;
+    @include m.flex-center;
+    margin: 0 auto t.$sp-4;
+  }
+
+  &__brand-name {
+    font-size: t.$text-2xl;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  &__brand-sub {
+    font-size: t.$text-sm;
+    color: var(--text-tertiary);
+    margin-top: t.$sp-1;
+  }
+
+  // ── Form ──
+  &__form {
+    @include m.flex-col(t.$sp-4);
+  }
+
+  &__error {
+    @include m.flex(center, flex-start, t.$sp-2);
+    padding: t.$sp-3;
+    border-radius: var(--radius-md);
+    background: var(--color-danger-subtle);
+    color: var(--color-danger);
+    font-size: t.$text-sm;
+    font-weight: 500;
+  }
+
+  &__submit {
+    height: 48px;
+    font-size: t.$text-base;
+    margin-top: t.$sp-2;
+  }
+
+  // ── Demo ──
+  &__demo {
+    margin-top: t.$sp-6;
+    padding-top: t.$sp-6;
+    border-top: 1px solid var(--border);
+    @include m.flex-col(t.$sp-3);
+    align-items: center;
+  }
+
+  &__demo-btns {
+    @include m.flex(center, center, t.$sp-2);
+  }
+}

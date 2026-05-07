@@ -1,0 +1,65 @@
+<div class="login-page">
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="login-card__brand">
+      <div class="login-card__brand-icon">
+        <lucide-icon name="stethoscope" [size]="28" />
+      </div>
+      <h1 class="login-card__brand-name">MedPilot</h1>
+      <p class="login-card__brand-sub">Clinic Management System</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-card__form">
+      <div class="field">
+        <label class="field__label" for="email">Email</label>
+        <div class="input-group">
+          <span class="input-icon">
+            <lucide-icon name="mail" [size]="16" />
+          </span>
+          <input id="email" class="input" type="email" formControlName="email"
+                 placeholder="you@clinic.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="password">Password</label>
+        <div class="input-group input-group--right">
+          <input id="password" class="input" [type]="showPassword() ? 'text' : 'password'"
+                 formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="input-icon btn btn--ghost" style="pointer-events:auto"
+                  (click)="togglePassword()">
+            <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="16" />
+          </button>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="login-card__error">
+          <lucide-icon name="alert-circle" [size]="14" />
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <button type="submit" class="btn btn--primary w-full login-card__submit"
+              [disabled]="form.invalid || loading()">
+        @if (loading()) {
+          <span class="spinner spinner--sm spinner--white"></span>
+          Signing in…
+        } @else {
+          Sign in
+        }
+      </button>
+    </form>
+
+    <!-- Demo accounts -->
+    <div class="login-card__demo">
+      <p class="label">Demo accounts</p>
+      <div class="login-card__demo-btns">
+        <button class="btn btn--secondary btn--sm" (click)="fillDemo('admin')">Admin</button>
+        <button class="btn btn--secondary btn--sm" (click)="fillDemo('doctor')">Doctor</button>
+        <button class="btn btn--secondary btn--sm" (click)="fillDemo('receptionist')">Reception</button>
+      </div>
+    </div>
+  </div>
+</div>

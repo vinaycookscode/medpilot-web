@@ -1,0 +1,224 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.billing {
+  &__row { cursor: pointer; }
+
+  &__inv-num {
+    font-family: t.$font-mono;
+    font-size: t.$text-xs;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  &__patient-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__pagination {
+    @include m.flex-between;
+    padding: t.$sp-4 t.$sp-6;
+    border-top: 1px solid var(--border);
+  }
+
+  // ── Create form ──
+  &__form-body { @include m.flex-col(t.$sp-4); }
+
+  &__selected-patient {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-3;
+    background: var(--color-primary-subtle);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--color-primary-light);
+  }
+
+  &__patient-drop {
+    @include m.flex-col(0);
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  &__patient-item {
+    @include m.flex(center, flex-start, t.$sp-2);
+    padding: t.$sp-2 t.$sp-3;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    transition: background t.$t-fast t.$ease;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__section-header {
+    @include m.flex-between;
+    margin-bottom: t.$sp-2;
+  }
+
+  &__items-list { @include m.flex-col(t.$sp-2); }
+
+  &__item-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: t.$sp-2;
+    align-items: start;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3;
+
+    @include m.below(md) { grid-template-columns: 1fr 1fr; }
+
+    .input { height: 36px; font-size: t.$text-sm; }
+  }
+
+  &__item-remove {
+    color: var(--text-tertiary);
+    margin-top: 6px;
+    &:hover { color: var(--color-danger); }
+  }
+
+  &__totals {
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    padding: t.$sp-4;
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__total-row {
+    @include m.flex-between;
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+  }
+
+  &__total-grand {
+    @include m.flex-between;
+    font-size: t.$text-base;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding-top: t.$sp-2;
+    border-top: 1px solid var(--border);
+  }
+
+  // ── Prescription section in create form ──
+  &__rx-section {
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: t.$sp-3;
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__rx-item {
+    background: var(--surface-card);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3;
+    text-align: left;
+    width: 100%;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: border-color t.$t-fast t.$ease, background t.$t-fast t.$ease;
+    &:hover { border-color: var(--color-primary-light); background: var(--color-primary-subtle); }
+  }
+
+  &__rx-diagnosis {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__rx-meds {
+    @include m.flex(center, flex-start, t.$sp-1);
+    flex-wrap: wrap;
+    margin-top: t.$sp-1;
+  }
+
+  // ── Detail modal ──
+  &__detail-header {
+    @include m.flex-between;
+    margin-bottom: t.$sp-4;
+    @include m.below(sm) { flex-direction: column; gap: t.$sp-3; }
+  }
+
+  &__items-table {
+    width: 100%;
+    font-size: t.$text-sm;
+    border-collapse: collapse;
+
+    th {
+      text-align: left;
+      font-size: t.$text-xs;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      padding: t.$sp-2 t.$sp-3;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: t.$sp-2 t.$sp-3;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  // ── Prescription detail in invoice modal ──
+  &__rx-detail-item {
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3 t.$sp-4;
+    margin-bottom: t.$sp-3;
+    &:last-child { margin-bottom: 0; }
+  }
+
+  &__rx-med-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: t.$text-xs;
+
+    th {
+      text-align: left;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: t.$sp-1 t.$sp-2;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: t.$sp-1 t.$sp-2;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  // ── Payment modal ──
+  &__pay-form { @include m.flex-col(t.$sp-4); }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: t.$sp-4;
+
+  @include m.below(sm) { grid-template-columns: 1fr; }
+
+  &__full { grid-column: 1 / -1; }
+}

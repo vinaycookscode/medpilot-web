@@ -1,0 +1,426 @@
+<div class="page prescriptions">
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">Prescriptions</h2>
+      <p class="page__subtitle">{{ total() }} total</p>
+    </div>
+    @if (isDoctor()) {
+      <button class="btn btn--primary" (click)="openCreate()">
+        <lucide-icon name="plus" [size]="16" />
+        New Prescription
+      </button>
+    }
+  </div>
+
+  <!-- Table -->
+  <div class="card card--flush">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Diagnosis</th>
+            <th>Medicines</th>
+            <th>Date</th>
+            <th>Follow Up</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            @for (i of [1,2,3,4,5]; track i) {
+              <tr>@for (j of [1,2,3,4,5,6,7]; track j) {
+                <td><div class="skeleton" style="height:13px;border-radius:4px"></div></td>
+              }</tr>
+            }
+          } @else if (prescriptions().length === 0) {
+            <tr><td colspan="7">
+              <div class="empty-state">
+                <div class="empty-state__icon"><lucide-icon name="file-text" [size]="24" /></div>
+                <p class="empty-state__title">No prescriptions yet</p>
+                <p class="empty-state__subtitle">
+                  @if (isDoctor()) { Click "New Prescription" to create the first one }
+                  @else { Prescriptions written by doctors will appear here }
+                </p>
+              </div>
+            </td></tr>
+          } @else {
+            @for (rx of prescriptions(); track rx.id) {
+              <tr class="prescriptions__row" (click)="openDetail(rx)">
+                <td>
+                  <div class="d-flex items-center gap-2">
+                    <div class="avatar avatar--xs">
+                      {{ rx.patient?.firstName?.[0] }}{{ rx.patient?.lastName?.[0] }}
+                    </div>
+                    <div>
+                      <div class="prescriptions__patient-name">
+                        {{ rx.patient?.firstName }} {{ rx.patient?.lastName }}
+                      </div>
+                      <div class="prescriptions__patient-code">{{ rx.patient?.patientCode }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-sm">Dr. {{ rx.doctor?.lastName }}</td>
+                <td>
+                  <span class="prescriptions__diagnosis">{{ rx.diagnosis }}</span>
+                </td>
+                <td>
+                  <div class="prescriptions__med-pills">
+                    @for (m of (rx.medicines ?? []).slice(0, 2); track m.id) {
+                      <span class="chip">{{ m.medicineName }}</span>
+                    }
+                    @if ((rx.medicines ?? []).length > 2) {
+                      <span class="chip">+{{ (rx.medicines ?? []).length - 2 }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="text-sm">{{ rx.createdAt | date:'dd MMM yyyy' }}</td>
+                <td>
+                  @if (rx.followUpDate) {
+                    <span class="badge badge--primary">{{ rx.followUpDate | date:'dd MMM' }}</span>
+                  } @else {
+                    <span class="text-tertiary text-sm">—</span>
+                  }
+                </td>
+                <td>
+                  <button class="btn btn--ghost btn--icon btn--sm" title="View">
+                    <lucide-icon name="eye" [size]="15" />
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="prescriptions__pagination">
+        <span class="text-sm text-tertiary">Page {{ page() }} of {{ totalPages }}</span>
+        <div class="d-flex gap-2">
+          <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+            <lucide-icon name="chevron-left" [size]="14" /> Prev
+          </button>
+          <button class="btn btn--secondary btn--sm" [disabled]="page() === totalPages" (click)="nextPage()">
+            Next <lucide-icon name="chevron-right" [size]="14" />
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ── Detail Modal ── -->
+@if (showDetail()) {
+  <div class="modal-backdrop" (click)="closeDetail()">
+    <div class="modal modal--lg prescriptions__detail" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h3 class="modal__title">Prescription</h3>
+          <p class="text-sm text-tertiary">{{ showDetail()!.createdAt | date:'dd MMMM yyyy' }}</p>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="closeDetail()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <!-- Patient + Doctor row -->
+        <div class="prescriptions__detail-header">
+          <div class="prescriptions__detail-person">
+            <div class="avatar avatar--md">
+              {{ showDetail()!.patient?.firstName?.[0] }}{{ showDetail()!.patient?.lastName?.[0] }}
+            </div>
+            <div>
+              <p class="prescriptions__detail-name">
+                {{ showDetail()!.patient?.firstName }} {{ showDetail()!.patient?.lastName }}
+              </p>
+              <p class="text-xs text-tertiary">{{ showDetail()!.patient?.patientCode }} · {{ showDetail()!.patient?.phone }}</p>
+            </div>
+          </div>
+          <div class="prescriptions__detail-doctor">
+            <lucide-icon name="stethoscope" [size]="14" />
+            Dr. {{ showDetail()!.doctor?.firstName }} {{ showDetail()!.doctor?.lastName }}
+            <span class="text-xs text-tertiary" *ngIf="showDetail()!.doctor?.specialization">
+              · {{ showDetail()!.doctor?.specialization }}
+            </span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Diagnosis & Notes -->
+        <div class="prescriptions__section">
+          <p class="label mb-2">Diagnosis</p>
+          <p class="prescriptions__diagnosis-text">{{ showDetail()!.diagnosis }}</p>
+        </div>
+
+        @if (showDetail()!.chiefComplaint) {
+          <div class="prescriptions__section">
+            <p class="label mb-2">Chief Complaint</p>
+            <p class="text-sm text-secondary">{{ showDetail()!.chiefComplaint }}</p>
+          </div>
+        }
+
+        @if (showDetail()!.examinationNotes) {
+          <div class="prescriptions__section">
+            <p class="label mb-2">Examination Notes</p>
+            <p class="text-sm text-secondary">{{ showDetail()!.examinationNotes }}</p>
+          </div>
+        }
+
+        <!-- Medicines -->
+        @if (showDetail()!.medicines.length) {
+          <div class="prescriptions__section">
+            <p class="label mb-3">Medicines ({{ showDetail()!.medicines.length }})</p>
+            <div class="prescriptions__med-table">
+              @for (m of showDetail()!.medicines; track m.id; let i = $index) {
+                <div class="prescriptions__med-row">
+                  <div class="prescriptions__med-num">{{ i + 1 }}</div>
+                  <div class="prescriptions__med-info">
+                    <span class="prescriptions__med-name">{{ m.medicineName }}</span>
+                    <div class="prescriptions__med-meta">
+                      <span>{{ m.dosage }}</span>
+                      <span>·</span>
+                      <span>{{ m.frequency }}</span>
+                      <span>·</span>
+                      <span>{{ m.duration }}</span>
+                      @if (m.timing) { <span>· {{ m.timing }}</span> }
+                    </div>
+                    @if (m.instructions) {
+                      <p class="prescriptions__med-note">{{ m.instructions }}</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Tests -->
+        @if (showDetail()!.tests.length) {
+          <div class="prescriptions__section">
+            <p class="label mb-3">Tests ({{ showDetail()!.tests.length }})</p>
+            @for (t of showDetail()!.tests; track t.id) {
+              <div class="prescriptions__test-row">
+                <lucide-icon name="check-square" [size]="14" />
+                <span>{{ t.testName }}</span>
+                @if (t.instructions) {
+                  <span class="text-xs text-tertiary">— {{ t.instructions }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (showDetail()!.advice) {
+          <div class="prescriptions__section">
+            <p class="label mb-2">Advice</p>
+            <p class="text-sm text-secondary">{{ showDetail()!.advice }}</p>
+          </div>
+        }
+
+        @if (showDetail()!.followUpDate) {
+          <div class="prescriptions__section">
+            <p class="label mb-2">Follow Up</p>
+            <p class="text-sm">
+              <span class="badge badge--primary">{{ showDetail()!.followUpDate | date:'dd MMMM yyyy' }}</span>
+              @if (showDetail()!.followUpNotes) {
+                <span class="text-secondary ml-2">{{ showDetail()!.followUpNotes }}</span>
+              }
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Create Modal ── -->
+@if (showCreate()) {
+  <div class="modal-backdrop" (click)="closeCreate()">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">New Prescription</h3>
+        <button class="btn btn--ghost btn--icon" (click)="closeCreate()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="modal__body prescriptions__form-body">
+
+          <!-- Patient selector -->
+          <div class="field">
+            <label class="field__label">Patient *</label>
+            @if (selectedPatient()) {
+              <div class="prescriptions__selected-patient">
+                <div class="avatar avatar--sm">
+                  {{ selectedPatient()!.firstName[0] }}{{ selectedPatient()!.lastName[0] }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p style="font-size:13px;font-weight:600">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</p>
+                  <p class="text-xs text-tertiary">{{ selectedPatient()!.patientCode }} · {{ selectedPatient()!.phone }}</p>
+                </div>
+                <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
+                  <lucide-icon name="x" [size]="14" />
+                </button>
+              </div>
+            } @else {
+              <div class="input-group" style="position:relative">
+                <span class="input-icon"><lucide-icon name="search" [size]="16" /></span>
+                <input class="input" type="search" placeholder="Search patient by name or phone…"
+                       (input)="onPatientSearch($event)" />
+              </div>
+              @if (showPatientDrop() && patientResults().length > 0) {
+                <div class="prescriptions__patient-drop">
+                  @for (p of patientResults(); track p.id) {
+                    <button type="button" class="prescriptions__patient-item" (click)="selectPatient(p)">
+                      <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                      <div>
+                        <p style="font-size:13px;font-weight:600">{{ p.firstName }} {{ p.lastName }}</p>
+                        <p class="text-xs text-tertiary">{{ p.phone }} · {{ p.patientCode }}</p>
+                      </div>
+                    </button>
+                  }
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Diagnosis -->
+          <div class="form-grid">
+            <div class="field form-grid__full" style="position:relative">
+              <label class="field__label">Diagnosis *</label>
+              <input class="input" formControlName="diagnosis"
+                     placeholder="e.g. Upper Respiratory Tract Infection"
+                     (input)="onDiagnosisInput($event)"
+                     (blur)="closeDiagnosisDrop()"
+                     autocomplete="off" />
+              @if (showDiagnosisDrop() && diagnosisSuggestions().length > 0) {
+                <div class="prescriptions__patient-drop" style="z-index:30">
+                  @for (d of diagnosisSuggestions(); track d) {
+                    <button type="button" class="prescriptions__patient-item"
+                            (mousedown)="selectDiagnosis(d)">
+                      <lucide-icon name="stethoscope" [size]="13" style="color:var(--color-primary);flex-shrink:0" />
+                      <span style="font-size:13px">{{ d }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            <div class="field">
+              <label class="field__label">Chief Complaint</label>
+              <input class="input" formControlName="chiefComplaint" placeholder="Presenting complaints" />
+            </div>
+            <div class="field">
+              <label class="field__label">Follow Up Date</label>
+              <input class="input" type="date" formControlName="followUpDate" />
+            </div>
+            <div class="field form-grid__full">
+              <label class="field__label">Examination Notes</label>
+              <textarea class="input" formControlName="examinationNotes" rows="2" placeholder="Clinical findings…"></textarea>
+            </div>
+          </div>
+
+          <!-- Medicines -->
+          <div class="prescriptions__section-header">
+            <p class="label">Medicines</p>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="addMedicine()">
+              <lucide-icon name="plus" [size]="14" /> Add Medicine
+            </button>
+          </div>
+
+          <div formArrayName="medicines" class="prescriptions__med-list">
+            @for (med of medicines.controls; track $index; let i = $index) {
+              <div [formGroupName]="i" class="prescriptions__med-entry">
+                <div class="prescriptions__med-entry-num">{{ i + 1 }}</div>
+                <div class="prescriptions__med-entry-fields">
+                  <!-- Medicine name with autocomplete -->
+                  <div class="field" style="position:relative">
+                    <input class="input" formControlName="medicineName"
+                           placeholder="Medicine name"
+                           (input)="onMedicineNameInput($event, i)" />
+                    @if (activeMedIndex() === i && medicineResults().length > 0) {
+                      <div class="prescriptions__med-drop">
+                        @for (m of medicineResults(); track m.id) {
+                          <button type="button" class="prescriptions__med-drop-item"
+                                  (click)="selectMedicine(m, i)">
+                            <span style="font-weight:600;font-size:13px">{{ m.name }}</span>
+                            <span class="text-xs text-tertiary">{{ m.form }} · {{ m.strength }}</span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <input class="input" formControlName="dosage" placeholder="Dosage (e.g. 1 tab)" />
+                  <input class="input" formControlName="frequency" placeholder="Frequency (e.g. Twice daily)" />
+                  <input class="input" formControlName="duration" placeholder="Duration (e.g. 5 days)" />
+                  <input class="input" formControlName="timing" placeholder="Timing (optional)" />
+                </div>
+                <button type="button" class="btn btn--ghost btn--icon btn--sm prescriptions__med-remove"
+                        (click)="removeMedicine(i)">
+                  <lucide-icon name="trash-2" [size]="14" />
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Tests -->
+          <div class="prescriptions__section-header mt-4">
+            <p class="label">Lab Tests</p>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="addTest()">
+              <lucide-icon name="plus" [size]="14" /> Add Test
+            </button>
+          </div>
+
+          <div formArrayName="tests">
+            @for (test of tests.controls; track $index; let i = $index) {
+              <div [formGroupName]="i" class="prescriptions__test-entry">
+                <div class="flex-1" style="position:relative">
+                  <input class="input" style="width:100%" formControlName="testName"
+                         placeholder="Test name (e.g. CBC, LFT)"
+                         (input)="onTestNameInput($event, i)"
+                         (blur)="activeTestIndex.set(null)"
+                         autocomplete="off" />
+                  @if (activeTestIndex() === i && testSuggestions().length > 0) {
+                    <div class="prescriptions__med-drop" style="z-index:30">
+                      @for (t of testSuggestions(); track t) {
+                        <button type="button" class="prescriptions__med-drop-item"
+                                (mousedown)="selectTest(t, i)">
+                          <span style="font-size:13px">{{ t }}</span>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+                <input class="input flex-1" formControlName="instructions" placeholder="Instructions (optional)" />
+                <button type="button" class="btn btn--ghost btn--icon btn--sm prescriptions__med-remove"
+                        (click)="removeTest(i)">
+                  <lucide-icon name="trash-2" [size]="14" />
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Advice -->
+          <div class="field mt-4">
+            <label class="field__label">Advice / Instructions</label>
+            <textarea class="input" formControlName="advice" rows="2"
+                      placeholder="Dietary advice, lifestyle recommendations…"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--secondary" (click)="closeCreate()">Cancel</button>
+          <button type="submit" class="btn btn--primary" [disabled]="form.invalid || saving()">
+            @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Save Prescription
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

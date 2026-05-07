@@ -1,0 +1,242 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.prescriptions {
+  &__row { cursor: pointer; }
+
+  &__patient-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__patient-code {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    font-family: t.$font-mono;
+  }
+
+  &__diagnosis {
+    font-size: t.$text-sm;
+    color: var(--text-primary);
+    max-width: 220px;
+    @include m.truncate;
+    display: block;
+  }
+
+  &__med-pills {
+    @include m.flex(center, flex-start, t.$sp-1);
+    flex-wrap: wrap;
+  }
+
+  &__pagination {
+    @include m.flex-between;
+    padding: t.$sp-4 t.$sp-6;
+    border-top: 1px solid var(--border);
+  }
+
+  // ── Detail modal ──
+  &__detail-header {
+    @include m.flex-between;
+    margin-bottom: t.$sp-4;
+
+    @include m.below(sm) { flex-direction: column; gap: t.$sp-3; }
+  }
+
+  &__detail-person { @include m.flex(center, flex-start, t.$sp-3); }
+
+  &__detail-name {
+    font-size: t.$text-base;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__detail-doctor {
+    @include m.flex(center, flex-start, t.$sp-1);
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--surface-input);
+    padding: t.$sp-2 t.$sp-3;
+    border-radius: var(--radius-md);
+  }
+
+  &__section {
+    margin-bottom: t.$sp-5;
+    &:last-child { margin-bottom: 0; }
+  }
+
+  &__diagnosis-text {
+    font-size: t.$text-base;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__med-table { @include m.flex-col(t.$sp-3); }
+
+  &__med-row {
+    @include m.flex(flex-start, flex-start, t.$sp-3);
+    padding: t.$sp-3;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+  }
+
+  &__med-num {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    @include m.flex-center;
+    font-size: t.$text-xs;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__med-info { @include m.flex-col(4px); flex: 1; }
+
+  &__med-name {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__med-meta {
+    @include m.flex(center, flex-start, t.$sp-1);
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+  }
+
+  &__med-note {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+
+  &__test-row {
+    @include m.flex(center, flex-start, t.$sp-2);
+    font-size: t.$text-sm;
+    color: var(--text-primary);
+    padding: t.$sp-2 0;
+    border-bottom: 1px solid var(--border);
+    &:last-child { border-bottom: none; }
+  }
+
+  // ── Create form ──
+  &__form-body { @include m.flex-col(t.$sp-4); }
+
+  &__selected-patient {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-3;
+    background: var(--color-primary-subtle);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--color-primary-light);
+  }
+
+  &__patient-drop {
+    @include m.flex-col(0);
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  &__patient-item {
+    @include m.flex(center, flex-start, t.$sp-2);
+    padding: t.$sp-2 t.$sp-3;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    transition: background t.$t-fast t.$ease;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__section-header {
+    @include m.flex-between;
+    margin-bottom: t.$sp-2;
+  }
+
+  &__med-list { @include m.flex-col(t.$sp-3); }
+
+  &__med-entry {
+    @include m.flex(flex-start, flex-start, t.$sp-2);
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3;
+  }
+
+  &__med-entry-num {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    @include m.flex-center;
+    font-size: t.$text-xs;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 10px;
+  }
+
+  &__med-entry-fields {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: t.$sp-2;
+    flex: 1;
+
+    @include m.below(md) { grid-template-columns: 1fr 1fr; }
+
+    .input { height: 36px; font-size: t.$text-sm; }
+  }
+
+  &__med-drop {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 20;
+    overflow: hidden;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  &__med-drop-item {
+    @include m.flex(center, space-between, t.$sp-2);
+    padding: t.$sp-2 t.$sp-3;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    text-align: left;
+    transition: background t.$t-fast t.$ease;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__med-remove {
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    margin-top: 6px;
+    &:hover { color: var(--color-danger); }
+  }
+
+  &__test-entry {
+    @include m.flex(center, flex-start, t.$sp-2);
+    margin-bottom: t.$sp-2;
+    .input { height: 36px; font-size: t.$text-sm; }
+  }
+}

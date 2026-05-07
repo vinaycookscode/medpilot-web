@@ -1,0 +1,118 @@
+@use '../../../styles/tokens' as t;
+@use '../../../styles/mixins' as m;
+
+.settings {
+  &__layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: t.$sp-6;
+    align-items: start;
+
+    @include m.below(md) { grid-template-columns: 1fr; }
+  }
+
+  // ── Side nav ──
+  &__nav {
+    @include m.flex-col(2px);
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: t.$sp-3;
+    position: sticky;
+    top: calc(var(--topbar-height) + 24px);
+  }
+
+  &__nav-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-2 t.$sp-3;
+    border-radius: var(--radius-md);
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all t.$t-fast t.$ease;
+    text-align: left;
+
+    &:hover { background: var(--surface-input); color: var(--text-primary); }
+
+    &--active {
+      background: var(--color-primary-subtle);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+  }
+
+  // ── Profile card ──
+  &__profile-header {
+    @include m.flex(center, flex-start, t.$sp-4);
+    margin-bottom: t.$sp-4;
+  }
+
+  &__profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: white;
+    @include m.flex-center;
+    font-size: t.$text-xl;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__profile-name {
+    font-size: t.$text-lg;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__profile-email {
+    font-size: t.$text-sm;
+    color: var(--text-tertiary);
+    margin-top: t.$sp-1;
+  }
+
+  // ── Password form ──
+  &__pw-form {
+    @include m.flex-col(t.$sp-4);
+    max-width: 400px;
+  }
+
+  &__pw-actions {
+    @include m.flex(center, flex-end, t.$sp-3);
+    margin-top: t.$sp-2;
+  }
+
+  // ── Session ──
+  &__session {
+    @include m.flex(center, flex-start, t.$sp-3);
+  }
+
+  &__session-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--color-success-subtle);
+    color: var(--color-success);
+    @include m.flex-center;
+    flex-shrink: 0;
+  }
+
+  // ── Clinic ──
+  &__clinic-header {
+    @include m.flex(center, flex-start, t.$sp-4);
+    margin-bottom: t.$sp-4;
+  }
+
+  &__clinic-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    @include m.flex-center;
+    flex-shrink: 0;
+  }
+}
