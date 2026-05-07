@@ -1,0 +1,229 @@
+<div class="home">
+
+  <!-- ── Navbar ── -->
+  <nav class="hn">
+    <div class="hn__inner">
+      <a class="hn__brand" routerLink="/">
+        <div class="hn__logo"><lucide-icon name="stethoscope" [size]="18" /></div>
+        <span>MedPilot</span>
+      </a>
+      <a routerLink="/login" class="btn btn--primary">Sign In</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero__left">
+      <div class="hero__badge">
+        <lucide-icon name="sparkles" [size]="13" />
+        <span>Complete clinic management, zero complexity</span>
+      </div>
+      <h1 class="hero__h1">
+        Your clinic,<br>running at its<br>
+        <span class="hero__h1-grad">best.</span>
+      </h1>
+      <p class="hero__sub">
+        MedPilot brings appointments, patients, prescriptions, and billing
+        into one seamless workflow — built for doctors and receptionists
+        who value their time.
+      </p>
+      <div class="hero__ctas">
+        <a routerLink="/login" class="btn btn--primary btn--lg hero__cta-primary">
+          Get Started Free
+          <lucide-icon name="arrow-right" [size]="16" />
+        </a>
+        <a href="#features" class="btn btn--ghost btn--lg">Explore Features</a>
+      </div>
+      <div class="hero__trust">
+        <div class="hero__trust-item">
+          <lucide-icon name="shield-check" [size]="14" />
+          <span>Secure &amp; private</span>
+        </div>
+        <div class="hero__trust-sep"></div>
+        <div class="hero__trust-item">
+          <lucide-icon name="check-circle-2" [size]="14" />
+          <span>No credit card needed</span>
+        </div>
+        <div class="hero__trust-sep"></div>
+        <div class="hero__trust-item">
+          <lucide-icon name="trending-up" [size]="14" />
+          <span>Live in 3 minutes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__right">
+      <!-- Floating mock dashboard UI -->
+      <div class="mockui">
+        <div class="mockui__bar">
+          <span class="mockui__dot mockui__dot--r"></span>
+          <span class="mockui__dot mockui__dot--y"></span>
+          <span class="mockui__dot mockui__dot--g"></span>
+          <span class="mockui__bar-title">MedPilot — Dashboard</span>
+        </div>
+        <div class="mockui__body">
+          <div class="mockui__stats">
+            <div class="mockui__stat mockui__stat--blue">
+              <div class="mockui__stat-val">24</div>
+              <div class="mockui__stat-lbl">Appointments</div>
+            </div>
+            <div class="mockui__stat mockui__stat--green">
+              <div class="mockui__stat-val">₹1.2L</div>
+              <div class="mockui__stat-lbl">Revenue</div>
+            </div>
+            <div class="mockui__stat mockui__stat--purple">
+              <div class="mockui__stat-val">156</div>
+              <div class="mockui__stat-lbl">Patients</div>
+            </div>
+          </div>
+
+          <div class="mockui__section-title">Today's Appointments</div>
+          <div class="mockui__list">
+            <div class="mockui__row">
+              <div class="mockui__av mockui__av--blue">AK</div>
+              <div class="mockui__info">
+                <div class="mockui__name">Arjun Kumar</div>
+                <div class="mockui__meta">9:30 AM · General</div>
+              </div>
+              <div class="mockui__pill mockui__pill--green">Confirmed</div>
+            </div>
+            <div class="mockui__row">
+              <div class="mockui__av mockui__av--purple">PS</div>
+              <div class="mockui__info">
+                <div class="mockui__name">Priya Sharma</div>
+                <div class="mockui__meta">10:15 AM · Follow-up</div>
+              </div>
+              <div class="mockui__pill mockui__pill--yellow">Pending</div>
+            </div>
+            <div class="mockui__row">
+              <div class="mockui__av mockui__av--teal">RV</div>
+              <div class="mockui__info">
+                <div class="mockui__name">Rahul Verma</div>
+                <div class="mockui__meta">11:00 AM · Cardiology</div>
+              </div>
+              <div class="mockui__pill mockui__pill--blue">Confirmed</div>
+            </div>
+          </div>
+
+          <div class="mockui__section-title" style="margin-top: 12px">Recent Billing</div>
+          <div class="mockui__billing">
+            <div class="mockui__bill-row">
+              <span class="mockui__bill-name">Invoice #1042</span>
+              <span class="mockui__bill-amt">₹850</span>
+              <span class="mockui__pill mockui__pill--green">Paid</span>
+            </div>
+            <div class="mockui__bill-row">
+              <span class="mockui__bill-name">Invoice #1041</span>
+              <span class="mockui__bill-amt">₹1,200</span>
+              <span class="mockui__pill mockui__pill--yellow">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating accent cards -->
+      <div class="hero__float-card hero__float-card--rx">
+        <lucide-icon name="file-text" [size]="16" />
+        <div>
+          <div class="hero__float-card-title">Prescription written</div>
+          <div class="hero__float-card-sub">Amoxicillin 500mg · 5 days</div>
+        </div>
+      </div>
+
+      <div class="hero__float-card hero__float-card--followup">
+        <lucide-icon name="calendar-check" [size]="16" />
+        <div>
+          <div class="hero__float-card-title">3 follow-ups today</div>
+          <div class="hero__float-card-sub">2 overdue · 1 upcoming</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats strip ── -->
+  <div class="stats-strip">
+    <div class="stats-strip__inner">
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">10,000+</div>
+        <div class="stats-strip__lbl">Appointments managed</div>
+      </div>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">500+</div>
+        <div class="stats-strip__lbl">Clinics onboarded</div>
+      </div>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">98%</div>
+        <div class="stats-strip__lbl">Satisfaction rate</div>
+      </div>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">&lt; 3 min</div>
+        <div class="stats-strip__lbl">Average setup time</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Features ── -->
+  <section class="feats" id="features">
+    <div class="feats__head">
+      <div class="sec-badge">Features</div>
+      <h2 class="feats__h2">Everything your clinic needs</h2>
+      <p class="feats__sub">From the first appointment to the final invoice — MedPilot handles it all.</p>
+    </div>
+    <div class="feats__grid">
+      @for (f of features; track f.title) {
+        <div class="fc">
+          <div class="fc__icon" [style.background]="f.bg" [style.color]="f.color">
+            <lucide-icon [name]="f.icon" [size]="22" />
+          </div>
+          <h3 class="fc__title">{{ f.title }}</h3>
+          <p class="fc__desc">{{ f.desc }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── How it works ── -->
+  <section class="hiw">
+    <div class="hiw__head">
+      <div class="sec-badge">How it works</div>
+      <h2 class="hiw__h2">Live in under 3 minutes</h2>
+    </div>
+    <div class="hiw__steps">
+      @for (s of steps; track s.num) {
+        <div class="hiw__step">
+          <div class="hiw__step-num">{{ s.num }}</div>
+          <h3 class="hiw__step-title">{{ s.title }}</h3>
+          <p class="hiw__step-desc">{{ s.desc }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-band">
+    <div class="cta-band__inner">
+      <div class="cta-band__icon"><lucide-icon name="stethoscope" [size]="30" /></div>
+      <h2 class="cta-band__h2">Ready to transform your clinic?</h2>
+      <p class="cta-band__sub">Join clinics using MedPilot to deliver better care, faster.</p>
+      <a routerLink="/login" class="btn btn--lg cta-band__btn">
+        Get Started Free
+        <lucide-icon name="arrow-right" [size]="16" />
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="hf">
+    <div class="hf__inner">
+      <div class="hf__brand">
+        <div class="hf__logo"><lucide-icon name="stethoscope" [size]="15" /></div>
+        <span>MedPilot</span>
+      </div>
+      <p class="hf__copy">© 2026 MedPilot · Built for modern healthcare</p>
+    </div>
+  </footer>
+
+</div>

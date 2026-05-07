@@ -16,6 +16,8 @@ import {
   Pill, FlaskConical, Info,
   // Follow-ups
   CalendarCheck, RefreshCw,
+  // Landing page
+  ArrowRight, TrendingUp, Sparkles,
 } from 'lucide-angular';
 
 @NgModule({
@@ -33,6 +35,7 @@ import {
       Printer, CreditCard,
       Pill, FlaskConical, Info,
       CalendarCheck, RefreshCw,
+      ArrowRight, TrendingUp, Sparkles,
     }),
   ],
   exports: [LucideAngularModule],
