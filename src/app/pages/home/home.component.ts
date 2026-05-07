@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
 
@@ -9,7 +9,43 @@ import { IconsModule } from '../../shared/icons';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit, OnDestroy {
+  readonly activeStep = signal(0);
+  private stepTimer: ReturnType<typeof setInterval> | null = null;
+
+  readonly demoSteps = [
+    {
+      id: 0, icon: 'user-check', label: 'Patient Check-in',
+      desc: 'Patient arrives and is registered in under 30 seconds.',
+    },
+    {
+      id: 1, icon: 'stethoscope', label: 'Doctor Examines',
+      desc: 'Doctor reviews history, records vitals and findings.',
+    },
+    {
+      id: 2, icon: 'file-text', label: 'Prescription Written',
+      desc: 'Digital Rx created with medicines, dosage and follow-up date.',
+    },
+    {
+      id: 3, icon: 'receipt', label: 'Bill & Discharge',
+      desc: 'Invoice auto-generated and patient discharged seamlessly.',
+    },
+  ];
+
+  setStep(i: number) {
+    this.activeStep.set(i);
+    if (this.stepTimer) clearInterval(this.stepTimer);
+    this.stepTimer = setInterval(() => this.activeStep.update(s => (s + 1) % 4), 3200);
+  }
+
+  ngOnInit() {
+    this.stepTimer = setInterval(() => this.activeStep.update(s => (s + 1) % 4), 3200);
+  }
+
+  ngOnDestroy() {
+    if (this.stepTimer) clearInterval(this.stepTimer);
+  }
+
   readonly features = [
     {
       title: 'Smart Scheduling',

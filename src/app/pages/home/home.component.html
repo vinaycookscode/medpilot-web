@@ -140,6 +140,145 @@
     </div>
   </section>
 
+  <!-- ── Clinic Demo Animation ── -->
+  <section class="demo">
+    <div class="demo__inner">
+      <div class="demo__head">
+        <div class="sec-badge">Patient Journey</div>
+        <h2 class="demo__h2">Watch MedPilot in action</h2>
+        <p class="demo__sub">Every patient visit — from check-in to discharge — guided seamlessly in real time.</p>
+      </div>
+
+      <div class="demo__layout">
+
+        <!-- ── Animated Clinic Scene ── -->
+        <div class="demo__scene">
+
+          <!-- ECG monitor (top-right) -->
+          <div class="ecg-mon" [class.ecg-mon--active]="activeStep() === 1">
+            <div class="ecg-mon__top">
+              <span class="ecg-mon__status-dot"></span>
+              <span class="ecg-mon__label">ECG Monitor</span>
+              <span class="ecg-mon__bpm">{{ activeStep() === 1 ? '92' : '72' }} BPM</span>
+            </div>
+            <div class="ecg-mon__screen">
+              <svg viewBox="0 0 280 50" class="ecg-svg" preserveAspectRatio="none">
+                <polyline class="ecg-svg__line" points="0,25 30,25 35,25 40,5 45,45 50,25 80,25 85,5 90,45 95,25 125,25 130,5 135,45 140,25 170,25 175,5 180,45 185,25 215,25 220,5 225,45 230,25 280,25"/>
+                <line class="ecg-svg__scan" x1="0" y1="0" x2="0" y2="50"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Doctor figure -->
+          <div class="fig fig--doc" [class.fig--examining]="activeStep() === 1" [class.fig--writing]="activeStep() === 2">
+            <div class="fig__head">
+              <div class="fig__hair"></div>
+            </div>
+            <div class="fig__body fig__body--coat">
+              <div class="fig__stripe"></div>
+              <div class="fig__id-badge"></div>
+            </div>
+            <div class="fig__arm fig__arm--dl"></div>
+            <div class="fig__arm fig__arm--dr"></div>
+            <div class="fig__steth" [class.fig__steth--glow]="activeStep() === 1"></div>
+            <span class="fig__name">Dr. Patel</span>
+          </div>
+
+          <!-- Exam table -->
+          <div class="exam-table">
+            <div class="exam-table__surface"></div>
+            <div class="exam-table__leg exam-table__leg--l"></div>
+            <div class="exam-table__leg exam-table__leg--r"></div>
+          </div>
+
+          <!-- Patient figure -->
+          <div class="fig fig--patient" [class.fig--arrived]="activeStep() >= 0">
+            <div class="fig__head fig__head--pt">
+              <div class="fig__hair fig__hair--pt"></div>
+            </div>
+            <div class="fig__body fig__body--pt"></div>
+            <div class="fig__arm fig__arm--pl"></div>
+            @if (activeStep() === 1) {
+              <div class="fig__pulse">
+                <div class="fig__pulse-ring"></div>
+                <div class="fig__pulse-ring fig__pulse-ring--2"></div>
+                <div class="fig__pulse-ring fig__pulse-ring--3"></div>
+              </div>
+            }
+            <span class="fig__name">Arjun K.</span>
+          </div>
+
+          <!-- Prescription clipboard (step 2) -->
+          @if (activeStep() === 2) {
+            <div class="clipboard">
+              <div class="clipboard__clip"></div>
+              <div class="clipboard__line"></div>
+              <div class="clipboard__line clipboard__line--2"></div>
+              <div class="clipboard__line clipboard__line--3"></div>
+              <div class="clipboard__pen"></div>
+            </div>
+          }
+
+          <!-- Activity cards (one per step, positioned around scene) -->
+          <div class="act act--tl" [class.act--on]="activeStep() === 0">
+            <lucide-icon name="calendar-check" [size]="14" />
+            <div>
+              <div class="act__title">Patient checked in</div>
+              <div class="act__sub">Arjun Kumar · 9:30 AM</div>
+            </div>
+          </div>
+          <div class="act act--tr" [class.act--on]="activeStep() === 1">
+            <lucide-icon name="stethoscope" [size]="14" />
+            <div>
+              <div class="act__title">Vitals recorded</div>
+              <div class="act__sub">BP 120/80 · Temp 98.4°F</div>
+            </div>
+          </div>
+          <div class="act act--bl" [class.act--on]="activeStep() === 2">
+            <lucide-icon name="pill" [size]="14" />
+            <div>
+              <div class="act__title">Prescription written</div>
+              <div class="act__sub">Amoxicillin 500mg · 5 days</div>
+            </div>
+          </div>
+          <div class="act act--br" [class.act--on]="activeStep() === 3">
+            <lucide-icon name="receipt" [size]="14" />
+            <div>
+              <div class="act__title">Invoice generated</div>
+              <div class="act__sub">₹850 · Paid ✓</div>
+            </div>
+          </div>
+
+        </div><!-- /demo__scene -->
+
+        <!-- ── Step Progress Panel ── -->
+        <div class="demo__steps">
+          @for (step of demoSteps; track step.id; let i = $index) {
+            <div class="dstep"
+                 [class.dstep--active]="activeStep() === i"
+                 [class.dstep--done]="activeStep() > i"
+                 (click)="setStep(i)">
+              <div class="dstep__icon">
+                <lucide-icon [name]="step.icon" [size]="18" />
+              </div>
+              <div class="dstep__body">
+                <div class="dstep__title">{{ step.label }}</div>
+                <div class="dstep__desc">{{ step.desc }}</div>
+                @if (activeStep() === i) {
+                  <div class="dstep__bar"><div class="dstep__bar-fill"></div></div>
+                }
+              </div>
+              @if (activeStep() > i) {
+                <div class="dstep__check"><lucide-icon name="check-circle-2" [size]="16" /></div>
+              }
+            </div>
+          }
+        </div>
+
+      </div><!-- /demo__layout -->
+    </div>
+  </section>
+
   <!-- ── Stats strip ── -->
   <div class="stats-strip">
     <div class="stats-strip__inner">
