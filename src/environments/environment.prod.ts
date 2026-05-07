@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.gotwell.org/api/v1',
+  apiUrl: 'https://medpilot-api-production.up.railway.app/api/v1',
 };
