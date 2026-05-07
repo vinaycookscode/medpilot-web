@@ -1,56 +1,139 @@
 <div class="login-page">
-  <div class="login-card">
-    <!-- Logo -->
-    <div class="login-card__brand">
-      <div class="login-card__brand-icon">
-        <lucide-icon name="stethoscope" [size]="28" />
-      </div>
-      <h1 class="login-card__brand-name">MedPilot</h1>
-      <p class="login-card__brand-sub">Clinic Management System</p>
+
+  <!-- ── Left: Animated Hospital Scene ── -->
+  <div class="lp-anim">
+
+    <!-- Dot grid overlay -->
+    <div class="lp-anim__grid"></div>
+
+    <!-- Brand top-left -->
+    <div class="lp-anim__brand">
+      <div class="lp-anim__logo"><lucide-icon name="stethoscope" [size]="22" /></div>
+      <span class="lp-anim__brand-name">MedPilot</span>
     </div>
 
-    <!-- Form -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-card__form">
-      <div class="field">
-        <label class="field__label" for="email">Email</label>
-        <div class="input-group">
-          <span class="input-icon">
-            <lucide-icon name="mail" [size]="16" />
-          </span>
-          <input id="email" class="input" type="email" formControlName="email"
-                 placeholder="you@clinic.com" autocomplete="email" />
-        </div>
+    <!-- Central scan rings + cross -->
+    <div class="lp-center">
+      <div class="lp-scan lp-scan--outer"></div>
+      <div class="lp-scan lp-scan--mid"></div>
+      <div class="lp-scan lp-scan--inner"></div>
+      <div class="lp-pulse-ring lp-pulse-ring--1"></div>
+      <div class="lp-pulse-ring lp-pulse-ring--2"></div>
+      <div class="lp-pulse-ring lp-pulse-ring--3"></div>
+      <div class="lp-cross-icon">
+        <div class="lp-cross-icon__h"></div>
+        <div class="lp-cross-icon__v"></div>
       </div>
+    </div>
 
-      <div class="field">
-        <label class="field__label" for="password">Password</label>
-        <div class="input-group input-group--right">
-          <input id="password" class="input" [type]="showPassword() ? 'text' : 'password'"
-                 formControlName="password" placeholder="••••••••" autocomplete="current-password" />
-          <button type="button" class="input-icon btn btn--ghost" style="pointer-events:auto"
-                  (click)="togglePassword()">
-            <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="16" />
-          </button>
-        </div>
+    <!-- ECG line (full-width, lower area) -->
+    <div class="lp-ecg">
+      <svg viewBox="0 0 900 70" class="lp-ecg__svg" preserveAspectRatio="none">
+        <path class="lp-ecg__path"
+          d="M0,35 L80,35 L90,35 L100,5 L110,65 L120,35 L180,35
+             L190,5 L200,65 L210,35 L280,35 L290,5 L300,65 L310,35
+             L380,35 L390,5 L400,65 L410,35 L480,35 L490,5 L500,65
+             L510,35 L580,35 L590,5 L600,65 L610,35 L680,35 L690,5
+             L700,65 L710,35 L780,35 L790,5 L800,65 L810,35 L900,35"/>
+      </svg>
+    </div>
+
+    <!-- Floating medical + symbols -->
+    <span class="lp-plus lp-plus--1">+</span>
+    <span class="lp-plus lp-plus--2">+</span>
+    <span class="lp-plus lp-plus--3">+</span>
+    <span class="lp-plus lp-plus--4">+</span>
+    <span class="lp-plus lp-plus--5">+</span>
+    <span class="lp-plus lp-plus--6">+</span>
+    <span class="lp-plus lp-plus--7">+</span>
+    <span class="lp-plus lp-plus--8">+</span>
+
+    <!-- Floating stat cards -->
+    <div class="lp-card lp-card--1">
+      <div class="lp-card__dot lp-card__dot--green"></div>
+      <lucide-icon name="users" [size]="15" />
+      <div>
+        <div class="lp-card__val">2,400+</div>
+        <div class="lp-card__lbl">Active patients</div>
       </div>
+    </div>
+    <div class="lp-card lp-card--2">
+      <div class="lp-card__dot lp-card__dot--blue"></div>
+      <lucide-icon name="calendar-check" [size]="15" />
+      <div>
+        <div class="lp-card__val">98%</div>
+        <div class="lp-card__lbl">Satisfaction rate</div>
+      </div>
+    </div>
+    <div class="lp-card lp-card--3">
+      <div class="lp-card__dot lp-card__dot--purple"></div>
+      <lucide-icon name="shield-check" [size]="15" />
+      <div>
+        <div class="lp-card__val">Secure</div>
+        <div class="lp-card__lbl">HIPAA compliant</div>
+      </div>
+    </div>
 
-      @if (errorMessage()) {
-        <div class="login-card__error">
-          <lucide-icon name="alert-circle" [size]="14" />
-          {{ errorMessage() }}
-        </div>
-      }
-
-      <button type="submit" class="btn btn--primary w-full login-card__submit"
-              [disabled]="form.invalid || loading()">
-        @if (loading()) {
-          <span class="spinner spinner--sm spinner--white"></span>
-          Signing in…
-        } @else {
-          Sign in
-        }
-      </button>
-    </form>
+    <!-- Bottom quote -->
+    <p class="lp-anim__quote">
+      "Better technology.<br>Better patient care."
+    </p>
 
   </div>
+
+  <!-- ── Right: Login form panel ── -->
+  <div class="lp-form">
+    <div class="login-card">
+      <div class="login-card__brand">
+        <div class="login-card__brand-icon">
+          <lucide-icon name="stethoscope" [size]="28" />
+        </div>
+        <h1 class="login-card__brand-name">Welcome back</h1>
+        <p class="login-card__brand-sub">Sign in to your clinic</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-card__form">
+        <div class="field">
+          <label class="field__label" for="email">Email</label>
+          <div class="input-group">
+            <span class="input-icon">
+              <lucide-icon name="mail" [size]="16" />
+            </span>
+            <input id="email" class="input" type="email" formControlName="email"
+                   placeholder="you@clinic.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="password">Password</label>
+          <div class="input-group input-group--right">
+            <input id="password" class="input" [type]="showPassword() ? 'text' : 'password'"
+                   formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="input-icon btn btn--ghost" style="pointer-events:auto"
+                    (click)="togglePassword()">
+              <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="16" />
+            </button>
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="login-card__error">
+            <lucide-icon name="alert-circle" [size]="14" />
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <button type="submit" class="btn btn--primary w-full login-card__submit"
+                [disabled]="form.invalid || loading()">
+          @if (loading()) {
+            <span class="spinner spinner--sm spinner--white"></span>
+            Signing in…
+          } @else {
+            Sign in
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+
 </div>

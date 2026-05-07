@@ -1,21 +1,347 @@
 @use '../../../styles/tokens' as t;
 @use '../../../styles/mixins' as m;
 
+// ─── Page shell ───────────────────────────────────────────────
 .login-page {
   min-height: 100vh;
-  background: var(--surface-page);
-  @include m.flex-center;
-  padding: t.$sp-6;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
+// ─── Animated left panel ──────────────────────────────────────
+.lp-anim {
+  background: #050d1a;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 900px) { display: none; }
+
+  // Dot grid overlay
+  &__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(0, 122, 255, 0.18) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none;
+  }
+
+  // Top-left brand
+  &__brand {
+    position: absolute;
+    top: 32px;
+    left: 36px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  &__logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__brand-name {
+    font-size: t.$text-lg;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #fff;
+  }
+
+  // Bottom quote
+  &__quote {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: t.$text-lg;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    z-index: 10;
+  }
+}
+
+// ─── Central scan rings ───────────────────────────────────────
+.lp-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.lp-scan {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &--outer {
+    width: 320px;
+    height: 320px;
+    border: 1px solid rgba(0, 122, 255, 0.08);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(0, 122, 255, 0.45) 15%,
+        transparent 15%
+      );
+      animation: scan-rotate 5s linear infinite;
+    }
+  }
+
+  &--mid {
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(0, 122, 255, 0.12);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 180deg,
+        transparent 0%,
+        rgba(90, 200, 250, 0.35) 12%,
+        transparent 12%
+      );
+      animation: scan-rotate 7s linear infinite reverse;
+    }
+  }
+
+  &--inner {
+    width: 130px;
+    height: 130px;
+    border: 1px solid rgba(0, 122, 255, 0.15);
+  }
+}
+
+@keyframes scan-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+// ─── Pulse rings ──────────────────────────────────────────────
+.lp-pulse-ring {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  border: 1.5px solid rgba(0, 122, 255, 0.5);
+  border-radius: 50%;
+  animation: lp-pulse 3.6s ease-out infinite;
+
+  &--2 { animation-delay: 1.2s; }
+  &--3 { animation-delay: 2.4s; }
+}
+
+@keyframes lp-pulse {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(6);   opacity: 0; }
+}
+
+// ─── Medical cross icon ───────────────────────────────────────
+.lp-cross-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  animation: cross-glow 3s ease-in-out infinite;
+
+  &__h {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 14px;
+    transform: translateY(-50%);
+    background: rgba(0, 122, 255, 0.7);
+    border-radius: 4px;
+    box-shadow: 0 0 16px rgba(0, 122, 255, 0.6);
+  }
+
+  &__v {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    transform: translateX(-50%);
+    background: rgba(0, 122, 255, 0.7);
+    border-radius: 4px;
+    box-shadow: 0 0 16px rgba(0, 122, 255, 0.6);
+  }
+}
+
+@keyframes cross-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(0, 122, 255, 0.5)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(0, 122, 255, 0.9)); }
+}
+
+// ─── ECG line ─────────────────────────────────────────────────
+.lp-ecg {
+  position: absolute;
+  bottom: 22%;
+  left: 0;
+  right: 0;
+
+  &__svg {
+    width: 100%;
+    height: 70px;
+    display: block;
+  }
+
+  &__path {
+    fill: none;
+    stroke: #34C759;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px rgba(52, 199, 89, 0.6));
+    stroke-dasharray: 2400;
+    stroke-dashoffset: 2400;
+    animation: ecg-trace 4s linear infinite;
+  }
+}
+
+@keyframes ecg-trace {
+  0%   { stroke-dashoffset: 2400; opacity: 0; }
+  8%   { opacity: 1; }
+  75%  { stroke-dashoffset: 0;    opacity: 1; }
+  90%  { stroke-dashoffset: 0;    opacity: 0.6; }
+  100% { stroke-dashoffset: 0;    opacity: 0; }
+}
+
+// ─── Floating medical + symbols ───────────────────────────────
+.lp-plus {
+  position: absolute;
+  font-weight: 200;
+  color: rgba(0, 122, 255, 0.2);
+  user-select: none;
+  pointer-events: none;
+  animation: plus-rise linear infinite;
+
+  &--1 { font-size: 28px; left: 8%;  bottom: -40px; animation-duration: 13s; animation-delay: 0s; }
+  &--2 { font-size: 16px; left: 20%; bottom: -40px; animation-duration: 9s;  animation-delay: 2s; }
+  &--3 { font-size: 36px; left: 38%; bottom: -40px; animation-duration: 15s; animation-delay: 6s; }
+  &--4 { font-size: 20px; left: 55%; bottom: -40px; animation-duration: 11s; animation-delay: 1s; }
+  &--5 { font-size: 14px; left: 68%; bottom: -40px; animation-duration: 8s;  animation-delay: 3.5s; }
+  &--6 { font-size: 44px; left: 12%; bottom: -40px; animation-duration: 18s; animation-delay: 8s; }
+  &--7 { font-size: 22px; left: 80%; bottom: -40px; animation-duration: 12s; animation-delay: 4s; }
+  &--8 { font-size: 18px; left: 45%; bottom: -40px; animation-duration: 10s; animation-delay: 7s; }
+}
+
+@keyframes plus-rise {
+  0%   { transform: translateY(0)      rotate(0deg);   opacity: 0; }
+  10%  { opacity: 1; }
+  85%  { opacity: 0.6; }
+  100% { transform: translateY(-105vh) rotate(120deg); opacity: 0; }
+}
+
+// ─── Floating stat cards ──────────────────────────────────────
+.lp-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 14px;
+  padding: 12px 16px;
+  color: #fff;
+  z-index: 10;
+
+  lucide-icon { color: rgba(255, 255, 255, 0.5); flex-shrink: 0; }
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: dot-blink 2s ease-in-out infinite;
+
+    &--green  { background: #34C759; }
+    &--blue   { background: #007AFF; }
+    &--purple { background: #AF52DE; }
+  }
+
+  &__val { font-size: t.$text-sm; font-weight: 700; color: #fff; }
+  &__lbl { font-size: t.$text-xs; color: rgba(255, 255, 255, 0.4); margin-top: 2px; }
+
+  &--1 { left: 6%;   top: 22%; animation: card-float-a 6s ease-in-out infinite; }
+  &--2 { right: 6%;  top: 30%; animation: card-float-b 7s ease-in-out infinite; }
+  &--3 { left: 12%;  bottom: 18%; animation: card-float-a 8s 1s ease-in-out infinite; }
+}
+
+@keyframes card-float-a {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes card-float-b {
+  0%, 100% { transform: translateY(-6px); }
+  50%       { transform: translateY(6px); }
+}
+
+@keyframes dot-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+// ─── Right form panel ─────────────────────────────────────────
+.lp-form {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  position: relative;
+
+  // Subtle left border glow
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 122, 255, 0.3), transparent);
+  }
+}
+
+// ─── Login card ───────────────────────────────────────────────
 .login-card {
   width: 100%;
-  max-width: 400px;
-  @include m.card;
-  padding: t.$sp-8;
-  animation: slide-up 280ms t.$ease-out both;
+  max-width: 380px;
+  animation: slide-up 320ms t.$ease-out both;
 
-  // ── Brand ──
   &__brand {
     text-align: center;
     margin-bottom: t.$sp-8;
@@ -29,6 +355,7 @@
     color: white;
     @include m.flex-center;
     margin: 0 auto t.$sp-4;
+    box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
   }
 
   &__brand-name {
@@ -45,7 +372,6 @@
     margin-top: t.$sp-1;
   }
 
-  // ── Form ──
   &__form {
     @include m.flex-col(t.$sp-4);
   }
@@ -64,18 +390,5 @@
     height: 48px;
     font-size: t.$text-base;
     margin-top: t.$sp-2;
-  }
-
-  // ── Demo ──
-  &__demo {
-    margin-top: t.$sp-6;
-    padding-top: t.$sp-6;
-    border-top: 1px solid var(--border);
-    @include m.flex-col(t.$sp-3);
-    align-items: center;
-  }
-
-  &__demo-btns {
-    @include m.flex(center, center, t.$sp-2);
   }
 }
