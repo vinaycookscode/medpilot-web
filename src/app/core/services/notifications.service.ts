@@ -33,7 +33,7 @@ export class NotificationsService {
   }
 
   markAllRead() {
-    return this.http.patch<ApiResponse<void>>(`${this.api}/mark-all-read`, {});
+    return this.http.patch<ApiResponse<void>>(`${this.api}/read-all`, {});
   }
 
   deleteNotification(id: string) {

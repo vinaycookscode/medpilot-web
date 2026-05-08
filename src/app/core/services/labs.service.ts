@@ -61,7 +61,7 @@ export class LabsService {
   }
 
   getTestCatalog() {
-    return this.http.get<ApiResponse<LabTest[]>>(`${this.base}/tests`);
+    return this.http.get<ApiResponse<LabTest[]>>(`${this.base}/catalog`);
   }
 
   private toParams(obj?: Record<string, string>): HttpParams {
