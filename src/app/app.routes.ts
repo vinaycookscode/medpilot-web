@@ -57,6 +57,26 @@ export const routes: Routes = [
         path: 'branches',
         loadComponent: () => import('./pages/branches/branches.component').then(m => m.BranchesComponent),
       },
+      {
+        path: 'staff',
+        loadComponent: () => import('./pages/staff/staff.component').then(m => m.StaffComponent),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./pages/notifications/notifications.component').then(m => m.NotificationsComponent),
+      },
+      {
+        path: 'reports',
+        loadComponent: () => import('./pages/reports/reports.component').then(m => m.ReportsComponent),
+      },
+      {
+        path: 'labs',
+        loadComponent: () => import('./pages/labs/labs.component').then(m => m.LabsComponent),
+      },
+      {
+        path: 'insurance',
+        loadComponent: () => import('./pages/insurance/insurance.component').then(m => m.InsuranceComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

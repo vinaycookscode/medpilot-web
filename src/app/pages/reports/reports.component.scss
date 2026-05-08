@@ -1,0 +1,99 @@
+@use '../../../styles/tokens' as t;
+
+.report-toolbar {
+  margin-bottom: t.$sp-5;
+
+  &__inner {
+    display: flex;
+    align-items: flex-end;
+    gap: t.$sp-4;
+    flex-wrap: wrap;
+  }
+
+  .field { margin-bottom: 0; }
+
+  .input { width: 160px; }
+}
+
+.report-tabs-row {
+  margin-bottom: t.$sp-5;
+}
+
+// ── KPI grid ──
+.report-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: t.$sp-4;
+  margin-bottom: t.$sp-5;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px)  { grid-template-columns: 1fr; }
+}
+
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: t.$sp-4;
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--blue   { background: var(--color-primary-subtle);  color: var(--color-primary); }
+    &--green  { background: var(--color-success-subtle);  color: var(--color-success); }
+    &--purple { background: var(--color-purple-subtle);   color: var(--color-purple); }
+    &--orange { background: var(--color-warning-subtle);  color: var(--color-warning); }
+    &--red    { background: var(--color-danger-subtle);   color: var(--color-danger); }
+  }
+
+  &__label {
+    font-size: t.$text-xs;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: t.$sp-1;
+  }
+
+  &__value {
+    font-size: t.$text-2xl;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.report-breakdown {
+  margin-top: t.$sp-2;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: t.$sp-3 0;
+    border-bottom: 1px solid var(--border);
+    font-size: t.$text-sm;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__label { color: var(--text-primary); }
+
+  &__value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+}

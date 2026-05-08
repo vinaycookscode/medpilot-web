@@ -1,0 +1,279 @@
+<div class="page">
+  <!-- Page header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Insurance Claims</h1>
+      <p class="page-sub">Manage insurance providers and patient claim submissions.</p>
+    </div>
+    @if (activeTab() === 'claims') {
+      <button class="btn btn--primary" (click)="openClaimModal()">
+        <lucide-icon name="plus" [size]="16" /> New Claim
+      </button>
+    } @else {
+      <button class="btn btn--primary" (click)="openProviderModal()">
+        <lucide-icon name="plus" [size]="16" /> Add Provider
+      </button>
+    }
+  </div>
+
+  <!-- Stats pills -->
+  <div class="stats-pills">
+    <div class="stats-pill">
+      <span class="stats-pill__count">{{ stats()?.total ?? claims().length }}</span>
+      <span class="stats-pill__label">Total Claims</span>
+    </div>
+    <div class="stats-pill stats-pill--success">
+      <span class="stats-pill__count">{{ stats()?.approved ?? 0 }}</span>
+      <span class="stats-pill__label">Approved</span>
+    </div>
+    <div class="stats-pill stats-pill--warning">
+      <span class="stats-pill__count">{{ stats()?.pending ?? 0 }}</span>
+      <span class="stats-pill__label">Pending</span>
+    </div>
+    <div class="stats-pill stats-pill--teal">
+      <span class="stats-pill__count">₹{{ (stats()?.totalApproved ?? 0) | number:'1.0-0' }}</span>
+      <span class="stats-pill__label">Approved Value</span>
+    </div>
+    <div class="stats-pill stats-pill--danger">
+      <span class="stats-pill__count">{{ stats()?.rejected ?? 0 }}</span>
+      <span class="stats-pill__label">Rejected</span>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="insurance-tabs-row">
+    <div class="tab-bar">
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='claims'" (click)="activeTab.set('claims')">
+        <lucide-icon name="file-text" [size]="14" /> Claims
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='providers'" (click)="activeTab.set('providers')">
+        <lucide-icon name="shield-check" [size]="14" /> Providers
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  }
+
+  <!-- Claims table -->
+  @if (!loading() && activeTab() === 'claims') {
+    @if (!claims().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="shield-check" [size]="28" /></div>
+        <p class="empty-state__title">No claims yet</p>
+        <p class="empty-state__subtitle">Click "New Claim" to submit the first claim.</p>
+      </div>
+    } @else {
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Claim #</th>
+                <th>Patient</th>
+                <th>Provider</th>
+                <th>Policy No.</th>
+                <th>Amount</th>
+                <th>Approved</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (claim of claims(); track claim.id) {
+                <tr>
+                  <td><span class="claim-number">{{ claim.claimNumber }}</span></td>
+                  <td>{{ claim.patientName }}</td>
+                  <td>{{ claim.providerName }}</td>
+                  <td class="text-secondary">{{ claim.policyNumber }}</td>
+                  <td>₹{{ (claim.claimAmount ?? 0) | number:'1.0-0' }}</td>
+                  <td>
+                    @if (claim.approvedAmount != null) {
+                      ₹{{ (claim.approvedAmount) | number:'1.0-0' }}
+                    } @else {
+                      <span class="text-secondary">—</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge" [class]="statusBadge(claim.status)">
+                      {{ statusLabel(claim.status) }}
+                    </span>
+                  </td>
+                  <td class="text-secondary">{{ claim.createdAt | date:'dd MMM yyyy' }}</td>
+                  <td>
+                    <div class="row-actions">
+                      @if (claim.status === 'draft') {
+                        <button class="btn btn--ghost btn--sm" title="Submit" (click)="updateClaimStatus(claim.id, 'submitted')">
+                          Submit
+                        </button>
+                      }
+                      @if (claim.status === 'submitted' || claim.status === 'under_review') {
+                        <button class="btn btn--ghost btn--icon btn--sm" title="Mark Approved" (click)="updateClaimStatus(claim.id, 'approved')">
+                          <lucide-icon name="check-circle-2" [size]="15" />
+                        </button>
+                        <button class="btn btn--ghost btn--icon btn--sm text-danger" title="Reject" (click)="updateClaimStatus(claim.id, 'rejected')">
+                          <lucide-icon name="x" [size]="15" />
+                        </button>
+                      }
+                      @if (claim.status === 'approved') {
+                        <button class="btn btn--ghost btn--sm" title="Mark Paid" (click)="updateClaimStatus(claim.id, 'paid')">
+                          Paid
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Providers tab -->
+  @if (!loading() && activeTab() === 'providers') {
+    @if (!providers().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="shield-check" [size]="28" /></div>
+        <p class="empty-state__title">No providers yet</p>
+        <p class="empty-state__subtitle">Add an insurance provider to get started.</p>
+      </div>
+    } @else {
+      <div class="providers-grid">
+        @for (p of providers(); track p.id) {
+          <div class="provider-card card">
+            <div class="provider-card__header">
+              <div class="provider-card__icon">
+                <lucide-icon name="shield-check" [size]="20" />
+              </div>
+              @if (p.isActive) {
+                <span class="badge badge--success">Active</span>
+              } @else {
+                <span class="badge badge--neutral">Inactive</span>
+              }
+            </div>
+            <div class="provider-card__name">{{ p.name }}</div>
+            <div class="provider-card__code">{{ p.code }}</div>
+            @if (p.contactEmail) {
+              <div class="provider-card__contact">
+                <lucide-icon name="mail" [size]="13" />
+                {{ p.contactEmail }}
+              </div>
+            }
+            @if (p.contactPhone) {
+              <div class="provider-card__contact">
+                <lucide-icon name="phone" [size]="13" />
+                {{ p.contactPhone }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- New Claim Modal -->
+@if (showClaimModal()) {
+  <div class="modal-backdrop" (click)="showClaimModal.set(false)">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">New Insurance Claim</h3>
+        <button class="btn btn--ghost btn--icon" (click)="showClaimModal.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <form [formGroup]="claimForm">
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field__label">Patient Name <span style="color:var(--color-danger)">*</span></label>
+              <input class="input" formControlName="patientName" placeholder="Enter patient name" autofocus>
+            </div>
+            <div class="field">
+              <label class="field__label">Insurance Provider <span style="color:var(--color-danger)">*</span></label>
+              <select class="select" formControlName="providerId">
+                <option value="">Select provider</option>
+                @for (p of providers(); track p.id) {
+                  <option [value]="p.id">{{ p.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label">Policy Number <span style="color:var(--color-danger)">*</span></label>
+              <input class="input" formControlName="policyNumber" placeholder="Policy / member ID">
+            </div>
+            <div class="field">
+              <label class="field__label">Claim Amount (₹) <span style="color:var(--color-danger)">*</span></label>
+              <input type="number" class="input" formControlName="claimAmount" min="1" step="0.01">
+            </div>
+            <div class="field">
+              <label class="field__label">Diagnoses / ICD Codes</label>
+              <input class="input" formControlName="diagnoses" placeholder="e.g. J06.9, E11">
+            </div>
+            <div class="field field--full">
+              <label class="field__label">Notes</label>
+              <textarea class="input" formControlName="notes" placeholder="Additional information…" rows="3"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showClaimModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" [disabled]="claimForm.invalid || saving()" (click)="submitClaim()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          Create Claim
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Add Provider Modal -->
+@if (showProviderModal()) {
+  <div class="modal-backdrop" (click)="showProviderModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Insurance Provider</h3>
+        <button class="btn btn--ghost btn--icon" (click)="showProviderModal.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <form [formGroup]="providerForm">
+          <div class="field">
+            <label class="field__label">Provider Name <span style="color:var(--color-danger)">*</span></label>
+            <input class="input" formControlName="name" placeholder="e.g. Star Health Insurance" autofocus>
+          </div>
+          <div class="field">
+            <label class="field__label">Code <span style="color:var(--color-danger)">*</span></label>
+            <input class="input" formControlName="code" placeholder="e.g. STAR">
+          </div>
+          <div class="field">
+            <label class="field__label">Contact Email</label>
+            <input type="email" class="input" formControlName="contactEmail" placeholder="claims@provider.com">
+          </div>
+          <div class="field">
+            <label class="field__label">Contact Phone</label>
+            <input class="input" formControlName="contactPhone" placeholder="Optional">
+          </div>
+          <div class="field">
+            <label class="field__label">Address</label>
+            <input class="input" formControlName="address" placeholder="Optional">
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showProviderModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" [disabled]="providerForm.invalid || saving()" (click)="submitProvider()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          Add Provider
+        </button>
+      </div>
+    </div>
+  </div>
+}

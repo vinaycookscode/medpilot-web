@@ -1,0 +1,134 @@
+@use '../../../styles/tokens' as t;
+
+.insurance-tabs-row {
+  margin-bottom: t.$sp-5;
+}
+
+// ── Stats pills row ──
+.stats-pills {
+  display: flex;
+  gap: t.$sp-3;
+  flex-wrap: wrap;
+  margin-bottom: t.$sp-5;
+}
+
+.stats-pill {
+  display: flex;
+  align-items: center;
+  gap: t.$sp-2;
+  padding: t.$sp-2 t.$sp-4;
+  border-radius: var(--radius-full);
+  background: var(--surface-input);
+  color: var(--text-secondary);
+  font-size: t.$text-sm;
+  font-weight: 500;
+
+  &__count {
+    font-size: t.$text-md;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  &__label {
+    opacity: 0.85;
+  }
+
+  &--success {
+    background: var(--color-success-subtle);
+    color: var(--color-success);
+    .stats-pill__count { color: var(--color-success); }
+  }
+
+  &--warning {
+    background: var(--color-warning-subtle);
+    color: var(--color-warning);
+    .stats-pill__count { color: var(--color-warning); }
+  }
+
+  &--teal {
+    background: var(--color-teal-subtle);
+    color: var(--color-teal);
+    .stats-pill__count { color: var(--color-teal); }
+  }
+
+  &--danger {
+    background: var(--color-danger-subtle);
+    color: var(--color-danger);
+    .stats-pill__count { color: var(--color-danger); }
+  }
+}
+
+// ── Claim number monospace ──
+.claim-number {
+  font-family: var(--font-mono);
+  font-size: t.$text-xs;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  padding: 2px t.$sp-2;
+  border-radius: var(--radius-xs);
+}
+
+// ── Providers grid ──
+.providers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: t.$sp-4;
+}
+
+.provider-card {
+  display: flex;
+  flex-direction: column;
+  gap: t.$sp-2;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: t.$sp-1;
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__name {
+    font-size: t.$text-base;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__code {
+    font-size: t.$text-xs;
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+  }
+
+  &__contact {
+    display: flex;
+    align-items: center;
+    gap: t.$sp-2;
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+  }
+}
+
+// ── Form grid inside modal ──
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: t.$sp-4;
+
+  .field { margin-bottom: 0; }
+  .field--full { grid-column: 1 / -1; }
+
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
+}
