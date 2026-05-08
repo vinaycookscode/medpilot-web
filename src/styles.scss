@@ -9,16 +9,12 @@
 @use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
 
 // ── Layout scaffold ──
-body { background: #050d1a; }
-
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--topbar-height) 1fr;
   min-height: 100vh;
-  background: transparent;
-  position: relative;
-  z-index: 1;
+  background: var(--surface-page);
 
   .app-topbar {
     grid-column: 1 / -1;
@@ -28,9 +24,9 @@ body { background: #050d1a; }
     z-index: var(--z-topbar);
     height: var(--topbar-height);
     background: var(--surface-topbar);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 122, 255, 0.08);
   }
 
   .app-sidebar {
@@ -41,9 +37,9 @@ body { background: #050d1a; }
     height: calc(100vh - var(--topbar-height));
     overflow-y: auto;
     background: var(--surface-sidebar);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border-right: 1px solid rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid rgba(0, 122, 255, 0.08);
     z-index: var(--z-sidebar);
   }
 
