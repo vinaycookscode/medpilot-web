@@ -76,6 +76,9 @@ export class SidebarComponent {
     { label: 'Billing',       route: '/billing',       icon: 'receipt',       roles: ['admin', 'receptionist'] },
     { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'] },
     { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'] },
+    { label: 'Schedules',     route: '/schedules',     icon: 'clock',         roles: ['admin'] },
+    { label: 'Inventory',     route: '/inventory',     icon: 'package',       roles: ['admin', 'receptionist'] },
+    { label: 'Branches',      route: '/branches',      icon: 'building-2',    roles: ['admin'] },
     { label: 'Settings',      route: '/settings',      icon: 'settings' },
   ];
 

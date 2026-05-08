@@ -108,3 +108,62 @@
     &:hover { color: var(--color-danger); }
   }
 }
+
+// ── Tablet: icon-only sidebar ──
+@media (max-width: 1024px) {
+  .sidebar {
+    padding: 12px 0;
+    align-items: center;
+
+    &__brand { padding: 8px; border-bottom: none; margin-bottom: 8px; justify-content: center; }
+    &__brand-text,
+    &__brand-clinic { display: none; }
+
+    &__nav { padding: 0 6px; }
+
+    &__nav-item {
+      justify-content: center;
+      padding: 10px;
+      border-radius: var(--radius-md);
+
+      span { display: none; }
+    }
+
+    &__footer { padding: 12px 6px 0; flex-direction: column; gap: 8px; align-items: center; }
+    &__user-info { display: none; }
+  }
+}
+
+// ── Mobile: bottom nav bar ──
+@media (max-width: 768px) {
+  .sidebar {
+    flex-direction: row;
+    height: auto;
+    padding: 4px 8px;
+    overflow-x: auto;
+    justify-content: space-around;
+    align-items: center;
+
+    &__brand { display: none; }
+
+    &__nav {
+      flex-direction: row;
+      flex: unset;
+      overflow: visible;
+      padding: 0;
+      gap: 0;
+    }
+
+    &__nav-item {
+      flex-direction: column;
+      padding: 6px 10px;
+      font-size: 10px;
+      gap: 3px;
+      border-radius: var(--radius-md);
+
+      span { display: block; font-size: 10px; }
+    }
+
+    &__footer { display: none; }
+  }
+}

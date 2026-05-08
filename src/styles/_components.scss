@@ -131,6 +131,8 @@ textarea.input {
 .card {
   @include m.card;
   padding: t.$sp-6;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   &__header {
     @include m.flex-between;
@@ -465,9 +467,12 @@ textarea.input {
   padding: t.$sp-6;
   max-width: 1440px;
 
+  // BEM variants (used by older pages)
   &__header {
     @include m.flex-between;
     margin-bottom: t.$sp-6;
+    flex-wrap: wrap;
+    gap: t.$sp-3;
   }
 
   &__title {
@@ -481,4 +486,74 @@ textarea.input {
     color: var(--text-secondary);
     margin-top: t.$sp-1;
   }
+}
+
+// Flat variants used by new pages (page-header, page-title, page-sub)
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$sp-4;
+  margin-bottom: t.$sp-6;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: t.$text-2xl;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.page-sub {
+  font-size: t.$text-sm;
+  color: var(--text-secondary);
+  margin: t.$sp-1 0 0;
+}
+
+// ── Tab bar ──
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface-input);
+  border-radius: var(--radius-lg);
+  padding: 3px;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: calc(var(--radius-lg) - 2px);
+  border: none;
+  background: transparent;
+  font-size: t.$text-sm;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+  white-space: nowrap;
+
+  &:hover { background: var(--surface-card); color: var(--text-primary); }
+
+  &--active {
+    background: var(--surface-card);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+// ── Row actions ──
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 120ms;
+
+  tr:hover & { opacity: 1; }
 }

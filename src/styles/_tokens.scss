@@ -87,10 +87,10 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --color-teal-subtle:    rgba(90, 200, 250, 0.10);
 
   // Surfaces
-  --surface-page:     #{$surface-page};
-  --surface-card:     #{$surface-card};
-  --surface-sidebar:  #{$surface-sidebar};
-  --surface-topbar:   rgba(255, 255, 255, 0.88);
+  --surface-page:     transparent;
+  --surface-card:     rgba(255, 255, 255, 0.82);
+  --surface-sidebar:  rgba(255, 255, 255, 0.88);
+  --surface-topbar:   rgba(255, 255, 255, 0.85);
   --surface-input:    #{$surface-input};
   --surface-overlay:  rgba(0, 0, 0, 0.36);
 

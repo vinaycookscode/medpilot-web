@@ -45,6 +45,18 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent),
       },
+      {
+        path: 'schedules',
+        loadComponent: () => import('./pages/schedules/schedules.component').then(m => m.SchedulesComponent),
+      },
+      {
+        path: 'inventory',
+        loadComponent: () => import('./pages/inventory/inventory.component').then(m => m.InventoryComponent),
+      },
+      {
+        path: 'branches',
+        loadComponent: () => import('./pages/branches/branches.component').then(m => m.BranchesComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

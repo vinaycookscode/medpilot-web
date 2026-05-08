@@ -1,0 +1,301 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Pharmacy &amp; Inventory</h1>
+      <p class="page-sub">Track medicine stock, flag low items, and manage supply levels.</p>
+    </div>
+    <button class="btn btn--primary" (click)="openAdd()">
+      <lucide-icon name="plus" [size]="16" /> Add Item
+    </button>
+  </div>
+
+  <!-- Summary strip -->
+  <div class="inv-summary">
+    <div class="inv-summary__card">
+      <div class="inv-summary__icon inv-summary__icon--default">
+        <lucide-icon name="package" [size]="20" />
+      </div>
+      <div>
+        <div class="inv-summary__val">{{ summary().total }}</div>
+        <div class="inv-summary__lbl">Total Items</div>
+      </div>
+    </div>
+    <div class="inv-summary__card inv-summary__card--warn">
+      <div class="inv-summary__icon inv-summary__icon--warn">
+        <lucide-icon name="alert-triangle" [size]="20" />
+      </div>
+      <div>
+        <div class="inv-summary__val">{{ summary().lowStock }}</div>
+        <div class="inv-summary__lbl">Low Stock</div>
+      </div>
+    </div>
+    <div class="inv-summary__card inv-summary__card--danger">
+      <div class="inv-summary__icon inv-summary__icon--danger">
+        <lucide-icon name="alert-circle" [size]="20" />
+      </div>
+      <div>
+        <div class="inv-summary__val">{{ summary().outStock }}</div>
+        <div class="inv-summary__lbl">Out of Stock</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="inv-filters">
+    <div class="tab-bar">
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='all'"  (click)="tab.set('all')">All Items</button>
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='low'"  (click)="tab.set('low')">
+        Low Stock
+        @if (summary().lowStock) { <span class="tab-badge tab-badge--warn">{{ summary().lowStock }}</span> }
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='out'"  (click)="tab.set('out')">
+        Out of Stock
+        @if (summary().outStock) { <span class="tab-badge tab-badge--danger">{{ summary().outStock }}</span> }
+      </button>
+    </div>
+    <div class="inv-filters__right">
+      <div class="input-group">
+        <span class="input-icon"><lucide-icon name="search" [size]="15" /></span>
+        <input class="input" placeholder="Search items…" [value]="search()" (input)="search.set($any($event.target).value)" style="width:220px">
+      </div>
+      <select class="input" style="width:160px" [value]="category()" (change)="category.set($any($event.target).value)">
+        <option value="">All categories</option>
+        @for (c of summary().categories; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Table -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  } @else if (!filtered().length) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <lucide-icon name="package" [size]="28" />
+      </div>
+      <p>No items found.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Reorder At</th>
+            <th>Unit Price</th>
+            <th>Expiry</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filtered(); track item.id) {
+            <tr>
+              <td>
+                <div class="item-name">{{ item.name }}</div>
+                @if (item.manufacturer) {
+                  <div class="item-mfr">{{ item.manufacturer }}</div>
+                }
+              </td>
+              <td><span class="chip">{{ item.category }}</span></td>
+              <td class="qty-cell">
+                <span [class]="'qty qty--' + stockStatus(item)">{{ item.quantity }} <span class="qty-unit">{{ item.unit }}</span></span>
+              </td>
+              <td class="text-secondary">{{ item.reorderLevel }}</td>
+              <td class="text-secondary">₹{{ item.sellingPrice | number:'1.2-2' }}</td>
+              <td class="text-secondary text-sm">{{ item.expiryDate ? (item.expiryDate | date:'MMM yyyy') : '—' }}</td>
+              <td>
+                @if (stockStatus(item) === 'out') {
+                  <span class="badge badge--danger">Out of Stock</span>
+                } @else if (stockStatus(item) === 'low') {
+                  <span class="badge badge--warning">Low Stock</span>
+                } @else {
+                  <span class="badge badge--success">In Stock</span>
+                }
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn--ghost btn--icon btn--sm" title="Adjust Stock" (click)="openAdjust(item)">
+                    <lucide-icon name="trending-up" [size]="15" />
+                  </button>
+                  <button class="btn btn--ghost btn--icon btn--sm" title="Edit" (click)="openEdit(item)">
+                    <lucide-icon name="file-text" [size]="15" />
+                  </button>
+                  <button class="btn btn--ghost btn--icon btn--sm text-danger" title="Delete" (click)="deleteItem(item)">
+                    <lucide-icon name="trash-2" [size]="15" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Add / Edit Item Modal -->
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="showForm.set(false)">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">
+            <lucide-icon name="pill" [size]="18" />
+          </div>
+          <div>
+            <h3 class="modal__title">{{ editItem() ? 'Edit Item' : 'Add Item' }}</h3>
+            <p class="modal__sub">{{ editItem() ? 'Update medicine or supply details' : 'Add a new medicine or supply to inventory' }}</p>
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="showForm.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <!-- Basic info -->
+        <div class="form-section">
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field__label">Name <span class="required">*</span></label>
+              <input class="input" placeholder="e.g. Paracetamol 500mg" [(ngModel)]="form.name" autofocus>
+            </div>
+            <div class="field">
+              <label class="field__label">Category</label>
+              <input class="input" placeholder="Medicine / Supplies…" [(ngModel)]="form.category">
+            </div>
+            <div class="field">
+              <label class="field__label">Unit</label>
+              <input class="input" placeholder="tablets / ml / units" [(ngModel)]="form.unit">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock & Pricing -->
+        <div class="form-section">
+          <div class="form-section__title">
+            <lucide-icon name="trending-up" [size]="13" /> Stock &amp; Pricing
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field__label">Quantity</label>
+              <input type="number" class="input" min="0" [(ngModel)]="form.quantity">
+            </div>
+            <div class="field">
+              <label class="field__label">Reorder Level</label>
+              <input type="number" class="input" min="0" [(ngModel)]="form.reorderLevel">
+            </div>
+            <div class="field">
+              <label class="field__label">Cost Price (₹)</label>
+              <input type="number" class="input" min="0" step="0.01" [(ngModel)]="form.costPrice">
+            </div>
+            <div class="field">
+              <label class="field__label">Selling Price (₹)</label>
+              <input type="number" class="input" min="0" step="0.01" [(ngModel)]="form.sellingPrice">
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="form-section form-section--last">
+          <div class="form-section__title">
+            <lucide-icon name="info" [size]="13" /> Additional Details
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field__label">Manufacturer</label>
+              <input class="input" placeholder="Optional" [(ngModel)]="form.manufacturer">
+            </div>
+            <div class="field">
+              <label class="field__label">Batch No.</label>
+              <input class="input" placeholder="Optional" [(ngModel)]="form.batchNumber">
+            </div>
+            <div class="field">
+              <label class="field__label">Expiry Date</label>
+              <input type="date" class="input" [(ngModel)]="form.expiryDate">
+            </div>
+            <div class="field">
+              <label class="field__label">Description</label>
+              <input class="input" placeholder="Optional notes" [(ngModel)]="form.description">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showForm.set(false)">Cancel</button>
+        <button class="btn btn--primary" [disabled]="saving() || !form.name" (click)="saveForm()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          {{ editItem() ? 'Save Changes' : 'Add Item' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Adjust Stock Modal -->
+@if (adjustTarget()) {
+  <div class="modal-backdrop" (click)="adjustTarget.set(null)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon modal-title-icon--green">
+            <lucide-icon name="trending-up" [size]="18" />
+          </div>
+          <div>
+            <h3 class="modal__title">Adjust Stock</h3>
+            <p class="modal__sub">{{ adjustTarget()!.name }}</p>
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="adjustTarget.set(null)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="current-stock-card">
+          <div class="current-stock-card__label">Current stock</div>
+          <div class="current-stock-card__val">
+            <span [class]="'qty qty--' + stockStatus(adjustTarget()!)">{{ adjustTarget()!.quantity }}</span>
+            <span class="current-stock-card__unit">{{ adjustTarget()!.unit }}</span>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:16px">
+          <label class="field__label">Transaction Type</label>
+          <div class="type-selector">
+            <button class="type-btn" [class.type-btn--active]="adjustType==='in'" (click)="adjustType='in'">
+              <lucide-icon name="plus" [size]="16" />
+              <span>Stock In</span>
+            </button>
+            <button class="type-btn type-btn--out" [class.type-btn--active]="adjustType==='out'" (click)="adjustType='out'">
+              <lucide-icon name="trending-up" [size]="16" style="transform:rotate(180deg)" />
+              <span>Stock Out</span>
+            </button>
+            <button class="type-btn type-btn--set" [class.type-btn--active]="adjustType==='adjustment'" (click)="adjustType='adjustment'">
+              <lucide-icon name="hash" [size]="16" />
+              <span>Set Exact</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label class="field__label">Quantity</label>
+            <input type="number" class="input" min="0.01" step="1" [(ngModel)]="adjustQty">
+          </div>
+          <div class="field">
+            <label class="field__label">Note (optional)</label>
+            <input class="input" placeholder="Reason…" [(ngModel)]="adjustNote">
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="adjustTarget.set(null)">Cancel</button>
+        <button class="btn btn--primary" (click)="saveAdjust()">Save Adjustment</button>
+      </div>
+    </div>
+  </div>
+}

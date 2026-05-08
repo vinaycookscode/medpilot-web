@@ -1,0 +1,151 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Doctor Schedules</h1>
+      <p class="page-sub">Set working hours and days off for each doctor.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner"></span></div>
+  } @else if (!doctors().length) {
+    <div class="empty-state">
+      <lucide-icon name="users" [size]="40" />
+      <p>No doctors found in this clinic.</p>
+    </div>
+  } @else {
+    <div class="sched-layout">
+
+      <!-- Doctor list -->
+      <div class="doc-list">
+        <div class="doc-list__title">Doctors</div>
+        @for (doc of doctors(); track doc.id) {
+          <button class="doc-item" [class.doc-item--active]="selectedDoc()?.id === doc.id" (click)="selectDoctor(doc)">
+            <div class="avatar avatar--sm">{{ doc.firstName[0] }}{{ doc.lastName[0] }}</div>
+            <div class="doc-item__info">
+              <div class="doc-item__name">Dr. {{ doc.firstName }} {{ doc.lastName }}</div>
+              <div class="doc-item__spec">{{ doc.specialization || 'General' }}</div>
+            </div>
+          </button>
+        }
+      </div>
+
+      <!-- Schedule grid -->
+      @if (selectedDoc()) {
+        <div class="sched-panel">
+          <div class="sched-panel__head">
+            <div>
+              <h2 class="sched-panel__title">Dr. {{ selectedDoc()!.firstName }} {{ selectedDoc()!.lastName }}</h2>
+              <p class="sched-panel__sub">Toggle days and set working hours. Click Save when done.</p>
+            </div>
+            <div class="sched-panel__actions">
+              <button class="btn btn--secondary" (click)="showOverride.set(true)">
+                <lucide-icon name="calendar-x" [size]="16" /> Add Day Off
+              </button>
+              <button class="btn btn--primary" [disabled]="saving()" (click)="saveSchedules()">
+                @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+                Save Schedule
+              </button>
+            </div>
+          </div>
+
+          <div class="day-grid">
+            @for (day of DAYS; track day) {
+              <div class="day-card" [class.day-card--active]="getDayEdit(day)?.enabled">
+                <div class="day-card__header">
+                  <div class="day-card__label">{{ DAY_LABELS[day] }}</div>
+                  <label class="toggle">
+                    <input type="checkbox" [checked]="getDayEdit(day)?.enabled" (change)="toggleDay(day)">
+                    <span class="toggle__track"></span>
+                  </label>
+                </div>
+
+                @if (getDayEdit(day)?.enabled) {
+                  <div class="day-card__body">
+                    <div class="day-field">
+                      <label>Start</label>
+                      <input type="time" class="input input--sm"
+                        [value]="getDayEdit(day)?.startTime"
+                        (change)="updateDayField(day, 'startTime', $any($event.target).value)">
+                    </div>
+                    <div class="day-field">
+                      <label>End</label>
+                      <input type="time" class="input input--sm"
+                        [value]="getDayEdit(day)?.endTime"
+                        (change)="updateDayField(day, 'endTime', $any($event.target).value)">
+                    </div>
+                    <div class="day-field">
+                      <label>Slot (min)</label>
+                      <input type="number" class="input input--sm" min="5" max="60" step="5"
+                        [value]="getDayEdit(day)?.slotDuration"
+                        (change)="updateDayField(day, 'slotDuration', +$any($event.target).value)">
+                    </div>
+                    <div class="day-field">
+                      <label>Max pts</label>
+                      <input type="number" class="input input--sm" min="1" max="100"
+                        [value]="getDayEdit(day)?.maxPatients"
+                        (change)="updateDayField(day, 'maxPatients', +$any($event.target).value)">
+                    </div>
+                  </div>
+                } @else {
+                  <div class="day-card__off">Day Off</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Override Modal -->
+@if (showOverride()) {
+  <div class="modal-backdrop" (click)="showOverride.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Day Off / Override</h3>
+        <button class="btn btn--ghost btn--icon" (click)="showOverride.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">Date</label>
+          <input type="date" class="input" [(ngModel)]="overrideDate">
+        </div>
+        <div class="field">
+          <label class="field__label">Type</label>
+          <div class="radio-group">
+            <label class="radio-opt">
+              <input type="radio" [checked]="overrideIsDayOff" (change)="overrideIsDayOff=true"> Full Day Off
+            </label>
+            <label class="radio-opt">
+              <input type="radio" [checked]="!overrideIsDayOff" (change)="overrideIsDayOff=false"> Custom Hours
+            </label>
+          </div>
+        </div>
+        @if (!overrideIsDayOff) {
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label">Start Time</label>
+              <input type="time" class="input" [(ngModel)]="overrideStart">
+            </div>
+            <div class="field">
+              <label class="field__label">End Time</label>
+              <input type="time" class="input" [(ngModel)]="overrideEnd">
+            </div>
+          </div>
+        }
+        <div class="field">
+          <label class="field__label">Reason (optional)</label>
+          <input type="text" class="input" placeholder="e.g. National holiday" [(ngModel)]="overrideReason">
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showOverride.set(false)">Cancel</button>
+        <button class="btn btn--primary" (click)="addOverride()">Save Override</button>
+      </div>
+    </div>
+  </div>
+}

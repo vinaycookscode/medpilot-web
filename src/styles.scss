@@ -9,13 +9,14 @@
 @use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
 
 // ── Layout scaffold ──
-// Applied once at the app-root level; components fill inside this.
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--topbar-height) 1fr;
   min-height: 100vh;
   background: var(--surface-page);
+  position: relative;
+  z-index: 1;
 
   .app-topbar {
     grid-column: 1 / -1;
@@ -27,7 +28,7 @@
     background: var(--surface-topbar);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(0, 122, 255, 0.08);
   }
 
   .app-sidebar {
@@ -38,7 +39,9 @@
     height: calc(100vh - var(--topbar-height));
     overflow-y: auto;
     background: var(--surface-sidebar);
-    border-right: 1px solid var(--border);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid rgba(0, 122, 255, 0.08);
     z-index: var(--z-sidebar);
   }
 
@@ -48,6 +51,55 @@
     overflow-y: auto;
     min-height: 0;
   }
+
+  // ── Tablet: collapse sidebar to icons only ──
+  @media (max-width: 1024px) {
+    grid-template-columns: 60px 1fr;
+
+    .app-sidebar {
+      overflow: visible;
+    }
+  }
+
+  // ── Mobile: stack topbar + content, hide sidebar ──
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-height) 1fr auto;
+
+    .app-topbar { grid-column: 1; }
+
+    .app-sidebar {
+      grid-column: 1;
+      grid-row: 3;
+      height: auto;
+      position: sticky;
+      bottom: 0;
+      top: auto;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      z-index: var(--z-topbar);
+    }
+
+    .app-content {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+}
+
+// ── Responsive page padding ──
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .page-header { gap: 12px; }
+  .inv-summary { grid-template-columns: 1fr !important; }
+  .branch-grid { grid-template-columns: 1fr !important; }
+  .form-grid   { grid-template-columns: 1fr !important; }
+  .field--full { grid-column: auto !important; }
+  .tab-bar     { overflow-x: auto; }
+}
+
+@media (max-width: 1024px) {
+  .page { padding: 20px; }
 }
 
 // ── Scrollbar (WebKit) ──
