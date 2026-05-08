@@ -51,14 +51,14 @@ export class StaffService {
   }
 
   createLeave(data: Partial<StaffLeave>) {
-    return this.http.post<ApiResponse<StaffLeave>>(`${this.api}/leaves`, data);
+    return this.http.post<ApiResponse<StaffLeave>>(`${this.api}/staff/leaves`, data);
   }
 
   getLeaves(params?: Record<string, string>) {
-    return this.http.get<ApiResponse<StaffLeave[]>>(`${this.api}/leaves`, { params });
+    return this.http.get<ApiResponse<StaffLeave[]>>(`${this.api}/staff/leaves`, { params });
   }
 
   updateLeaveStatus(id: string, status: 'approved' | 'rejected') {
-    return this.http.patch<ApiResponse<StaffLeave>>(`${this.api}/leaves/${id}/status`, { status });
+    return this.http.patch<ApiResponse<StaffLeave>>(`${this.api}/staff/leaves/${id}/status`, { status });
   }
 }
