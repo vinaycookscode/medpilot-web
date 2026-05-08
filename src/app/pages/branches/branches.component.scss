@@ -1,0 +1,120 @@
+@use '../../../styles/tokens' as t;
+
+.branch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.branch-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 150ms;
+
+  &:hover { box-shadow: var(--shadow-md); }
+
+  &--hq { border-left: 3px solid var(--color-primary); }
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__name {
+    font-size: t.$text-base;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  &__addr {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+    line-height: 1.4;
+
+    lucide-icon { flex-shrink: 0; margin-top: 2px; }
+  }
+
+  &__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__contact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field--full { grid-column: 1 / -1; }
+
+.checkbox-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: t.$text-sm;
+  color: var(--text-primary);
+  cursor: pointer;
+
+  input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+}
+
+.text-danger { color: var(--color-danger); }
+
+.badge--neutral {
+  background: var(--surface-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.badge--primary {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
