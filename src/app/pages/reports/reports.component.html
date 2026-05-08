@@ -1,0 +1,336 @@
+<div class="page">
+  <!-- Page header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reports &amp; Analytics</h1>
+      <p class="page-sub">Generate insights across revenue, appointments, patients, and inventory.</p>
+    </div>
+  </div>
+
+  <!-- Date range + generate -->
+  <div class="report-toolbar card">
+    <div class="report-toolbar__inner">
+      <div class="field">
+        <label class="field__label">From</label>
+        <input type="date" class="input" [formControl]="fromCtrl">
+      </div>
+      <div class="field">
+        <label class="field__label">To</label>
+        <input type="date" class="input" [formControl]="toCtrl">
+      </div>
+      <button class="btn btn--primary" (click)="loadReport()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner spinner--sm spinner--white"></span>
+        } @else {
+          <lucide-icon name="chart-bar" [size]="16" />
+        }
+        Generate
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="report-tabs-row">
+    <div class="tab-bar">
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='revenue'" (click)="onTabChange('revenue')">
+        <lucide-icon name="indian-rupee" [size]="14" /> Revenue
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='appointments'" (click)="onTabChange('appointments')">
+        <lucide-icon name="calendar" [size]="14" /> Appointments
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='patients'" (click)="onTabChange('patients')">
+        <lucide-icon name="users" [size]="14" /> Patients
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='inventory'" (click)="onTabChange('inventory')">
+        <lucide-icon name="package" [size]="14" /> Inventory
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  }
+
+  <!-- Revenue tab -->
+  @if (!loading() && activeTab() === 'revenue') {
+    <div class="report-kpis">
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <lucide-icon name="indian-rupee" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Total Revenue</div>
+          <div class="kpi-card__value">₹{{ (revenueData()?.totalRevenue ?? 0) | number:'1.0-0' }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <lucide-icon name="receipt" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Total Invoices</div>
+          <div class="kpi-card__value">{{ revenueData()?.totalInvoices ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--purple">
+          <lucide-icon name="trending-up" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Avg Invoice Value</div>
+          <div class="kpi-card__value">₹{{ (revenueData()?.avgInvoiceValue ?? 0) | number:'1.0-0' }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--orange">
+          <lucide-icon name="alert-circle" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Outstanding</div>
+          <div class="kpi-card__value">₹{{ (revenueData()?.outstanding ?? 0) | number:'1.0-0' }}</div>
+        </div>
+      </div>
+    </div>
+
+    @if (revenueData()?.breakdown?.length) {
+      <div class="card report-breakdown">
+        <div class="card__header">
+          <span class="card__title">Revenue Breakdown</span>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Invoices</th>
+                <th>Revenue</th>
+                <th>Collected</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of revenueData()?.breakdown; track row.period) {
+                <tr>
+                  <td>{{ row.period }}</td>
+                  <td>{{ row.invoices }}</td>
+                  <td>₹{{ (row.revenue ?? 0) | number:'1.0-0' }}</td>
+                  <td>₹{{ (row.collected ?? 0) | number:'1.0-0' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else if (revenueData() !== null) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="chart-bar" [size]="28" /></div>
+        <p class="empty-state__title">No revenue data</p>
+        <p class="empty-state__subtitle">Try a different date range.</p>
+      </div>
+    }
+  }
+
+  <!-- Appointments tab -->
+  @if (!loading() && activeTab() === 'appointments') {
+    <div class="report-kpis">
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <lucide-icon name="calendar" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Total Appointments</div>
+          <div class="kpi-card__value">{{ appointmentData()?.total ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <lucide-icon name="check-circle-2" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Completed</div>
+          <div class="kpi-card__value">{{ appointmentData()?.completed ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--orange">
+          <lucide-icon name="calendar-x" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Cancelled</div>
+          <div class="kpi-card__value">{{ appointmentData()?.cancelled ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--purple">
+          <lucide-icon name="user-check" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Show Rate</div>
+          <div class="kpi-card__value">{{ appointmentData()?.showRate ?? 0 }}%</div>
+        </div>
+      </div>
+    </div>
+
+    @if (appointmentData()?.byType?.length) {
+      <div class="card report-breakdown">
+        <div class="card__header">
+          <span class="card__title">By Appointment Type</span>
+        </div>
+        <div class="report-list">
+          @for (item of appointmentData()?.byType; track item.type) {
+            <div class="report-list__row">
+              <span class="report-list__label">{{ item.type }}</span>
+              <span class="report-list__value">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (appointmentData() !== null) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="calendar" [size]="28" /></div>
+        <p class="empty-state__title">No appointment data</p>
+        <p class="empty-state__subtitle">Try a different date range.</p>
+      </div>
+    }
+  }
+
+  <!-- Patients tab -->
+  @if (!loading() && activeTab() === 'patients') {
+    <div class="report-kpis">
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <lucide-icon name="users" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Total Patients</div>
+          <div class="kpi-card__value">{{ patientData()?.total ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <lucide-icon name="user-plus" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">New This Period</div>
+          <div class="kpi-card__value">{{ patientData()?.newPatients ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--purple">
+          <lucide-icon name="refresh-cw" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Returning</div>
+          <div class="kpi-card__value">{{ patientData()?.returning ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--orange">
+          <lucide-icon name="trending-up" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Avg Visits / Patient</div>
+          <div class="kpi-card__value">{{ (patientData()?.avgVisits ?? 0) | number:'1.1-1' }}</div>
+        </div>
+      </div>
+    </div>
+
+    @if (patientData()?.byGender?.length) {
+      <div class="card report-breakdown">
+        <div class="card__header">
+          <span class="card__title">By Gender</span>
+        </div>
+        <div class="report-list">
+          @for (item of patientData()?.byGender; track item.gender) {
+            <div class="report-list__row">
+              <span class="report-list__label">{{ item.gender }}</span>
+              <span class="report-list__value">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (patientData() !== null) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="users" [size]="28" /></div>
+        <p class="empty-state__title">No patient data</p>
+        <p class="empty-state__subtitle">Try a different date range.</p>
+      </div>
+    }
+  }
+
+  <!-- Inventory tab -->
+  @if (!loading() && activeTab() === 'inventory') {
+    <div class="report-kpis">
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <lucide-icon name="package" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Total SKUs</div>
+          <div class="kpi-card__value">{{ inventoryData()?.totalSkus ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <lucide-icon name="indian-rupee" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Stock Value</div>
+          <div class="kpi-card__value">₹{{ (inventoryData()?.stockValue ?? 0) | number:'1.0-0' }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--orange">
+          <lucide-icon name="alert-triangle" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Low Stock Items</div>
+          <div class="kpi-card__value">{{ inventoryData()?.lowStockCount ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="kpi-card card">
+        <div class="kpi-card__icon kpi-card__icon--red">
+          <lucide-icon name="alert-circle" [size]="20" />
+        </div>
+        <div>
+          <div class="kpi-card__label">Out of Stock</div>
+          <div class="kpi-card__value">{{ inventoryData()?.outOfStockCount ?? 0 }}</div>
+        </div>
+      </div>
+    </div>
+
+    @if (inventoryData()?.topConsumed?.length) {
+      <div class="card report-breakdown">
+        <div class="card__header">
+          <span class="card__title">Top Consumed Items</span>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Consumed</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of inventoryData()?.topConsumed; track row.name) {
+                <tr>
+                  <td>{{ row.name }}</td>
+                  <td><span class="chip">{{ row.category }}</span></td>
+                  <td>{{ row.consumed }} {{ row.unit }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else if (inventoryData() !== null) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="package" [size]="28" /></div>
+        <p class="empty-state__title">No inventory data</p>
+        <p class="empty-state__subtitle">Try a different date range.</p>
+      </div>
+    }
+  }
+</div>

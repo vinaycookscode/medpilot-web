@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Notifications</h1>
+      <p class="page-sub">
+        Stay updated on appointments, billing, and clinic activity.
+        @if (unreadCount() > 0) {
+          <span class="badge badge--primary" style="margin-left: 8px;">{{ unreadCount() }} unread</span>
+        }
+      </p>
+    </div>
+    @if (unreadCount() > 0) {
+      <button class="btn btn--secondary" (click)="markAllRead()">
+        <lucide-icon name="check-circle-2" [size]="16" /> Mark all read
+      </button>
+    }
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="tab-bar" style="margin-bottom: 20px; width: fit-content;">
+    <button class="tab-btn" [class.tab-btn--active]="filter() === 'all'" (click)="setFilter('all')">
+      All
+    </button>
+    <button class="tab-btn" [class.tab-btn--active]="filter() === 'unread'" (click)="setFilter('unread')">
+      Unread
+      @if (unreadCount() > 0) {
+        <span class="badge badge--warning">{{ unreadCount() }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  } @else if (!filteredNotifications.length) {
+    <!-- Empty state -->
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <lucide-icon name="bell" [size]="28" />
+      </div>
+      <p class="empty-state__title">
+        {{ filter() === 'unread' ? 'All caught up!' : 'No notifications' }}
+      </p>
+      <p class="empty-state__subtitle">
+        {{ filter() === 'unread' ? 'No unread notifications.' : 'Notifications will appear here as activity happens.' }}
+      </p>
+    </div>
+  } @else {
+    <!-- Notifications list -->
+    <div class="notif-list card card--flush">
+      @for (notif of filteredNotifications; track notif.id) {
+        <div class="notif-item" [class.notif-item--unread]="!notif.isRead">
+          <!-- Type icon tile -->
+          <div class="notif-item__icon"
+               [style.background]="getTypeBg(notif.type)"
+               [style.color]="getTypeColor(notif.type)">
+            <lucide-icon [name]="getTypeIcon(notif.type)" [size]="18" />
+          </div>
+
+          <!-- Content -->
+          <div class="notif-item__body">
+            <div class="notif-item__title">{{ notif.title }}</div>
+            <div class="notif-item__message">{{ notif.message }}</div>
+            <div class="notif-item__meta">
+              <span class="notif-item__time">{{ timeAgo(notif.createdAt) }}</span>
+              <span class="badge badge--neutral notif-item__type">{{ notif.type }}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="notif-item__actions">
+            @if (!notif.isRead) {
+              <button class="btn btn--ghost btn--sm btn--icon" title="Mark as read" (click)="markRead(notif.id)">
+                <lucide-icon name="check-circle-2" [size]="16" />
+              </button>
+            }
+            <button class="btn btn--ghost btn--sm btn--icon notif-item__delete" title="Delete" (click)="deleteNotif(notif.id)">
+              <lucide-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

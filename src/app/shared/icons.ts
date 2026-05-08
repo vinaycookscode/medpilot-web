@@ -20,6 +20,8 @@ import {
   ArrowRight, TrendingUp, Sparkles,
   // Clinic management
   Package, MapPin, Warehouse,
+  // Reports, Labs, Insurance
+  ChartBar,
 } from 'lucide-angular';
 
 @NgModule({
@@ -39,6 +41,7 @@ import {
       CalendarCheck, RefreshCw,
       ArrowRight, TrendingUp, Sparkles,
       Package, MapPin, Warehouse,
+      ChartBar,
     }),
   ],
   exports: [LucideAngularModule],

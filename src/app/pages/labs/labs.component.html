@@ -1,0 +1,233 @@
+<div class="page">
+  <!-- Page header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Lab Orders</h1>
+      <p class="page-sub">Manage laboratory test orders and results.</p>
+    </div>
+    <button class="btn btn--primary" (click)="openOrderModal()">
+      <lucide-icon name="plus" [size]="16" /> New Order
+    </button>
+  </div>
+
+  <!-- Status pills -->
+  <div class="status-pills">
+    <div class="status-pill status-pill--warning">
+      <span class="status-pill__count">{{ countByStatus('pending') }}</span>
+      <span class="status-pill__label">Pending</span>
+    </div>
+    <div class="status-pill status-pill--primary">
+      <span class="status-pill__count">{{ countByStatus('processing') }}</span>
+      <span class="status-pill__label">Processing</span>
+    </div>
+    <div class="status-pill status-pill--success">
+      <span class="status-pill__count">{{ countByStatus('completed') }}</span>
+      <span class="status-pill__label">Completed</span>
+    </div>
+    <div class="status-pill status-pill--neutral">
+      <span class="status-pill__count">{{ countByStatus('cancelled') }}</span>
+      <span class="status-pill__label">Cancelled</span>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="labs-tabs-row">
+    <div class="tab-bar">
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='orders'" (click)="activeTab.set('orders')">
+        <lucide-icon name="file-text" [size]="14" /> Orders
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='catalog'" (click)="activeTab.set('catalog')">
+        <lucide-icon name="flask-conical" [size]="14" /> Catalog
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  }
+
+  <!-- Orders table -->
+  @if (!loading() && activeTab() === 'orders') {
+    @if (!orders().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="flask-conical" [size]="28" /></div>
+        <p class="empty-state__title">No lab orders yet</p>
+        <p class="empty-state__subtitle">Click "New Order" to create the first one.</p>
+      </div>
+    } @else {
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Tests</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders(); track order.id) {
+                <tr>
+                  <td><span class="order-number">{{ order.orderNumber }}</span></td>
+                  <td>{{ order.patientName }}</td>
+                  <td>{{ order.doctorName || '—' }}</td>
+                  <td>{{ order.items?.length ?? 0 }} test(s)</td>
+                  <td>₹{{ (order.totalAmount ?? 0) | number:'1.0-0' }}</td>
+                  <td>
+                    <span class="badge" [class]="statusBadge(order.status)">
+                      {{ statusLabel(order.status) }}
+                    </span>
+                  </td>
+                  <td class="text-secondary">{{ order.createdAt | date:'dd MMM yyyy' }}</td>
+                  <td>
+                    <div class="row-actions">
+                      @if (order.status === 'pending' || order.status === 'processing') {
+                        <button class="btn btn--ghost btn--icon btn--sm" title="Enter Results" (click)="openResultModal(order)">
+                          <lucide-icon name="file-text" [size]="15" />
+                        </button>
+                        <button class="btn btn--ghost btn--icon btn--sm text-danger" title="Cancel" (click)="cancelOrder(order.id)">
+                          <lucide-icon name="x" [size]="15" />
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Catalog -->
+  @if (!loading() && activeTab() === 'catalog') {
+    @if (!catalog().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="flask-conical" [size]="28" /></div>
+        <p class="empty-state__title">No tests in catalog</p>
+        <p class="empty-state__subtitle">Test catalog is empty.</p>
+      </div>
+    } @else {
+      <div class="catalog-grid">
+        @for (test of catalog(); track test.id) {
+          <div class="catalog-card card">
+            <div class="catalog-card__header">
+              <div class="catalog-card__icon">
+                <lucide-icon name="flask-conical" [size]="18" />
+              </div>
+              <span class="badge badge--primary">{{ test.category }}</span>
+            </div>
+            <div class="catalog-card__name">{{ test.name }}</div>
+            <div class="catalog-card__code">{{ test.code }}</div>
+            @if (test.description) {
+              <div class="catalog-card__desc">{{ test.description }}</div>
+            }
+            <div class="catalog-card__footer">
+              <span class="catalog-card__price">₹{{ test.price | number:'1.0-0' }}</span>
+              <span class="catalog-card__turnaround">{{ test.turnaroundDays }}d TAT</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- New Order Modal -->
+@if (showOrderModal()) {
+  <div class="modal-backdrop" (click)="showOrderModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">New Lab Order</h3>
+        <button class="btn btn--ghost btn--icon" (click)="showOrderModal.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <form [formGroup]="orderForm">
+          <div class="field">
+            <label class="field__label">Patient Name <span style="color:var(--color-danger)">*</span></label>
+            <input class="input" formControlName="patientName" placeholder="Enter patient name" autofocus>
+          </div>
+          <div class="field">
+            <label class="field__label">Ordering Doctor</label>
+            <input class="input" formControlName="doctorName" placeholder="Optional">
+          </div>
+          <div class="field">
+            <label class="field__label">Notes</label>
+            <textarea class="input" formControlName="notes" placeholder="Clinical notes or special instructions" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showOrderModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" [disabled]="orderForm.invalid || saving()" (click)="submitOrder()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          Create Order
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Results Modal -->
+@if (showResultModal() && selectedOrder()) {
+  <div class="modal-backdrop" (click)="showResultModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h3 class="modal__title">Enter Results</h3>
+          <p class="modal__sub">{{ selectedOrder()?.orderNumber }} — {{ selectedOrder()?.patientName }}</p>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="showResultModal.set(false)">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal__body">
+        <form [formGroup]="resultForm">
+          <div class="field">
+            <label class="field__label">Update Status</label>
+            <select class="select" formControlName="status">
+              <option value="processing">Processing</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label">Notes</label>
+            <textarea class="input" formControlName="notes" placeholder="Result notes…" rows="3"></textarea>
+          </div>
+        </form>
+
+        <!-- Items list -->
+        @if (selectedOrder()?.items?.length) {
+          <div class="result-items">
+            <div class="result-items__title">Tests in this order</div>
+            @for (item of selectedOrder()!.items; track item.testId) {
+              <div class="result-item" [class.result-item--abnormal]="item.isAbnormal">
+                <span class="result-item__name">{{ item.testName }}</span>
+                @if (item.result) {
+                  <span class="result-item__result">{{ item.result }} {{ item.unit }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showResultModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" [disabled]="saving()" (click)="submitResults()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          Save Results
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,145 @@
+@use '../../../styles/tokens' as t;
+
+// ── Staff grid ──
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+// ── Staff card ──
+.staff-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: box-shadow 150ms, border-color 150ms;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__name {
+    font-size: t.$text-base;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__status {
+    margin-left: auto;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+  }
+
+  &__detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+    line-height: 1.4;
+
+    lucide-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--text-tertiary);
+    }
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// ── Avatar with role colors ──
+.staff-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: t.$text-sm;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+
+  &[data-role='doctor'] {
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+  }
+
+  &[data-role='receptionist'] {
+    background: var(--color-success-subtle);
+    color: var(--color-success);
+  }
+
+  &[data-role='admin'] {
+    background: var(--color-purple-subtle);
+    color: var(--color-purple);
+  }
+
+  &[data-role='nurse'] {
+    background: var(--color-teal-subtle);
+    color: var(--color-teal);
+  }
+
+  // default fallback
+  background: var(--surface-input);
+  color: var(--text-secondary);
+}
+
+// ── Role badge helper ──
+.badge--doctor       { background: var(--color-primary-subtle); color: var(--color-primary); }
+.badge--receptionist { background: var(--color-success-subtle); color: var(--color-success); }
+.badge--admin-role   { background: var(--color-purple-subtle);  color: var(--color-purple);  }
+
+// ── Staff name in table ──
+.staff-name-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+// ── Modal form ──
+.modal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}

@@ -78,8 +78,13 @@ export class SidebarComponent {
     { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'] },
     { label: 'Schedules',     route: '/schedules',     icon: 'clock',         roles: ['admin'] },
     { label: 'Inventory',     route: '/inventory',     icon: 'package',       roles: ['admin', 'receptionist'] },
-    { label: 'Branches',      route: '/branches',      icon: 'building-2',    roles: ['admin'] },
-    { label: 'Settings',      route: '/settings',      icon: 'settings' },
+    { label: 'Labs',          route: '/labs',          icon: 'flask-conical', roles: ['admin', 'doctor', 'receptionist'] },
+    { label: 'Insurance',     route: '/insurance',     icon: 'shield-check',  roles: ['admin', 'receptionist'] },
+    { label: 'Reports',       route: '/reports',       icon: 'chart-bar',     roles: ['admin'] },
+    { label: 'Branches',       route: '/branches',       icon: 'building-2',     roles: ['admin'] },
+    { label: 'Staff',          route: '/staff',          icon: 'users',          roles: ['admin'] },
+    { label: 'Notifications',  route: '/notifications',  icon: 'bell' },
+    { label: 'Settings',       route: '/settings',       icon: 'settings' },
   ];
 
   readonly visibleItems = computed(() => {
