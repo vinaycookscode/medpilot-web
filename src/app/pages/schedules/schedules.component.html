@@ -101,7 +101,7 @@
 
 <!-- Override Modal -->
 @if (showOverride()) {
-  <div class="modal-overlay" (click)="showOverride.set(false)">
+  <div class="modal-backdrop" (click)="showOverride.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal__header">
         <h3 class="modal__title">Add Day Off / Override</h3>

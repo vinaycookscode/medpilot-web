@@ -10,60 +10,66 @@
   </div>
 
   @if (loading()) {
-    <div class="empty-state"><span class="spinner"></span></div>
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
   } @else if (!branches().length) {
-    <div class="empty-state">
-      <lucide-icon name="building-2" [size]="40" />
-      <p>No branches yet. Add your first location.</p>
+    <div class="empty-state empty-state--lg">
+      <div class="empty-state__icon">
+        <lucide-icon name="building-2" [size]="32" />
+      </div>
+      <p class="empty-state__title">No branches yet</p>
+      <p class="empty-state__sub">Add your first location to get started with multi-branch management.</p>
+      <button class="btn btn--primary" (click)="openAdd()">
+        <lucide-icon name="plus" [size]="16" /> Add First Branch
+      </button>
     </div>
   } @else {
     <div class="branch-grid">
       @for (b of branches(); track b.id) {
         <div class="branch-card" [class.branch-card--hq]="b.isHeadOffice">
+          @if (b.isHeadOffice) {
+            <div class="branch-card__hq-tag">
+              <lucide-icon name="shield-check" [size]="11" /> Head Office
+            </div>
+          }
           <div class="branch-card__top">
-            <div class="branch-card__icon">
-              <lucide-icon name="building-2" [size]="20" />
+            <div class="branch-card__icon" [class.branch-card__icon--hq]="b.isHeadOffice">
+              <lucide-icon name="building-2" [size]="22" />
             </div>
             <div class="branch-card__meta">
               <div class="branch-card__name">{{ b.name }}</div>
-              @if (b.isHeadOffice) {
-                <span class="badge badge--primary">Head Office</span>
-              } @else {
-                <span class="badge" [class.badge--success]="b.isActive" [class.badge--neutral]="!b.isActive">
-                  {{ b.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              }
+              <span class="badge" [class.badge--success]="b.isActive" [class.badge--neutral]="!b.isActive">
+                {{ b.isActive ? 'Active' : 'Inactive' }}
+              </span>
             </div>
           </div>
 
-          @if (b.addressLine1 || b.city) {
-            <div class="branch-card__addr">
-              <lucide-icon name="map-pin" [size]="13" />
-              <span>{{ addressOf(b) }}</span>
-            </div>
-          }
-
-          <div class="branch-card__contacts">
+          <div class="branch-card__details">
+            @if (b.addressLine1 || b.city) {
+              <div class="branch-card__detail-row">
+                <lucide-icon name="map-pin" [size]="13" />
+                <span>{{ addressOf(b) }}</span>
+              </div>
+            }
             @if (b.phone) {
-              <div class="branch-card__contact">
+              <div class="branch-card__detail-row">
                 <lucide-icon name="phone" [size]="13" />
                 <span>{{ b.phone }}</span>
               </div>
             }
             @if (b.email) {
-              <div class="branch-card__contact">
+              <div class="branch-card__detail-row">
                 <lucide-icon name="mail" [size]="13" />
                 <span>{{ b.email }}</span>
               </div>
             }
           </div>
 
-          <div class="branch-card__actions">
+          <div class="branch-card__footer">
             <button class="btn btn--ghost btn--sm" (click)="openEdit(b)">
               <lucide-icon name="file-text" [size]="14" /> Edit
             </button>
             @if (!b.isHeadOffice) {
-              <button class="btn btn--ghost btn--sm text-danger" (click)="deleteBranch(b)">
+              <button class="btn btn--ghost btn--sm branch-card__delete" (click)="deleteBranch(b)">
                 <lucide-icon name="trash-2" [size]="14" /> Delete
               </button>
             }
@@ -76,61 +82,97 @@
 
 <!-- Add / Edit Modal -->
 @if (showForm()) {
-  <div class="modal-overlay" (click)="showForm.set(false)">
+  <div class="modal-backdrop" (click)="showForm.set(false)">
     <div class="modal modal--lg" (click)="$event.stopPropagation()">
       <div class="modal__header">
-        <h3 class="modal__title">{{ editBranch() ? 'Edit Branch' : 'Add Branch' }}</h3>
+        <div class="modal-title-group">
+          <div class="modal-title-icon">
+            <lucide-icon name="building-2" [size]="18" />
+          </div>
+          <div>
+            <h3 class="modal__title">{{ editBranch() ? 'Edit Branch' : 'Add Branch' }}</h3>
+            <p class="modal__sub">{{ editBranch() ? 'Update location details' : 'Set up a new clinic location' }}</p>
+          </div>
+        </div>
         <button class="btn btn--ghost btn--icon" (click)="showForm.set(false)">
           <lucide-icon name="x" [size]="18" />
         </button>
       </div>
+
       <div class="modal__body">
-        <div class="form-grid">
-          <div class="field field--full">
-            <label class="field__label">Branch Name *</label>
-            <input class="input" placeholder="e.g. Main Branch, Downtown Clinic" [(ngModel)]="form.name">
-          </div>
-          <div class="field field--full">
-            <label class="field__label">Address Line 1</label>
-            <input class="input" placeholder="Street address" [(ngModel)]="form.addressLine1">
-          </div>
-          <div class="field field--full">
-            <label class="field__label">Address Line 2</label>
-            <input class="input" placeholder="Floor, suite, landmark…" [(ngModel)]="form.addressLine2">
-          </div>
+        <!-- Branch Name -->
+        <div class="form-section">
           <div class="field">
-            <label class="field__label">City</label>
-            <input class="input" [(ngModel)]="form.city">
-          </div>
-          <div class="field">
-            <label class="field__label">State</label>
-            <input class="input" [(ngModel)]="form.state">
-          </div>
-          <div class="field">
-            <label class="field__label">Pincode</label>
-            <input class="input" [(ngModel)]="form.pincode">
-          </div>
-          <div class="field">
-            <label class="field__label">Phone</label>
-            <input class="input" placeholder="+91…" [(ngModel)]="form.phone">
-          </div>
-          <div class="field">
-            <label class="field__label">Email</label>
-            <input type="email" class="input" [(ngModel)]="form.email">
-          </div>
-          <div class="field field--full">
-            <label class="checkbox-opt">
-              <input type="checkbox" [(ngModel)]="form.isHeadOffice">
-              <span>Mark as Head Office</span>
-            </label>
+            <label class="field__label">Branch Name <span class="required">*</span></label>
+            <input class="input" placeholder="e.g. Main Branch, Downtown Clinic" [(ngModel)]="form.name" autofocus>
           </div>
         </div>
+
+        <!-- Address Section -->
+        <div class="form-section">
+          <div class="form-section__title">
+            <lucide-icon name="map-pin" [size]="13" /> Address
+          </div>
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field__label">Address Line 1</label>
+              <input class="input" placeholder="Street address, building name" [(ngModel)]="form.addressLine1">
+            </div>
+            <div class="field field--full">
+              <label class="field__label">Address Line 2</label>
+              <input class="input" placeholder="Floor, suite, landmark (optional)" [(ngModel)]="form.addressLine2">
+            </div>
+            <div class="field">
+              <label class="field__label">City</label>
+              <input class="input" placeholder="Mumbai" [(ngModel)]="form.city">
+            </div>
+            <div class="field">
+              <label class="field__label">State</label>
+              <input class="input" placeholder="Maharashtra" [(ngModel)]="form.state">
+            </div>
+            <div class="field">
+              <label class="field__label">Pincode</label>
+              <input class="input" placeholder="400001" [(ngModel)]="form.pincode">
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="form-section">
+          <div class="form-section__title">
+            <lucide-icon name="phone" [size]="13" /> Contact
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field__label">Phone</label>
+              <input class="input" placeholder="+91 98765 43210" [(ngModel)]="form.phone">
+            </div>
+            <div class="field">
+              <label class="field__label">Email</label>
+              <input type="email" class="input" placeholder="branch@clinic.com" [(ngModel)]="form.email">
+            </div>
+          </div>
+        </div>
+
+        <!-- Head Office Toggle -->
+        <div class="form-section form-section--last">
+          <label class="toggle-field">
+            <div class="toggle-field__info">
+              <span class="toggle-field__label">Mark as Head Office</span>
+              <span class="toggle-field__hint">The primary location of your clinic</span>
+            </div>
+            <div class="toggle-switch" [class.toggle-switch--on]="form.isHeadOffice" (click)="form.isHeadOffice = !form.isHeadOffice">
+              <div class="toggle-switch__thumb"></div>
+            </div>
+          </label>
+        </div>
       </div>
+
       <div class="modal__footer">
         <button class="btn btn--ghost" (click)="showForm.set(false)">Cancel</button>
         <button class="btn btn--primary" [disabled]="saving() || !form.name" (click)="saveForm()">
           @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          {{ editBranch() ? 'Update' : 'Add Branch' }}
+          {{ editBranch() ? 'Save Changes' : 'Add Branch' }}
         </button>
       </div>
     </div>
