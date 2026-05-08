@@ -10,7 +10,7 @@
   &__brand {
     @include m.flex(center, flex-start, t.$sp-3);
     padding: t.$sp-2 t.$sp-4 t.$sp-4;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--border);
     margin-bottom: t.$sp-2;
   }
 
@@ -22,7 +22,6 @@
     color: white;
     @include m.flex-center;
     flex-shrink: 0;
-    box-shadow: 0 0 14px rgba(0,122,255,0.5);
   }
 
   &__brand-text {
@@ -34,12 +33,12 @@
     font-size: t.$text-md;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: rgba(255,255,255,0.92);
+    color: var(--text-primary);
   }
 
   &__brand-clinic {
     font-size: t.$text-xs;
-    color: rgba(255,255,255,0.4);
+    color: var(--text-tertiary);
   }
 
   // ── Nav ──
@@ -56,18 +55,18 @@
     border-radius: var(--radius-md);
     font-size: t.$text-sm;
     font-weight: 500;
-    color: rgba(255,255,255,0.5);
+    color: var(--text-secondary);
     transition: all t.$t-fast t.$ease;
     cursor: pointer;
 
     &:hover {
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.9);
+      background: var(--surface-input);
+      color: var(--text-primary);
     }
 
     &--active {
-      background: rgba(0,122,255,0.18);
-      color: #4da6ff;
+      background: var(--color-primary-subtle);
+      color: var(--color-primary);
       font-weight: 600;
     }
   }
@@ -76,7 +75,7 @@
   &__footer {
     @include m.flex-between;
     padding: t.$sp-3 t.$sp-3 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--border);
     margin-top: auto;
     padding-top: t.$sp-4;
   }
@@ -94,19 +93,19 @@
   &__user-name {
     font-size: t.$text-sm;
     font-weight: 600;
-    color: rgba(255,255,255,0.85);
+    color: var(--text-primary);
     display: block;
   }
 
   &__user-role {
     font-size: t.$text-xs;
-    color: rgba(255,255,255,0.35);
+    color: var(--text-tertiary);
     text-transform: capitalize;
   }
 
   &__logout {
-    color: rgba(255,255,255,0.35);
-    &:hover { color: #ff4757; }
+    color: var(--text-tertiary);
+    &:hover { color: var(--color-danger); }
   }
 }
 
