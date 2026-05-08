@@ -614,8 +614,20 @@ textarea.input {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: background 120ms, border-color 120ms;
+  user-select: none;
 
-  input[type="checkbox"] { flex-shrink: 0; accent-color: var(--color-primary); width: 16px; height: 16px; cursor: pointer; }
+  &__box {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-strong);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    transition: border-color 120ms, background 120ms;
+  }
 
   &__name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-primary); }
   &__cat { flex-shrink: 0; }
@@ -624,6 +636,12 @@ textarea.input {
   &--selected {
     background: var(--color-primary-subtle);
     border-color: var(--color-primary-light);
+
+    .test-check-item__box {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
   }
 
   &:hover { background: var(--surface-input); }
