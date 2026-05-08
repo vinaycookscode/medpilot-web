@@ -9,12 +9,16 @@
 @use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
 
 // ── Layout scaffold ──
+body { background: #050d1a; }
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--topbar-height) 1fr;
   min-height: 100vh;
-  background: var(--surface-page);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 
   .app-topbar {
     grid-column: 1 / -1;
@@ -24,9 +28,9 @@
     z-index: var(--z-topbar);
     height: var(--topbar-height);
     background: var(--surface-topbar);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
   .app-sidebar {
@@ -37,7 +41,9 @@
     height: calc(100vh - var(--topbar-height));
     overflow-y: auto;
     background: var(--surface-sidebar);
-    border-right: 1px solid var(--border);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-right: 1px solid rgba(255,255,255,0.07);
     z-index: var(--z-sidebar);
   }
 

@@ -1,0 +1,453 @@
+// Fixed full-viewport hospital scene — sits behind all shell content
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-scene {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #050d1a 0%, #071525 60%, #0d2137 100%);
+  position: relative;
+}
+
+// ── Opacity wrapper — all elements at 35% so content stays readable ──
+.bg-scene > * { opacity: 0.35; }
+
+// ── Stars ──
+.bg-star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: bg-twinkle var(--d, 2s) ease-in-out infinite alternate;
+}
+@keyframes bg-twinkle {
+  from { opacity: 0.3; transform: scale(0.7); }
+  to   { opacity: 1;   transform: scale(1.3); }
+}
+
+// ── Moon ──
+.bg-moon {
+  position: absolute;
+  top: 5%;
+  right: 8%;
+  width: 52px;
+  height: 52px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow: 0 0 28px 10px rgba(255,215,0,0.35);
+  animation: bg-moon-glow 4s ease-in-out infinite alternate;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 10px;
+    width: 36px; height: 36px;
+    background: #070f1c;
+    border-radius: 50%;
+  }
+}
+@keyframes bg-moon-glow {
+  from { box-shadow: 0 0 28px 10px rgba(255,215,0,0.35); }
+  to   { box-shadow: 0 0 44px 20px rgba(255,215,0,0.55); }
+}
+
+// ── Beacon ──
+.bg-beacon {
+  position: absolute;
+  top: 8%;
+  right: 20%;
+  width: 12px;
+  height: 12px;
+}
+.bg-beacon__dot {
+  width: 12px; height: 12px;
+  background: #ff4757;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ff4757;
+}
+.bg-beacon__ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1.5px solid #ff4757;
+  border-radius: 50%;
+  opacity: 0;
+  animation: bg-beacon-ring 2.1s ease-out infinite;
+}
+@keyframes bg-beacon-ring {
+  0%   { width: 12px; height: 12px; opacity: 0.8; }
+  100% { width: 56px; height: 56px; opacity: 0; }
+}
+
+// ── ECG monitor ──
+.bg-ecg {
+  position: absolute;
+  top: 3%;
+  left: 2%;
+  width: 220px;
+  height: 76px;
+  background: #020e0e;
+  border: 1.5px solid #00ff88;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0,255,136,0.25), inset 0 0 20px rgba(0,255,136,0.06);
+}
+.bg-ecg__label {
+  font-size: 8px;
+  font-weight: 700;
+  color: #00ff88;
+  letter-spacing: 1.5px;
+  padding: 5px 8px 2px;
+  font-family: monospace;
+}
+.bg-ecg__svg {
+  width: 100%;
+  height: 40px;
+  display: block;
+}
+.bg-ecg__line {
+  fill: none;
+  stroke: #00ff88;
+  stroke-width: 1.5;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: bg-ecg-draw 2.2s linear infinite;
+  filter: drop-shadow(0 0 3px #00ff88);
+}
+@keyframes bg-ecg-draw {
+  0%   { stroke-dashoffset: 600; opacity: 1; }
+  80%  { stroke-dashoffset: 0;   opacity: 1; }
+  100% { stroke-dashoffset: 0;   opacity: 0; }
+}
+.bg-ecg__bpm {
+  position: absolute;
+  right: 8px; bottom: 6px;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #00ff88;
+  animation: bg-bpm-pulse 0.85s ease-in-out infinite;
+}
+@keyframes bg-bpm-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+// ── Hospital building ──
+.bg-hospital {
+  position: absolute;
+  bottom: 11%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+}
+.bg-hosp__roof {
+  width: 240px;
+  height: 22px;
+  background: linear-gradient(90deg, #1a4a8a, #2a6abf, #1a4a8a);
+  border-radius: 5px 5px 0 0;
+  margin-left: -10px;
+  border: 1.5px solid #3a7acc;
+}
+.bg-hosp__body {
+  width: 220px;
+  height: 170px;
+  background: linear-gradient(180deg, #1a3a6c 0%, #0f2548 100%);
+  border-radius: 0 0 4px 4px;
+  border: 1.5px solid #2a5080;
+  position: relative;
+}
+.bg-hosp__cross {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+}
+.bg-hosp__cross-h,
+.bg-hosp__cross-v {
+  position: absolute;
+  background: #ff4757;
+  border-radius: 2px;
+  animation: bg-cross-pulse 2.2s ease-in-out infinite;
+}
+.bg-hosp__cross-h { width: 100%; height: 33%; top: 33%; left: 0; }
+.bg-hosp__cross-v { height: 100%; width: 33%; left: 33%; top: 0; }
+@keyframes bg-cross-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+.bg-hosp__winrow {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 14px;
+  margin-top: 14px;
+}
+.bg-win {
+  width: 28px;
+  height: 32px;
+  background: #ffd700;
+  border-radius: 3px;
+  border: 1px solid #e6b800;
+  box-shadow: 0 0 8px rgba(255,215,0,0.5);
+  animation: bg-win-flicker var(--wd, 4s) ease-in-out infinite;
+}
+.bg-win--off {
+  background: #0a1e38;
+  box-shadow: none;
+  animation: none;
+}
+.bg-win--blue {
+  background: #00cfff;
+  border-color: #00b0e0;
+  box-shadow: 0 0 8px rgba(0,207,255,0.5);
+}
+@keyframes bg-win-flicker {
+  0%,89%,100% { opacity: 1; }
+  94%          { opacity: 0.3; }
+}
+.bg-hosp__entrance {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 62px;
+  background: #071525;
+  border-radius: 4px 4px 0 0;
+  border: 1.5px solid #2a5080;
+}
+
+// ── Trees ──
+.bg-tree {
+  position: absolute;
+  bottom: 12.5%;
+}
+.bg-tree--l { left: 22%; }
+.bg-tree--r { right: 22%; animation-delay: .5s; }
+
+.bg-tree__trunk {
+  width: 10px;
+  height: 26px;
+  background: #4a3020;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+.bg-tree__top {
+  width: 0; height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  border-bottom: 48px solid #1a5c2a;
+  margin-left: -14px;
+  margin-top: -10px;
+  animation: bg-sway 5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.bg-tree__top2 {
+  width: 0; height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-bottom: 38px solid #226b32;
+  margin-left: -8px;
+  margin-top: -32px;
+}
+@keyframes bg-sway {
+  0%,100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg); }
+}
+
+// ── Ground / Road ──
+.bg-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 11%;
+  background: linear-gradient(180deg, #0d2137 0%, #0a1a2e 100%);
+  border-top: 2px solid #1a3a5c;
+}
+.bg-road {
+  position: absolute;
+  bottom: 28%; left: 0; right: 0;
+  height: 34%;
+  background: #0f1e30;
+  border-top: 2px solid #1d3d5c;
+  border-bottom: 2px solid #1d3d5c;
+  overflow: hidden;
+}
+.bg-road__line {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 4px;
+  background: #ffd700;
+  border-radius: 2px;
+  animation: bg-road-scroll 1.4s linear infinite;
+}
+@keyframes bg-road-scroll {
+  from { transform: translateY(-50%) translateX(0);    opacity: 1; }
+  to   { transform: translateY(-50%) translateX(-80px); opacity: 0.2; }
+}
+
+// ── Ambulance ──
+.bg-ambulance {
+  position: absolute;
+  bottom: 2%;
+  left: -150px;
+  width: 130px;
+  animation: bg-ambu-drive 7s linear infinite;
+}
+@keyframes bg-ambu-drive {
+  from { left: -150px; }
+  to   { left: 110%; }
+}
+.bg-ambu__lights {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bg-ambu__light {
+  width: 18px; height: 9px;
+  border-radius: 3px;
+  animation: bg-light-flash 0.5s ease-in-out infinite alternate;
+}
+.bg-ambu__light--red  { background: #ff4757; animation-delay: 0s; }
+.bg-ambu__light--blue { background: #007aff; animation-delay: 0.25s; }
+@keyframes bg-light-flash {
+  from { opacity: 1; box-shadow: 0 0 10px 4px currentColor; }
+  to   { opacity: 0.1; box-shadow: none; }
+}
+.bg-ambu__body {
+  width: 120px; height: 54px;
+  background: linear-gradient(180deg, #fff 60%, #e8e8e8 100%);
+  border-radius: 5px 10px 0 0;
+  position: relative;
+  border: 1.5px solid #ccc;
+}
+.bg-ambu__stripe {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 38%;
+  background: #ff4757;
+  border-radius: 4px 0 0 0;
+  clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%);
+}
+.bg-ambu__cross-h,
+.bg-ambu__cross-v {
+  position: absolute;
+  background: white;
+  border-radius: 1px;
+}
+.bg-ambu__cross-h { width: 60%; height: 28%; top: 36%; left: 20%; }
+.bg-ambu__cross-v { height: 60%; width: 28%; left: 36%; top: 20%; }
+.bg-ambu__text {
+  position: absolute;
+  top: 50%; right: 10px;
+  transform: translateY(-50%);
+  font-size: 7px;
+  font-weight: 800;
+  color: #ff4757;
+  letter-spacing: 1px;
+  font-family: monospace;
+}
+.bg-ambu__window {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 28px; height: 22px;
+  background: linear-gradient(135deg, #87ceeb 30%, #b0e0f8 100%);
+  border-radius: 3px;
+  border: 1px solid #aaa;
+}
+.bg-ambu__base {
+  width: 124px; height: 10px;
+  background: #ccc;
+  border-radius: 0 0 4px 4px;
+  margin-left: -2px;
+}
+.bg-ambu__wheels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin-top: -2px;
+}
+.bg-wheel {
+  width: 22px; height: 22px;
+  background: #333;
+  border-radius: 50%;
+  border: 3px solid #555;
+  animation: bg-wheel-spin 0.45s linear infinite;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background: #888;
+    border-radius: 50%;
+  }
+}
+@keyframes bg-wheel-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// ── IV Drip ──
+.bg-iv {
+  position: absolute;
+  top: 12%;
+  right: 28%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bg-iv__bag {
+  width: 30px; height: 40px;
+  background: linear-gradient(180deg, rgba(0,207,255,.3) 0%, rgba(0,207,255,.6) 100%);
+  border: 1.5px solid rgba(0,207,255,.7);
+  border-radius: 6px 6px 3px 3px;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -9px; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 9px;
+    background: rgba(0,207,255,.5);
+    border-radius: 2px 2px 0 0;
+  }
+}
+.bg-iv__tube {
+  width: 2px; height: 44px;
+  background: linear-gradient(180deg, rgba(0,207,255,.7), rgba(0,207,255,.2));
+}
+.bg-iv__drop {
+  width: 7px; height: 10px;
+  background: #00cfff;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  opacity: 0;
+  animation: bg-drip 1.8s ease-in infinite;
+}
+@keyframes bg-drip {
+  0%   { transform: translateY(0);    opacity: 0.9; }
+  100% { transform: translateY(24px); opacity: 0;   }
+}
+
+// ── Floating particles ──
+.bg-float {
+  position: absolute;
+  opacity: 0;
+  animation: bg-float-up var(--fd, 8s) ease-in-out infinite;
+}
+@keyframes bg-float-up {
+  0%   { transform: translateY(30px) rotate(0deg);   opacity: 0; }
+  15%  { opacity: 0.7; }
+  85%  { opacity: 0.4; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}

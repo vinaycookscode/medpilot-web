@@ -10,7 +10,7 @@
   &__brand {
     @include m.flex(center, flex-start, t.$sp-3);
     padding: t.$sp-2 t.$sp-4 t.$sp-4;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     margin-bottom: t.$sp-2;
   }
 
@@ -22,6 +22,7 @@
     color: white;
     @include m.flex-center;
     flex-shrink: 0;
+    box-shadow: 0 0 14px rgba(0,122,255,0.5);
   }
 
   &__brand-text {
@@ -33,12 +34,12 @@
     font-size: t.$text-md;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--text-primary);
+    color: rgba(255,255,255,0.92);
   }
 
   &__brand-clinic {
     font-size: t.$text-xs;
-    color: var(--text-tertiary);
+    color: rgba(255,255,255,0.4);
   }
 
   // ── Nav ──
@@ -55,18 +56,18 @@
     border-radius: var(--radius-md);
     font-size: t.$text-sm;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: rgba(255,255,255,0.5);
     transition: all t.$t-fast t.$ease;
     cursor: pointer;
 
     &:hover {
-      background: var(--surface-input);
-      color: var(--text-primary);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.9);
     }
 
     &--active {
-      background: var(--color-primary-subtle);
-      color: var(--color-primary);
+      background: rgba(0,122,255,0.18);
+      color: #4da6ff;
       font-weight: 600;
     }
   }
@@ -75,7 +76,7 @@
   &__footer {
     @include m.flex-between;
     padding: t.$sp-3 t.$sp-3 0;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(255,255,255,0.08);
     margin-top: auto;
     padding-top: t.$sp-4;
   }
@@ -93,19 +94,19 @@
   &__user-name {
     font-size: t.$text-sm;
     font-weight: 600;
-    color: var(--text-primary);
+    color: rgba(255,255,255,0.85);
     display: block;
   }
 
   &__user-role {
     font-size: t.$text-xs;
-    color: var(--text-tertiary);
+    color: rgba(255,255,255,0.35);
     text-transform: capitalize;
   }
 
   &__logout {
-    color: var(--text-tertiary);
-    &:hover { color: var(--color-danger); }
+    color: rgba(255,255,255,0.35);
+    &:hover { color: #ff4757; }
   }
 }
 

@@ -19,10 +19,11 @@ $color-info:    #5AC8FA;
 $color-purple:  #AF52DE;
 
 // Surfaces
-$surface-page:    #F2F2F7;
+$surface-page:    transparent;
 $surface-card:    #FFFFFF;
 $surface-input:   #F2F2F7;
-$surface-sidebar: #FFFFFF;
+$surface-sidebar: #0b1a2e;
+$surface-topbar:  #0b1a2e;
 
 // Text
 $text-primary:   #1C1C1E;
@@ -86,13 +87,13 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --color-teal:           #5AC8FA;
   --color-teal-subtle:    rgba(90, 200, 250, 0.10);
 
-  // Surfaces
-  --surface-page:     #{$surface-page};
-  --surface-card:     #{$surface-card};
-  --surface-sidebar:  #{$surface-sidebar};
-  --surface-topbar:   rgba(255, 255, 255, 0.88);
-  --surface-input:    #{$surface-input};
-  --surface-overlay:  rgba(0, 0, 0, 0.36);
+  // Surfaces — page is transparent so the hospital bg shows through
+  --surface-page:     transparent;
+  --surface-card:     rgba(255, 255, 255, 0.94);
+  --surface-sidebar:  rgba(7, 15, 28, 0.92);
+  --surface-topbar:   rgba(7, 15, 28, 0.88);
+  --surface-input:    rgba(255, 255, 255, 0.92);
+  --surface-overlay:  rgba(0, 0, 0, 0.55);
 
   // Text
   --text-primary:   #{$text-primary};

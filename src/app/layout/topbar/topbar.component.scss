@@ -35,10 +35,10 @@
 
   &__action-btn {
     position: relative;
-    color: var(--text-secondary);
+    color: rgba(255,255,255,0.55);
     width: 36px;
     height: 36px;
-    &:hover { color: var(--text-primary); background: var(--surface-input); }
+    &:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.08); }
   }
 
   &__badge {
@@ -227,7 +227,7 @@
     transition: background t.$t-fast t.$ease;
     max-width: 200px;
 
-    &:hover { background: var(--surface-input); }
+    &:hover { background: rgba(255,255,255,0.08); }
   }
 
   &__user-meta {
@@ -241,19 +241,19 @@
   &__user-name {
     font-size: t.$text-sm;
     font-weight: 600;
-    color: var(--text-primary);
+    color: rgba(255,255,255,0.88);
     @include m.truncate;
     max-width: 120px;
   }
 
   &__user-role {
     font-size: t.$text-xs;
-    color: var(--text-tertiary);
+    color: rgba(255,255,255,0.4);
     text-transform: capitalize;
   }
 
   &__chevron {
-    color: var(--text-tertiary);
+    color: rgba(255,255,255,0.35);
     transition: transform t.$t-fast t.$ease;
     flex-shrink: 0;
 
