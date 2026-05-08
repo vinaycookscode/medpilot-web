@@ -153,13 +153,56 @@
       <div class="modal__body">
         <form [formGroup]="orderForm">
           <div class="field">
-            <label class="field__label">Patient Name <span style="color:var(--color-danger)">*</span></label>
-            <input class="input" formControlName="patientName" placeholder="Enter patient name" autofocus>
+            <label class="field__label">Patient <span style="color:var(--color-danger)">*</span></label>
+            <div class="patient-search">
+              @if (selectedPatient()) {
+                <div class="patient-selected">
+                  <div class="patient-selected__info">
+                    <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
+                    <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
+                  </div>
+                  <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
+                    <lucide-icon name="x" [size]="14" />
+                  </button>
+                </div>
+              } @else {
+                <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+                  placeholder="Search by name or phone…" autocomplete="off" autofocus>
+                @if (patientDropdown().length) {
+                  <div class="patient-dropdown">
+                    @for (p of patientDropdown(); track p.id) {
+                      <div class="patient-dropdown__item" (click)="selectPatient(p)">
+                        <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
+                        <span class="patient-dropdown__phone">{{ p.phone }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </div>
           </div>
+
           <div class="field">
-            <label class="field__label">Ordering Doctor</label>
-            <input class="input" formControlName="doctorName" placeholder="Optional">
+            <label class="field__label">Select Tests <span style="color:var(--color-danger)">*</span></label>
+            @if (!catalog().length) {
+              <p class="field__hint">No tests in catalog. Add tests first.</p>
+            } @else {
+              <div class="test-checklist">
+                @for (test of catalog(); track test.id) {
+                  <label class="test-check-item" [class.test-check-item--selected]="selectedTestIds().has(test.id)">
+                    <input type="checkbox" [checked]="selectedTestIds().has(test.id)" (change)="toggleTest(test.id)">
+                    <span class="test-check-item__name">{{ test.name }}</span>
+                    <span class="test-check-item__cat badge badge--neutral">{{ test.category }}</span>
+                    <span class="test-check-item__price">₹{{ test.price | number:'1.0-0' }}</span>
+                  </label>
+                }
+              </div>
+              @if (selectedTestIds().size > 0) {
+                <p class="field__hint">{{ selectedTestIds().size }} test(s) selected</p>
+              }
+            }
           </div>
+
           <div class="field">
             <label class="field__label">Notes</label>
             <textarea class="input" formControlName="notes" placeholder="Clinical notes or special instructions" rows="3"></textarea>

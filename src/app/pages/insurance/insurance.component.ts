@@ -3,6 +3,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
 import { InsuranceService, InsuranceClaim, InsuranceProvider } from '../../core/services/insurance.service';
+import { PatientsService } from '../../core/services/patients.service';
+import { Patient } from '../../core/models/patient.models';
 import { ToastService } from '../../core/services/toast.service';
 
 type InsuranceTab = 'claims' | 'providers';
@@ -16,6 +18,7 @@ type InsuranceTab = 'claims' | 'providers';
 })
 export class InsuranceComponent implements OnInit {
   private insuranceService = inject(InsuranceService);
+  private patientsService = inject(PatientsService);
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
 
@@ -28,12 +31,18 @@ export class InsuranceComponent implements OnInit {
   readonly showClaimModal = signal(false);
   readonly showProviderModal = signal(false);
 
+  // Patient search
+  readonly patientQuery = signal('');
+  readonly patientDropdown = signal<Patient[]>([]);
+  readonly selectedPatient = signal<Patient | null>(null);
+  private patientSearchTimer: any;
+
   claimForm: FormGroup = this.fb.group({
-    patientName: ['', Validators.required],
+    patientId: ['', Validators.required],
+    memberName: ['', Validators.required],
     providerId: ['', Validators.required],
     policyNumber: ['', Validators.required],
     claimAmount: [0, [Validators.required, Validators.min(1)]],
-    diagnoses: [''],
     notes: [''],
   });
 
@@ -54,14 +63,8 @@ export class InsuranceComponent implements OnInit {
   loadClaims() {
     this.loading.set(true);
     this.insuranceService.getClaims().subscribe({
-      next: (res) => {
-        this.claims.set(res.data ?? []);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.toast.show('Failed to load claims', 'danger');
-      },
+      next: (res) => { this.claims.set(res.data ?? []); this.loading.set(false); },
+      error: () => { this.loading.set(false); this.toast.show('Failed to load claims', 'danger'); },
     });
   }
 
@@ -79,6 +82,43 @@ export class InsuranceComponent implements OnInit {
     });
   }
 
+  openClaimModal() {
+    this.claimForm.reset({ patientId: '', memberName: '', providerId: '', policyNumber: '', claimAmount: 0, notes: '' });
+    this.patientQuery.set('');
+    this.patientDropdown.set([]);
+    this.selectedPatient.set(null);
+    this.showClaimModal.set(true);
+  }
+
+  onPatientSearch(event: Event) {
+    const q = (event.target as HTMLInputElement).value;
+    this.patientQuery.set(q);
+    clearTimeout(this.patientSearchTimer);
+    if (q.length < 2) { this.patientDropdown.set([]); return; }
+    this.patientSearchTimer = setTimeout(() => {
+      this.patientsService.list({ search: q, limit: 8 }).subscribe({
+        next: (res) => this.patientDropdown.set(res.data ?? []),
+        error: () => {},
+      });
+    }, 300);
+  }
+
+  selectPatient(patient: Patient) {
+    this.selectedPatient.set(patient);
+    this.claimForm.patchValue({
+      patientId: patient.id,
+      memberName: `${patient.firstName} ${patient.lastName}`,
+    });
+    this.patientQuery.set('');
+    this.patientDropdown.set([]);
+  }
+
+  clearPatient() {
+    this.selectedPatient.set(null);
+    this.claimForm.patchValue({ patientId: '', memberName: '' });
+    this.patientDropdown.set([]);
+  }
+
   submitClaim() {
     if (this.claimForm.invalid) return;
     this.saving.set(true);
@@ -90,10 +130,7 @@ export class InsuranceComponent implements OnInit {
         this.loadClaims();
         this.loadStats();
       },
-      error: () => {
-        this.saving.set(false);
-        this.toast.show('Failed to create claim', 'danger');
-      },
+      error: () => { this.saving.set(false); this.toast.show('Failed to create claim', 'danger'); },
     });
   }
 
@@ -107,47 +144,31 @@ export class InsuranceComponent implements OnInit {
         this.toast.show('Provider added', 'success');
         this.loadProviders();
       },
-      error: () => {
-        this.saving.set(false);
-        this.toast.show('Failed to add provider', 'danger');
-      },
+      error: () => { this.saving.set(false); this.toast.show('Failed to add provider', 'danger'); },
     });
   }
 
   updateClaimStatus(id: string, status: InsuranceClaim['status']) {
     this.insuranceService.updateClaim(id, { status }).subscribe({
-      next: () => {
-        this.toast.show('Claim status updated', 'success');
-        this.loadClaims();
-        this.loadStats();
-      },
+      next: () => { this.toast.show('Claim status updated', 'success'); this.loadClaims(); this.loadStats(); },
       error: () => this.toast.show('Failed to update claim', 'danger'),
     });
   }
 
+  openProviderModal() {
+    this.providerForm.reset({ name: '', code: '', contactEmail: '', contactPhone: '', address: '' });
+    this.showProviderModal.set(true);
+  }
+
   statusBadge(status: string): string {
     const map: Record<string, string> = {
-      draft: 'badge--neutral',
-      submitted: 'badge--primary',
-      under_review: 'badge--warning',
-      approved: 'badge--success',
-      rejected: 'badge--danger',
-      paid: 'badge--teal',
+      draft: 'badge--neutral', submitted: 'badge--primary', under_review: 'badge--warning',
+      approved: 'badge--success', rejected: 'badge--danger', paid: 'badge--teal',
     };
     return map[status] ?? 'badge--neutral';
   }
 
   statusLabel(status: string): string {
     return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  openClaimModal() {
-    this.claimForm.reset({ patientName: '', providerId: '', policyNumber: '', claimAmount: 0, diagnoses: '', notes: '' });
-    this.showClaimModal.set(true);
-  }
-
-  openProviderModal() {
-    this.providerForm.reset({ name: '', code: '', contactEmail: '', contactPhone: '', address: '' });
-    this.showProviderModal.set(true);
   }
 }

@@ -547,6 +547,89 @@ textarea.input {
   }
 }
 
+// ── Patient search typeahead ──
+.patient-search {
+  position: relative;
+}
+
+.patient-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-primary-subtle);
+  border: 1px solid var(--color-primary-light);
+  border-radius: var(--radius-md);
+
+  &__info { display: flex; flex-direction: column; gap: 2px; }
+  &__name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  &__phone { font-size: 12px; color: var(--text-secondary); }
+}
+
+.patient-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 120ms;
+
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  &__phone { font-size: 12px; color: var(--text-secondary); }
+}
+
+// ── Test checklist ──
+.test-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.test-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms;
+
+  input[type="checkbox"] { flex-shrink: 0; accent-color: var(--color-primary); width: 16px; height: 16px; cursor: pointer; }
+
+  &__name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  &__cat { flex-shrink: 0; }
+  &__price { font-size: 13px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
+
+  &--selected {
+    background: var(--color-primary-subtle);
+    border-color: var(--color-primary-light);
+  }
+
+  &:hover { background: var(--surface-input); }
+  &--selected:hover { background: var(--color-primary-subtle); }
+}
+
 // ── Row actions ──
 .row-actions {
   display: flex;

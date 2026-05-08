@@ -191,8 +191,38 @@
         <form [formGroup]="claimForm">
           <div class="form-grid">
             <div class="field field--full">
-              <label class="field__label">Patient Name <span style="color:var(--color-danger)">*</span></label>
-              <input class="input" formControlName="patientName" placeholder="Enter patient name" autofocus>
+              <label class="field__label">Patient <span style="color:var(--color-danger)">*</span></label>
+              <div class="patient-search">
+                @if (selectedPatient()) {
+                  <div class="patient-selected">
+                    <div class="patient-selected__info">
+                      <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
+                      <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
+                    </div>
+                    <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
+                      <lucide-icon name="x" [size]="14" />
+                    </button>
+                  </div>
+                } @else {
+                  <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+                    placeholder="Search by name or phone…" autocomplete="off" autofocus>
+                  @if (patientDropdown().length) {
+                    <div class="patient-dropdown">
+                      @for (p of patientDropdown(); track p.id) {
+                        <div class="patient-dropdown__item" (click)="selectPatient(p)">
+                          <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
+                          <span class="patient-dropdown__phone">{{ p.phone }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+            <div class="field field--full">
+              <label class="field__label">Member / Insured Name <span style="color:var(--color-danger)">*</span></label>
+              <input class="input" formControlName="memberName" placeholder="Name on the insurance policy">
+              <span class="field__hint">Pre-filled from patient — edit if policyholder is different.</span>
             </div>
             <div class="field">
               <label class="field__label">Insurance Provider <span style="color:var(--color-danger)">*</span></label>
