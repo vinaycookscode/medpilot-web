@@ -131,6 +131,8 @@ textarea.input {
 .card {
   @include m.card;
   padding: t.$sp-6;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   &__header {
     @include m.flex-between;
