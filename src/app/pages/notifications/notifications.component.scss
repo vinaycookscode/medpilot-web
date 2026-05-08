@@ -1,0 +1,112 @@
+@use '../../../styles/tokens' as t;
+
+// ── Notifications list ──
+.notif-list {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Notification item ──
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background t.$t-fast t.$ease;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--surface-input);
+  }
+
+  // Unread: blue left border + subtle tint
+  &--unread {
+    border-left: 3px solid var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 3%, var(--surface-card));
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-primary) 6%, var(--surface-card));
+    }
+
+    .notif-item__title {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: t.$text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  &__message {
+    font-size: t.$text-sm;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  &__time {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  &__type {
+    text-transform: capitalize;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity t.$t-fast t.$ease;
+    flex-shrink: 0;
+  }
+
+  &:hover &__actions {
+    opacity: 1;
+  }
+
+  &__delete {
+    color: var(--text-tertiary);
+    &:hover { color: var(--color-danger) !important; }
+  }
+
+  // Always show actions on unread (for mark-read button)
+  &--unread &__actions {
+    opacity: 1;
+  }
+}

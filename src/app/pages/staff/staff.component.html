@@ -1,0 +1,203 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Staff Management</h1>
+      <p class="page-sub">Manage your team members, roles, and leave requests.</p>
+    </div>
+    <button class="btn btn--primary" (click)="openLeaveModal()">
+      <lucide-icon name="plus" [size]="16" /> Request Leave
+    </button>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar" style="margin-bottom: 24px; width: fit-content;">
+    <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'staff'" (click)="activeTab.set('staff')">
+      <lucide-icon name="users" [size]="14" /> Staff
+    </button>
+    <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'leaves'" (click)="activeTab.set('leaves')">
+      <lucide-icon name="calendar-check" [size]="14" /> Leave Requests
+      @if (pendingLeavesCount > 0) {
+        <span class="badge badge--warning">{{ pendingLeavesCount }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- Staff tab -->
+  @if (activeTab() === 'staff') {
+    @if (loading()) {
+      <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+    } @else if (!staff().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <lucide-icon name="users" [size]="28" />
+        </div>
+        <p class="empty-state__title">No staff members yet</p>
+        <p class="empty-state__subtitle">Add team members to start managing your clinic staff.</p>
+      </div>
+    } @else {
+      <div class="staff-grid">
+        @for (member of staff(); track member.id) {
+          <div class="staff-card">
+            <div class="staff-card__top">
+              <div class="staff-avatar" [attr.data-role]="member.role">
+                {{ getInitials(member.firstName, member.lastName) }}
+              </div>
+              <div class="staff-card__meta">
+                <div class="staff-card__name">{{ member.firstName }} {{ member.lastName }}</div>
+                <span class="badge" [ngClass]="getRoleBadgeClass(member.role)">{{ member.role }}</span>
+              </div>
+              <span class="badge staff-card__status" [class.badge--success]="member.isActive" [class.badge--neutral]="!member.isActive">
+                {{ member.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+
+            <div class="staff-card__details">
+              @if (member.specialization) {
+                <div class="staff-card__detail-row">
+                  <lucide-icon name="stethoscope" [size]="13" />
+                  <span>{{ member.specialization }}</span>
+                </div>
+              }
+              @if (member.email) {
+                <div class="staff-card__detail-row">
+                  <lucide-icon name="mail" [size]="13" />
+                  <span>{{ member.email }}</span>
+                </div>
+              }
+              @if (member.phone) {
+                <div class="staff-card__detail-row">
+                  <lucide-icon name="phone" [size]="13" />
+                  <span>{{ member.phone }}</span>
+                </div>
+              }
+              @if (member.consultationFee) {
+                <div class="staff-card__detail-row">
+                  <lucide-icon name="indian-rupee" [size]="13" />
+                  <span>{{ member.consultationFee | number }} / consultation</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Leaves tab -->
+  @if (activeTab() === 'leaves') {
+    @if (!leaves().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <lucide-icon name="calendar-check" [size]="28" />
+        </div>
+        <p class="empty-state__title">No leave requests</p>
+        <p class="empty-state__subtitle">Leave requests submitted by staff will appear here.</p>
+      </div>
+    } @else {
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Staff Member</th>
+                <th>Leave Type</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (leave of leaves(); track leave.id) {
+                <tr>
+                  <td>
+                    <span class="staff-name-cell">{{ getStaffName(leave) }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge--neutral">{{ leave.leaveType }}</span>
+                  </td>
+                  <td>{{ leave.startDate | date: 'dd MMM yyyy' }}</td>
+                  <td>{{ leave.endDate | date: 'dd MMM yyyy' }}</td>
+                  <td>{{ getLeaveDuration(leave) }} day{{ getLeaveDuration(leave) !== 1 ? 's' : '' }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(leave.status)">
+                      {{ leave.status }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (leave.status === 'pending') {
+                      <div class="row-actions" style="opacity: 1;">
+                        <button class="btn btn--sm btn--ghost" style="color: var(--color-success);" (click)="updateLeaveStatus(leave.id, 'approved')">
+                          <lucide-icon name="check-circle-2" [size]="14" /> Approve
+                        </button>
+                        <button class="btn btn--sm btn--ghost" style="color: var(--color-danger);" (click)="updateLeaveStatus(leave.id, 'rejected')">
+                          <lucide-icon name="x" [size]="14" /> Reject
+                        </button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Leave Request Modal -->
+@if (showLeaveModal()) {
+  <div class="modal-backdrop" (click)="closeLeaveModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Request Leave</h3>
+        <button class="btn btn--ghost btn--icon" (click)="closeLeaveModal()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <form [formGroup]="leaveForm" class="modal-form">
+          <div class="field">
+            <label class="field__label">Leave Type <span style="color: var(--color-danger);">*</span></label>
+            <select class="select" formControlName="leaveType">
+              <option value="">Select type</option>
+              <option value="sick">Sick Leave</option>
+              <option value="casual">Casual Leave</option>
+              <option value="annual">Annual Leave</option>
+              <option value="emergency">Emergency Leave</option>
+              <option value="maternity">Maternity Leave</option>
+              <option value="paternity">Paternity Leave</option>
+            </select>
+          </div>
+
+          <div class="form-grid" style="margin-top: 16px;">
+            <div class="field">
+              <label class="field__label">Start Date <span style="color: var(--color-danger);">*</span></label>
+              <input type="date" class="input" formControlName="startDate" />
+            </div>
+            <div class="field">
+              <label class="field__label">End Date <span style="color: var(--color-danger);">*</span></label>
+              <input type="date" class="input" formControlName="endDate" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: 16px;">
+            <label class="field__label">Reason</label>
+            <textarea class="input" rows="3" placeholder="Brief reason for leave..." formControlName="reason"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="closeLeaveModal()">Cancel</button>
+        <button class="btn btn--primary" [disabled]="leaveForm.invalid || saving()" (click)="submitLeave()">
+          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+          Submit Request
+        </button>
+      </div>
+    </div>
+  </div>
+}
