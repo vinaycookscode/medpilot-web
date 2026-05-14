@@ -28,6 +28,8 @@ import {
   ChevronUp,
   // Dashboard quick actions
   CalendarPlus,
+  // ABHA
+  Link, Unlink, Download,
 } from 'lucide-angular';
 
 @NgModule({
@@ -51,6 +53,7 @@ import {
       ArrowLeft, CalendarDays, LogIn, MessageSquare, UserX,
       ChevronUp,
       CalendarPlus,
+      Link, Unlink, Download,
     }),
   ],
   exports: [LucideAngularModule],

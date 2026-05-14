@@ -249,6 +249,168 @@
     flex-shrink: 0;
     margin-top: 1px;
   }
+
+  // ── ABHA section ──────────────────────────────────────────────────────────
+
+  &__abha-card {
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3 t.$sp-4;
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__abha-empty {
+    background: var(--surface-input);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: t.$sp-4;
+    text-align: center;
+  }
+
+  &__abha-info-row {
+    @include m.flex(center, space-between, t.$sp-3);
+    flex-wrap: wrap;
+  }
+
+  &__abha-number {
+    font-family: t.$font-mono;
+    font-size: t.$text-sm;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 0.04em;
+  }
+
+  // ABHA modal step indicator
+  &__abha-steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: t.$sp-5;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  &__abha-step {
+    @include m.flex(center, flex-start, 6px);
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--surface-input);
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    &-line {
+      flex: 1;
+      min-width: 20px;
+      height: 1.5px;
+      background: var(--border);
+      margin: 0 t.$sp-2;
+    }
+
+    &.active {
+      color: var(--color-primary);
+      .patients__abha-step-num {
+        background: var(--color-primary-subtle);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
+    }
+
+    &.done {
+      .patients__abha-step-num {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: #fff;
+      }
+    }
+  }
+
+  // OTP step UI
+  &__abha-otp-banner {
+    @include m.flex(center, flex-start, t.$sp-3);
+    background: var(--color-primary-subtle);
+    border: 1px solid var(--color-primary-light);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3 t.$sp-4;
+    margin-bottom: t.$sp-4;
+    color: var(--color-primary);
+
+    p { margin: 0; font-size: t.$text-sm; color: var(--text-secondary); }
+  }
+
+  &__abha-countdown {
+    @include m.flex(center, flex-start, 4px);
+    margin-top: t.$sp-1;
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+  }
+
+  // Address suggestions
+  &__abha-suggestions {
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__abha-suggestion-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-2 t.$sp-3;
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: t.$text-sm;
+    transition: border-color t.$t-fast t.$ease;
+
+    &:hover { border-color: var(--color-primary-light); }
+    input[type='radio'] { accent-color: var(--color-primary); flex-shrink: 0; }
+  }
+
+  // Success state
+  &__abha-success {
+    @include m.flex-col(t.$sp-3);
+    align-items: center;
+    text-align: center;
+    padding: t.$sp-4 0;
+
+    &-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--color-success, #16a34a) 12%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-success, #16a34a);
+    }
+  }
+
+  &__abha-result {
+    width: 100%;
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3 t.$sp-4;
+    @include m.flex-col(t.$sp-2);
+    margin-top: t.$sp-2;
+    text-align: left;
+
+    &-row {
+      @include m.flex(center, space-between, t.$sp-2);
+      flex-wrap: wrap;
+    }
+  }
 }
 
 @keyframes slide-in-right {

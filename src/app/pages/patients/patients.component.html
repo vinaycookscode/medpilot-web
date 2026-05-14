@@ -187,6 +187,70 @@
 
       <div class="divider"></div>
 
+      <!-- ABHA Health ID -->
+      <div>
+        <div class="d-flex items-center justify-between mb-3">
+          <div class="d-flex items-center gap-2">
+            <lucide-icon name="shield-check" [size]="14" style="color:var(--color-primary)" />
+            <p class="label" style="margin:0">ABHA Health ID</p>
+          </div>
+          @if (abhaProfile()?.hasAbha && auth.hasRole('admin', 'doctor')) {
+            <button class="btn btn--ghost btn--sm" (click)="downloadCard()" [disabled]="abhaLoading()">
+              <lucide-icon name="download" [size]="13" />
+              Card
+            </button>
+          }
+        </div>
+
+        @if (abhaLoading() && !abhaProfile()) {
+          <div class="skeleton" style="height:88px;border-radius:8px"></div>
+        } @else if (abhaProfile()?.hasAbha) {
+          <div class="patients__abha-card">
+            <div class="patients__abha-info-row">
+              <span class="patients__info-label">ABHA Number</span>
+              <span class="patients__abha-number">{{ abhaProfile()!.abhaNumber }}</span>
+            </div>
+            @if (abhaProfile()!.abhaAddress) {
+              <div class="patients__abha-info-row">
+                <span class="patients__info-label">ABHA Address</span>
+                <span class="patients__info-value">{{ abhaProfile()!.abhaAddress }}</span>
+              </div>
+            }
+            <div class="patients__abha-info-row">
+              <span class="patients__info-label">Status</span>
+              <span class="badge badge--success" style="font-size:11px">
+                <lucide-icon name="check-circle" [size]="11" style="vertical-align:-1px;margin-right:2px" />
+                Verified · {{ abhaProfile()!.kycType | titlecase }}
+              </span>
+            </div>
+            @if (auth.isAdmin()) {
+              <div style="margin-top:4px">
+                <button class="btn btn--ghost btn--sm patients__delete" (click)="unlinkAbha()" [disabled]="abhaLoading()">
+                  <lucide-icon name="unlink" [size]="13" />
+                  Unlink ABHA
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="patients__abha-empty">
+            <p class="text-xs text-tertiary mb-2">No ABHA Health ID linked.</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn--primary btn--sm" (click)="openCreateAbha()">
+                <lucide-icon name="shield-check" [size]="13" />
+                Create ABHA
+              </button>
+              <button class="btn btn--secondary btn--sm" (click)="openVerifyAbha()">
+                <lucide-icon name="link" [size]="13" />
+                Link Existing
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="divider"></div>
+
       <!-- Prescription History -->
       <div>
         <div class="d-flex items-center justify-between mb-3">
@@ -372,6 +436,269 @@
           </div>
         }
 
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Create ABHA Modal ── -->
+@if (showCreateAbha()) {
+  <div class="modal-backdrop" style="z-index:800" (click)="closeCreateAbha()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h3 class="modal__title">Create ABHA Health ID</h3>
+          <p class="text-xs text-tertiary">
+            @switch (abhaCreateStep()) {
+              @case (1) { Step 1 — Enter Aadhaar number }
+              @case (2) { Step 2 — Enter OTP }
+              @case (3) { Step 3 — Choose ABHA address }
+              @case (4) { Enrollment complete }
+            }
+          </p>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="closeCreateAbha()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <!-- Step indicator -->
+        <div class="patients__abha-steps">
+          <div class="patients__abha-step" [class.active]="abhaCreateStep() >= 1" [class.done]="abhaCreateStep() > 1">
+            <div class="patients__abha-step-num">@if (abhaCreateStep() > 1) { ✓ } @else { 1 }</div>
+            <span>Aadhaar</span>
+          </div>
+          <div class="patients__abha-step-line"></div>
+          <div class="patients__abha-step" [class.active]="abhaCreateStep() >= 2" [class.done]="abhaCreateStep() > 2">
+            <div class="patients__abha-step-num">@if (abhaCreateStep() > 2) { ✓ } @else { 2 }</div>
+            <span>OTP</span>
+          </div>
+          <div class="patients__abha-step-line"></div>
+          <div class="patients__abha-step" [class.active]="abhaCreateStep() >= 3" [class.done]="abhaCreateStep() > 3">
+            <div class="patients__abha-step-num">@if (abhaCreateStep() > 3) { ✓ } @else { 3 }</div>
+            <span>Address</span>
+          </div>
+          <div class="patients__abha-step-line"></div>
+          <div class="patients__abha-step" [class.active]="abhaCreateStep() >= 4">
+            <div class="patients__abha-step-num">4</div>
+            <span>Done</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Aadhaar -->
+        @if (abhaCreateStep() === 1) {
+          <div class="field">
+            <label class="field__label">Aadhaar Number *</label>
+            <input class="input" type="text" [(ngModel)]="abhaAadhaar" maxlength="12"
+                   placeholder="12-digit Aadhaar number" inputmode="numeric" />
+            <span class="field__hint">OTP will be sent to the Aadhaar-linked mobile</span>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label class="field__label">Override Mobile (optional)</label>
+            <input class="input" type="tel" [(ngModel)]="abhaMobile" maxlength="10"
+                   placeholder="10-digit mobile number" />
+            <span class="field__hint">Leave blank to use the Aadhaar-linked mobile</span>
+          </div>
+        }
+
+        <!-- Step 2: OTP -->
+        @if (abhaCreateStep() === 2) {
+          <div class="patients__abha-otp-banner">
+            <lucide-icon name="shield-check" [size]="20" />
+            <p>OTP sent to the Aadhaar-linked mobile. Enter it below to complete enrollment.</p>
+          </div>
+          <div class="field">
+            <label class="field__label">OTP *</label>
+            <input class="input" type="text" [(ngModel)]="abhaOtp" maxlength="6"
+                   placeholder="6-digit OTP" inputmode="numeric" />
+            <div class="patients__abha-countdown">
+              @if (abhaCountdown() > 0) {
+                <lucide-icon name="clock" [size]="11" />
+                <span>Expires in {{ abhaCountdown() }}s</span>
+              } @else {
+                <span style="color:var(--color-danger)">OTP expired — please start over</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Step 3: Address selection -->
+        @if (abhaCreateStep() === 3) {
+          <p class="text-sm text-secondary mb-3">Choose an ABHA address for this patient.</p>
+          <div class="patients__abha-suggestions">
+            @for (addr of abhaCreateSuggestions(); track addr) {
+              <label class="patients__abha-suggestion-item">
+                <input type="radio" [(ngModel)]="selectedAbhaAddress" [value]="addr" />
+                <span>{{ addr }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Step 4: Success -->
+        @if (abhaCreateStep() === 4) {
+          <div class="patients__abha-success">
+            <div class="patients__abha-success-icon">
+              <lucide-icon name="check-circle-2" [size]="36" />
+            </div>
+            <p style="font-size:14px;font-weight:700;color:var(--color-primary)">ABHA created successfully!</p>
+            @if (abhaCreateResult()) {
+              <div class="patients__abha-result">
+                <div class="patients__abha-result-row">
+                  <span class="patients__info-label">ABHA Number</span>
+                  <span class="patients__abha-number">{{ abhaCreateResult()!.abhaNumber }}</span>
+                </div>
+                @if (abhaCreateResult()!.abhaAddress) {
+                  <div class="patients__abha-result-row">
+                    <span class="patients__info-label">ABHA Address</span>
+                    <span class="patients__info-value">{{ abhaCreateResult()!.abhaAddress }}</span>
+                  </div>
+                }
+                <div class="patients__abha-result-row">
+                  <span class="patients__info-label">Name</span>
+                  <span class="patients__info-value">{{ abhaCreateResult()!.name }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal__footer">
+        @if (abhaCreateStep() === 1) {
+          <button class="btn btn--secondary" (click)="closeCreateAbha()">Cancel</button>
+          <button class="btn btn--primary" (click)="initiateAbhaCreate()"
+                  [disabled]="abhaCreateLoading() || abhaAadhaar.length !== 12">
+            @if (abhaCreateLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Send OTP
+          </button>
+        }
+        @if (abhaCreateStep() === 2) {
+          <button class="btn btn--secondary" (click)="abhaCreateStep.set(1)" [disabled]="abhaCreateLoading()">Back</button>
+          <button class="btn btn--primary" (click)="enrollAbha()"
+                  [disabled]="abhaCreateLoading() || abhaOtp.length !== 6 || abhaCountdown() === 0">
+            @if (abhaCreateLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Verify & Enroll
+          </button>
+        }
+        @if (abhaCreateStep() === 3) {
+          <button class="btn btn--secondary" (click)="skipAddressSelection()">Skip</button>
+          <button class="btn btn--primary" (click)="selectAbhaAddress()"
+                  [disabled]="!selectedAbhaAddress || abhaCreateLoading()">
+            @if (abhaCreateLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Set Address
+          </button>
+        }
+        @if (abhaCreateStep() === 4) {
+          <button class="btn btn--primary" (click)="closeCreateAbha()">Done</button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Link Existing ABHA Modal ── -->
+@if (showVerifyAbha()) {
+  <div class="modal-backdrop" style="z-index:800" (click)="closeVerifyAbha()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h3 class="modal__title">Link Existing ABHA</h3>
+          <p class="text-xs text-tertiary">
+            @switch (abhaVerifyStep()) {
+              @case (1) { Step 1 — Enter ABHA number }
+              @case (2) { Step 2 — Enter OTP to verify }
+              @case (3) { ABHA linked }
+            }
+          </p>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="closeVerifyAbha()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <div class="modal__body">
+        @if (abhaVerifyStep() === 1) {
+          <div class="field">
+            <label class="field__label">ABHA Number *</label>
+            <input class="input" type="text" [(ngModel)]="abhaVerifyLoginId"
+                   placeholder="91-XXXX-XXXX-XXXX" />
+            <span class="field__hint">Enter the 14-digit ABHA number with hyphens</span>
+          </div>
+        }
+
+        @if (abhaVerifyStep() === 2) {
+          <div class="patients__abha-otp-banner">
+            <lucide-icon name="shield-check" [size]="20" />
+            <p>OTP sent to the ABHA-linked mobile. Ask the patient to share it.</p>
+          </div>
+          <div class="field">
+            <label class="field__label">OTP *</label>
+            <input class="input" type="text" [(ngModel)]="abhaVerifyOtp" maxlength="6"
+                   placeholder="6-digit OTP" inputmode="numeric" />
+            <div class="patients__abha-countdown">
+              @if (abhaVerifyCountdown() > 0) {
+                <lucide-icon name="clock" [size]="11" />
+                <span>Expires in {{ abhaVerifyCountdown() }}s</span>
+              } @else {
+                <span style="color:var(--color-danger)">OTP expired — please start over</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (abhaVerifyStep() === 3) {
+          <div class="patients__abha-success">
+            <div class="patients__abha-success-icon">
+              <lucide-icon name="check-circle-2" [size]="36" />
+            </div>
+            <p style="font-size:14px;font-weight:700;color:var(--color-primary)">
+              @if (abhaVerifyResult()?.isNewPatient) { ABHA linked to this patient! }
+              @else { ABHA verified — already linked in system. }
+            </p>
+            @if (abhaVerifyResult()) {
+              <div class="patients__abha-result">
+                <div class="patients__abha-result-row">
+                  <span class="patients__info-label">ABHA Number</span>
+                  <span class="patients__abha-number">{{ abhaVerifyResult()!.abhaNumber }}</span>
+                </div>
+                @if (abhaVerifyResult()!.abhaAddress) {
+                  <div class="patients__abha-result-row">
+                    <span class="patients__info-label">ABHA Address</span>
+                    <span class="patients__info-value">{{ abhaVerifyResult()!.abhaAddress }}</span>
+                  </div>
+                }
+                <div class="patients__abha-result-row">
+                  <span class="patients__info-label">Name on ABHA</span>
+                  <span class="patients__info-value">{{ abhaVerifyResult()!.name }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal__footer">
+        @if (abhaVerifyStep() === 1) {
+          <button class="btn btn--secondary" (click)="closeVerifyAbha()">Cancel</button>
+          <button class="btn btn--primary" (click)="initiateAbhaVerify()"
+                  [disabled]="abhaVerifyLoading() || abhaVerifyLoginId.length < 10">
+            @if (abhaVerifyLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Send OTP
+          </button>
+        }
+        @if (abhaVerifyStep() === 2) {
+          <button class="btn btn--secondary" (click)="abhaVerifyStep.set(1)" [disabled]="abhaVerifyLoading()">Back</button>
+          <button class="btn btn--primary" (click)="confirmAbhaVerify()"
+                  [disabled]="abhaVerifyLoading() || abhaVerifyOtp.length !== 6 || abhaVerifyCountdown() === 0">
+            @if (abhaVerifyLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Verify & Link
+          </button>
+        }
+        @if (abhaVerifyStep() === 3) {
+          <button class="btn btn--primary" (click)="closeVerifyAbha()">Done</button>
+        }
       </div>
     </div>
   </div>

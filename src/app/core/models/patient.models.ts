@@ -27,6 +27,9 @@ export interface Patient {
   notes?: string;
   tags?: string[];
   createdAt: string;
+  abhaNumber?: string;
+  abhaAddress?: string;
+  abhaVerified?: boolean;
 }
 
 export interface CreatePatientDto {
