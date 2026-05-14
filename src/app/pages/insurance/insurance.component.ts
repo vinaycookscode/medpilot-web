@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
 import { InsuranceService, InsuranceClaim, InsuranceProvider } from '../../core/services/insurance.service';
@@ -13,7 +13,7 @@ type InsuranceTab = 'claims' | 'providers';
 @Component({
   selector: 'app-insurance',
   standalone: true,
-  imports: [ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe],
+  imports: [FormsModule, ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe],
   templateUrl: './insurance.component.html',
   styleUrl: './insurance.component.scss',
 })
