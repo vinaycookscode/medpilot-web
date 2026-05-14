@@ -39,7 +39,24 @@ export class BillingComponent implements OnInit {
   readonly paymentInvoice      = signal<Invoice | null>(null);
   readonly services       = signal<Service[]>([]);
   readonly page           = signal(1);
-  readonly pageSize       = 20;
+  readonly pageSize       = signal(20);
+  readonly sortCol        = signal<string>('invoiceDate');
+  readonly sortDir        = signal<'asc' | 'desc'>('desc');
+
+  readonly sorted = computed(() => {
+    const col = this.sortCol();
+    const dir = this.sortDir();
+    return [...this.invoices()].sort((a, b) => {
+      const av = col === 'patientName'
+        ? `${(a as any).patient?.firstName ?? ''} ${(a as any).patient?.lastName ?? ''}`
+        : (a as any)[col] ?? '';
+      const bv = col === 'patientName'
+        ? `${(b as any).patient?.firstName ?? ''} ${(b as any).patient?.lastName ?? ''}`
+        : (b as any)[col] ?? '';
+      const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
   private clinic: ClinicDetail | null = null;
 
   // Patient search
@@ -91,7 +108,7 @@ export class BillingComponent implements OnInit {
 
   load() {
     this.loading.set(true);
-    this.billingSvc.listInvoices({ page: this.page() } as any).subscribe({
+    this.billingSvc.listInvoices({ page: this.page(), limit: this.pageSize() } as any).subscribe({
       next: r => { this.invoices.set(r.data); this.total.set(r.meta.total); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
@@ -283,7 +300,22 @@ export class BillingComponent implements OnInit {
     return status === 'partially_paid' ? 'partial' : status;
   }
 
-  get totalPages() { return Math.ceil(this.total() / this.pageSize); }
+  get totalPages() { return Math.ceil(this.total() / this.pageSize()); }
   prevPage() { if (this.page() > 1) { this.page.update(p => p - 1); this.load(); } }
   nextPage() { if (this.page() < this.totalPages) { this.page.update(p => p + 1); this.load(); } }
+  changePageSize(n: number) { this.pageSize.set(n); this.page.set(1); this.load(); }
+
+  sort(col: string) {
+    if (this.sortCol() === col) {
+      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortCol.set(col);
+      this.sortDir.set('asc');
+    }
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortCol() !== col) return 'chevrons-up-down';
+    return this.sortDir() === 'asc' ? 'chevron-up' : 'chevron-down';
+  }
 }

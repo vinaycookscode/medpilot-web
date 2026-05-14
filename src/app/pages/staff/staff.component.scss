@@ -1,5 +1,13 @@
 @use '../../../styles/tokens' as t;
 
+// ── Staff grid toolbar ──
+.staff-grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
 // ── Staff grid ──
 .staff-grid {
   display: grid;
@@ -142,4 +150,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+}
+
+.staff-modal-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+  }
 }

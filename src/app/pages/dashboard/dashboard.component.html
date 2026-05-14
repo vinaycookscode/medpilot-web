@@ -1,165 +1,274 @@
 <div class="page dashboard">
+
   <!-- Header -->
-  <div class="page__header">
-    <div>
-      <h2 class="page__title">Good morning, {{ auth.user()?.firstName }} 👋</h2>
-      <p class="page__subtitle">{{ today() }}</p>
+  <div class="dash-header">
+    <div class="dash-header__left">
+      <h2 class="dash-header__greeting">Good {{ timeOfDay() }}, {{ auth.user()?.firstName }} 👋</h2>
+      <p class="dash-header__date">{{ today() }}</p>
     </div>
-    <a class="btn btn--primary" routerLink="/appointments">
+    <a class="btn btn--primary" routerLink="/appointments" [queryParams]="{new: '1'}">
       <lucide-icon name="plus" [size]="16" />
       New Appointment
     </a>
   </div>
 
   <!-- KPI Cards -->
-  <div class="dashboard__kpis">
+  <div class="dash-kpis">
     @if (summary(); as s) {
-      <!-- Today's Appointments -->
-      <div class="stat-card">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Today's Appointments</span>
-          <div class="stat-card__icon" style="background:var(--color-primary-subtle);color:var(--color-primary)">
-            <lucide-icon name="calendar" [size]="20" />
+
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__top">
+          <span class="kpi-card__label">Today's Appointments</span>
+          <div class="kpi-card__icon">
+            <lucide-icon name="calendar" [size]="18" />
           </div>
         </div>
-        <div class="stat-card__value">{{ s.todayAppointments.total }}</div>
-        <div class="stat-card__delta stat-card__delta--flat">
+        <div class="kpi-card__value">{{ s.todayAppointments.total }}</div>
+        <div class="kpi-card__sub">
           <lucide-icon name="check-circle-2" [size]="12" />
           {{ s.todayAppointments.completed }} completed
         </div>
       </div>
 
-      <!-- Today's Revenue -->
-      <div class="stat-card">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Today's Revenue</span>
-          <div class="stat-card__icon" style="background:var(--color-success-subtle);color:var(--color-success)">
-            <lucide-icon name="indian-rupee" [size]="20" />
+      @if (auth.role() !== 'receptionist') {
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-card__top">
+            <span class="kpi-card__label">Today's Revenue</span>
+            <div class="kpi-card__icon">
+              <lucide-icon name="indian-rupee" [size]="18" />
+            </div>
+          </div>
+          <div class="kpi-card__value">{{ formatCurrency(s.todayRevenue.collected) }}</div>
+          <div class="kpi-card__sub">
+            <lucide-icon name="clock" [size]="12" />
+            {{ formatCurrency(s.todayRevenue.pending) }} pending
           </div>
         </div>
-        <div class="stat-card__value">{{ formatCurrency(s.todayRevenue.collected) }}</div>
-        <div class="stat-card__delta stat-card__delta--flat">
-          <lucide-icon name="clock" [size]="12" />
-          {{ formatCurrency(s.todayRevenue.pending) }} pending
-        </div>
-      </div>
+      }
 
-      <!-- Total Patients -->
-      <div class="stat-card">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Total Patients</span>
-          <div class="stat-card__icon" style="background:var(--color-purple-subtle);color:var(--color-purple)">
-            <lucide-icon name="users" [size]="20" />
+      <div class="kpi-card kpi-card--purple">
+        <div class="kpi-card__top">
+          <span class="kpi-card__label">Total Patients</span>
+          <div class="kpi-card__icon">
+            <lucide-icon name="users" [size]="18" />
           </div>
         </div>
-        <div class="stat-card__value">{{ s.totalPatients }}</div>
-        <div class="stat-card__delta stat-card__delta--up">
-          <lucide-icon name="user-check" [size]="12" />
+        <div class="kpi-card__value">{{ s.totalPatients }}</div>
+        <div class="kpi-card__sub kpi-card__sub--up">
+          <lucide-icon name="trending-up" [size]="12" />
           {{ s.newPatientsThisMonth }} new this month
         </div>
       </div>
 
-      <!-- Pending Invoices -->
-      <div class="stat-card">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Pending Invoices</span>
-          <div class="stat-card__icon" style="background:var(--color-warning-subtle);color:var(--color-warning)">
-            <lucide-icon name="receipt" [size]="20" />
+      @if (auth.role() !== 'receptionist') {
+        <div class="kpi-card kpi-card--amber">
+          <div class="kpi-card__top">
+            <span class="kpi-card__label">Pending Invoices</span>
+            <div class="kpi-card__icon">
+              <lucide-icon name="receipt" [size]="18" />
+            </div>
+          </div>
+          <div class="kpi-card__value">{{ s.pendingInvoicesCount }}</div>
+          <div class="kpi-card__sub" [class.kpi-card__sub--warn]="s.pendingInvoicesCount > 0">
+            <lucide-icon name="alert-triangle" [size]="12" />
+            {{ formatCurrency(s.pendingInvoicesAmount) }} outstanding
           </div>
         </div>
-        <div class="stat-card__value">{{ s.pendingInvoicesCount }}</div>
-        <div class="stat-card__delta" [class.stat-card__delta--flat]="s.pendingInvoicesCount === 0"
-             [class.stat-card__delta--down]="s.pendingInvoicesCount > 0">
-          <lucide-icon name="alert-triangle" [size]="12" />
-          {{ formatCurrency(s.pendingInvoicesAmount) }} outstanding
-        </div>
-      </div>
+      }
+
     } @else {
       @for (i of [1,2,3,4]; track i) {
-        <div class="stat-card">
-          <div class="skeleton" style="height:14px;width:60%;margin-bottom:12px;border-radius:6px"></div>
-          <div class="skeleton" style="height:32px;width:40%;border-radius:6px"></div>
+        <div class="kpi-card">
+          <div class="skeleton" style="height:12px;width:55%;margin-bottom:16px;border-radius:4px"></div>
+          <div class="skeleton" style="height:36px;width:45%;border-radius:6px"></div>
         </div>
       }
     }
   </div>
 
-  <!-- Main content grid -->
-  <div class="dashboard__grid">
-    <!-- Today's queue -->
-    <div class="card card--flush dashboard__queue">
-      <div class="card__header" style="padding:20px 24px 0">
-        <span class="card__title">Today's Queue</span>
-        <a class="btn btn--ghost btn--sm" routerLink="/appointments">View all</a>
+  <!-- ── Receptionist layout ── -->
+  @if (auth.role() === 'receptionist') {
+    <div class="dash-grid dash-grid--receptionist">
+
+      <!-- Today's Queue full width -->
+      <div class="card card--flush dash-queue">
+        <div class="dash-queue__head">
+          <span class="card__title">Today's Queue</span>
+          <a class="btn btn--ghost btn--sm" routerLink="/appointments">View all</a>
+        </div>
+        @if (loading()) {
+          <div class="dash-queue__list">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="dash-queue__item">
+                <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0"></div>
+                <div style="flex:1">
+                  <div class="skeleton" style="height:13px;width:50%;margin-bottom:6px;border-radius:4px"></div>
+                  <div class="skeleton" style="height:11px;width:30%;border-radius:4px"></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (!todayQueue().length) {
+          <div class="empty-state">
+            <div class="empty-state__icon"><lucide-icon name="calendar-x" [size]="24" /></div>
+            <p class="empty-state__title">No appointments today</p>
+            <p class="empty-state__subtitle">Schedule an appointment to see it here</p>
+          </div>
+        } @else {
+          <div class="dash-queue__list">
+            @for (appt of todayQueue(); track appt.id) {
+              <div class="dash-queue__item">
+                <div class="avatar avatar--sm">
+                  {{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}
+                </div>
+                <div class="dash-queue__info">
+                  <span class="dash-queue__name">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</span>
+                  <span class="dash-queue__meta">{{ appt.startTime }} · {{ (appt.appointmentType ?? '') | titlecase }}</span>
+                </div>
+                <span class="badge" [class]="statusClass(appt.status)">{{ appt.status | titlecase }}</span>
+              </div>
+            }
+          </div>
+        }
+        <div class="table-pagination">
+          <span class="table-pagination__info">{{ queueTotal() }} appointments &nbsp;·&nbsp; Page {{ queuePage() }} of {{ queueTotalPages || 1 }}</span>
+          <div class="table-pagination__size">
+            <label class="table-pagination__size-label">Rows</label>
+            <select class="table-pagination__size-select" [ngModel]="queuePageSize()" (ngModelChange)="changeQueuePageSize($event)" [ngModelOptions]="{standalone:true}">
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="50">50</option>
+            </select>
+          </div>
+          <div class="table-pagination__controls">
+            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() === 1" (click)="queuePrevPage()">
+              <lucide-icon name="chevron-left" [size]="14" /> Prev
+            </button>
+            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">
+              Next <lucide-icon name="chevron-right" [size]="14" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      @if (loading()) {
-        <div class="dashboard__queue-list">
-          @for (i of [1,2,3,4,5]; track i) {
-            <div class="dashboard__queue-item">
-              <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0"></div>
-              <div style="flex:1">
-                <div class="skeleton" style="height:13px;width:55%;margin-bottom:6px;border-radius:4px"></div>
-                <div class="skeleton" style="height:11px;width:35%;border-radius:4px"></div>
-              </div>
-            </div>
-          }
+      <!-- Quick Actions -->
+      <div class="card dash-quick">
+        <div class="card__header"><span class="card__title">Quick Actions</span></div>
+        <div class="dash-quick__grid">
+          <a routerLink="/appointments" [queryParams]="{new: '1'}" class="quick-action quick-action--blue">
+            <div class="quick-action__icon"><lucide-icon name="calendar-plus" [size]="20" /></div>
+            <span class="quick-action__label">New Appointment</span>
+          </a>
+          <a routerLink="/patients" class="quick-action quick-action--purple">
+            <div class="quick-action__icon"><lucide-icon name="user-plus" [size]="20" /></div>
+            <span class="quick-action__label">Register Patient</span>
+          </a>
+          <a routerLink="/followups" class="quick-action quick-action--teal">
+            <div class="quick-action__icon"><lucide-icon name="calendar-check" [size]="20" /></div>
+            <span class="quick-action__label">Follow-ups</span>
+          </a>
+          <a routerLink="/insurance" class="quick-action quick-action--amber">
+            <div class="quick-action__icon"><lucide-icon name="shield-check" [size]="20" /></div>
+            <span class="quick-action__label">Insurance</span>
+          </a>
         </div>
-      } @else if (todayQueue().length === 0) {
-        <div class="empty-state">
-          <div class="empty-state__icon"><lucide-icon name="calendar-x" [size]="24" /></div>
-          <p class="empty-state__title">No appointments today</p>
-          <p class="empty-state__subtitle">Schedule an appointment to see it here</p>
-        </div>
-      } @else {
-        <div class="dashboard__queue-list">
-          @for (appt of todayQueue(); track appt.id) {
-            <div class="dashboard__queue-item">
-              <div class="avatar avatar--sm">
-                {{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}
-              </div>
-              <div class="dashboard__queue-info min-w-0">
-                <span class="dashboard__queue-name truncate">
-                  {{ appt.patient?.firstName }} {{ appt.patient?.lastName }}
-                </span>
-                <span class="dashboard__queue-meta">
-                  {{ appt.startTime }} · {{ appt.type | titlecase }}
-                </span>
-              </div>
-              <span class="badge" [class]="statusClass(appt.status)">
-                {{ appt.status | titlecase }}
-              </span>
-            </div>
-          }
-        </div>
-      }
+      </div>
+
     </div>
 
-    <!-- Appointment stats -->
-    <div class="card dashboard__appt-stats">
-      <div class="card__header">
-        <span class="card__title">Appointment Status</span>
-        <span class="text-tertiary text-sm">{{ totalAppts() }} total</span>
-      </div>
-      @if (apptStats().length > 0) {
-        <div class="dashboard__stats-list">
-          @for (stat of buildStatRows(apptStats()); track stat.label) {
-            <div class="dashboard__stat-row">
-              <span class="dashboard__stat-label">{{ stat.label }}</span>
-              <div class="dashboard__stat-bar-wrap">
-                <div class="dashboard__stat-bar"
-                     [style.width.%]="stat.pct"
-                     [style.background]="stat.color"></div>
-              </div>
-              <span class="dashboard__stat-value">{{ stat.value }}</span>
-            </div>
-          }
+  } @else {
+  <!-- ── Admin / Doctor layout ── -->
+    <div class="dash-grid">
+
+      <!-- Today's Queue -->
+      <div class="card card--flush dash-queue">
+        <div class="dash-queue__head">
+          <span class="card__title">Today's Queue</span>
+          <a class="btn btn--ghost btn--sm" routerLink="/appointments">View all</a>
         </div>
-      } @else if (!loading()) {
-        <p class="text-tertiary text-sm" style="margin-top:16px">No appointment data yet</p>
-      } @else {
-        <div class="skeleton" style="height:160px;border-radius:8px;margin-top:16px"></div>
-      }
+        @if (loading()) {
+          <div class="dash-queue__list">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="dash-queue__item">
+                <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0"></div>
+                <div style="flex:1">
+                  <div class="skeleton" style="height:13px;width:50%;margin-bottom:6px;border-radius:4px"></div>
+                  <div class="skeleton" style="height:11px;width:30%;border-radius:4px"></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (!todayQueue().length) {
+          <div class="empty-state">
+            <div class="empty-state__icon"><lucide-icon name="calendar-x" [size]="24" /></div>
+            <p class="empty-state__title">No appointments today</p>
+            <p class="empty-state__subtitle">Schedule an appointment to see it here</p>
+          </div>
+        } @else {
+          <div class="dash-queue__list">
+            @for (appt of todayQueue(); track appt.id) {
+              <div class="dash-queue__item">
+                <div class="avatar avatar--sm">
+                  {{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}
+                </div>
+                <div class="dash-queue__info">
+                  <span class="dash-queue__name">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</span>
+                  <span class="dash-queue__meta">{{ appt.startTime }} · {{ (appt.appointmentType ?? '') | titlecase }}</span>
+                </div>
+                <span class="badge" [class]="statusClass(appt.status)">{{ appt.status | titlecase }}</span>
+              </div>
+            }
+          </div>
+        }
+        <div class="table-pagination">
+          <span class="table-pagination__info">{{ queueTotal() }} appointments &nbsp;·&nbsp; Page {{ queuePage() }} of {{ queueTotalPages || 1 }}</span>
+          <div class="table-pagination__size">
+            <label class="table-pagination__size-label">Rows</label>
+            <select class="table-pagination__size-select" [ngModel]="queuePageSize()" (ngModelChange)="changeQueuePageSize($event)" [ngModelOptions]="{standalone:true}">
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="50">50</option>
+            </select>
+          </div>
+          <div class="table-pagination__controls">
+            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() === 1" (click)="queuePrevPage()">
+              <lucide-icon name="chevron-left" [size]="14" /> Prev
+            </button>
+            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">
+              Next <lucide-icon name="chevron-right" [size]="14" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Status -->
+      <div class="card dash-appt-stats">
+        <div class="card__header">
+          <span class="card__title">Appointment Status</span>
+          <span class="text-tertiary text-sm">{{ totalAppts() }} total</span>
+        </div>
+        @if (apptStats().length > 0) {
+          <div class="dash-stats-list">
+            @for (stat of buildStatRows(apptStats()); track stat.label) {
+              <div class="dash-stat-row">
+                <span class="dash-stat-label">{{ stat.label }}</span>
+                <div class="dash-stat-bar-wrap">
+                  <div class="dash-stat-bar" [style.width.%]="stat.pct" [style.background]="stat.color"></div>
+                </div>
+                <span class="dash-stat-value">{{ stat.value }}</span>
+              </div>
+            }
+          </div>
+        } @else if (!loading()) {
+          <p class="text-tertiary text-sm" style="margin-top:16px">No appointment data yet</p>
+        } @else {
+          <div class="skeleton" style="height:160px;border-radius:8px;margin-top:16px"></div>
+        }
+      </div>
+
     </div>
-  </div>
+  }
+
 </div>

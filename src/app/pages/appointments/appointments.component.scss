@@ -1,6 +1,29 @@
 @use '../../../styles/tokens' as t;
 @use '../../../styles/mixins' as m;
 
+// ─── Keyframes ────────────────────────────────────────────────
+@keyframes slideInRight {
+  from { transform: translateX(-18px); }
+  to   { transform: translateX(0); }
+}
+@keyframes slideInUp {
+  from { transform: translateY(14px); }
+  to   { transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(16px); }
+  to   { transform: translateX(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9) translateY(-8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+// ─── Appointments base ────────────────────────────────────────
 .appointments {
   &__view-toggle {
     @include m.flex(center, center, 2px);
@@ -46,7 +69,6 @@
     width: 100%;
     text-align: left;
     transition: background t.$t-fast t.$ease;
-
     &:hover { background: var(--surface-input); }
   }
 
@@ -66,14 +88,950 @@
     background: var(--surface-card);
     cursor: pointer;
     transition: all t.$t-fast t.$ease;
-
     &:hover { border-color: var(--color-primary); color: var(--color-primary); }
-
     &--selected {
       border-color: var(--color-primary);
       background: var(--color-primary-subtle);
       color: var(--color-primary);
       font-weight: 600;
     }
+  }
+}
+
+// ─── Doctor Picker (compact + scrollable) ────────────────────
+.doctor-picker-loading {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 0; color: var(--text-secondary); font-size: 13px;
+}
+
+.doctor-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+}
+
+.doctor-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color t.$t-fast t.$ease, background t.$t-fast t.$ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-subtle);
+  }
+
+  &__avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    display: flex; flex-direction: column; gap: 1px;
+    flex: 1; min-width: 0;
+  }
+
+  &__name {
+    font-size: 12px; font-weight: 600; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  &__spec {
+    font-size: 10px; color: var(--text-tertiary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  &__count {
+    font-size: 10px; font-weight: 600;
+    color: var(--text-secondary);
+    padding: 2px 6px;
+    background: var(--surface-input);
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+
+  &__status {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 99px;
+    background: var(--surface-input); color: var(--text-tertiary);
+    flex-shrink: 0;
+    &--on { background: var(--color-success-subtle); color: var(--color-success); }
+  }
+}
+
+.doctor-selected {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-primary-subtle);
+  border: 1.5px solid var(--color-primary-light);
+  border-radius: var(--radius-md);
+
+  &__avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--color-primary); color: #fff;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  &__name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  &__spec { font-size: 11px; color: var(--text-secondary); }
+}
+
+// ─── Calendar View ────────────────────────────────────────────
+.cal-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &__label {
+    min-width: 180px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+}
+
+.cal-skeleton {
+  &__head {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  &__body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+}
+
+.cal-grid-wrap {
+  overflow: hidden;
+}
+
+.cal-body-wrap {
+  position: relative;
+}
+
+.cal-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.cal-dow {
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  background: var(--surface-input);
+
+  &:not(:last-child) { border-right: 1px solid var(--border); }
+}
+
+.cal-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 97px; // fixed row height — keeps drawer offset calculation reliable
+}
+
+.cal-cell {
+  height: 97px;
+  padding: 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background 120ms;
+  position: relative;
+  overflow: hidden;
+
+  &:nth-child(7n) { border-right: none; }
+  &:nth-last-child(-n+7) { border-bottom: none; }
+
+  &:hover:not(.cal-cell--disabled) { background: var(--color-primary-subtle); }
+
+  &--disabled { cursor: not-allowed; }
+
+  &--other {
+    background: var(--surface-page);
+    .cal-cell__num { color: var(--text-tertiary); opacity: 0.5; }
+  }
+
+  &--past:not(.cal-cell--selected) {
+    .cal-cell__num { color: var(--text-tertiary); opacity: 0.45; }
+  }
+
+  &--today {
+    background: var(--color-primary-subtle);
+    .cal-cell__num {
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 50%;
+    }
+  }
+
+  &--selected {
+    background: var(--color-primary-subtle);
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  &__num {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  &__dots {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  &__count {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-top: auto;
+  }
+}
+
+.cal-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--text-tertiary);
+
+  &--scheduled   { background: var(--text-tertiary); }
+  &--confirmed   { background: var(--color-primary); }
+  &--checked_in  { background: var(--color-teal); }
+  &--in_progress { background: var(--color-warning); }
+  &--completed   { background: var(--color-success); }
+  &--cancelled,
+  &--no_show     { background: var(--color-danger); }
+}
+
+// ─── Calendar Popup Drawer ─────────────────────────────────────
+.cal-view {
+  position: relative;
+}
+
+.cal-panel {
+  display: none;        // hidden until --open is applied
+  position: absolute;
+  min-height: 220px;
+  max-height: 700px;
+  width: 300px;
+  flex-direction: column;
+  z-index: 200;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-card);
+  overflow: hidden;
+
+  &--open {
+    display: flex;      // shown when day is selected
+    animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  // ── Gradient header ──
+  &__head {
+    background: linear-gradient(145deg, #4f46e5 0%, #7c3aed 100%);
+    padding: 18px 16px 14px;
+    flex-shrink: 0;
+  }
+
+  &__head-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__date-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+  }
+
+  &__date-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  &__close {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 150ms;
+    &:hover { background: rgba(255, 255, 255, 0.28); }
+  }
+
+  &__head-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+
+  &__count-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+  }
+
+  &__book-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.32);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: background 150ms;
+    &:hover { background: rgba(255, 255, 255, 0.3); }
+  }
+
+  // ── Empty state ──
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+    padding: 40px 24px;
+    color: var(--text-tertiary);
+    text-align: center;
+  }
+
+  &__empty-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  &__empty-sub {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  // ── Scrollable list ──
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  }
+}
+
+// ─── Appointment item card inside drawer ───────────────────────
+.cal-pitem {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  transition: background 120ms;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--surface-input); }
+
+  &--completed { opacity: 0.72; }
+  &--cancelled,
+  &--no_show   { opacity: 0.55; }
+
+  // Status stripe
+  &__stripe {
+    width: 4px;
+    flex-shrink: 0;
+    background: var(--border);
+    border-radius: 0;
+  }
+
+  &--scheduled   .cal-pitem__stripe { background: var(--text-tertiary); }
+  &--confirmed   .cal-pitem__stripe { background: var(--color-primary); }
+  &--checked_in  .cal-pitem__stripe { background: var(--color-teal); }
+  &--in_progress .cal-pitem__stripe { background: var(--color-warning); }
+  &--completed   .cal-pitem__stripe { background: var(--color-success); }
+  &--cancelled   .cal-pitem__stripe,
+  &--no_show     .cal-pitem__stripe { background: var(--color-danger); }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  // Row 1: time chip + token + status badge
+  &__row1 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__time-chip {
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--text-tertiary);
+    padding: 2px 8px;
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+
+  &--confirmed   .cal-pitem__time-chip { background: var(--color-primary); }
+  &--checked_in  .cal-pitem__time-chip { background: var(--color-teal); }
+  &--in_progress .cal-pitem__time-chip { background: var(--color-warning); }
+  &--completed   .cal-pitem__time-chip { background: var(--color-success); }
+  &--cancelled   .cal-pitem__time-chip,
+  &--no_show     .cal-pitem__time-chip { background: var(--color-danger); }
+
+  &__token {
+    font-size: 10px;
+    font-family: t.$font-mono;
+    font-weight: 700;
+    color: var(--text-tertiary);
+  }
+
+  &__spacer { flex: 1; }
+
+  // Row 2: patient avatar + name + phone
+  &__patient {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  &__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface-input);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info { flex: 1; min-width: 0; }
+
+  &__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__phone {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+  }
+
+  // Row 3: doctor name (colored) + type
+  &__doctor {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7c3aed;
+  }
+
+  &__type {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-tertiary);
+  }
+
+  &__action {
+    font-size: 10px;
+    padding: 3px 10px;
+    height: auto;
+    border-radius: 99px;
+    align-self: flex-start;
+  }
+}
+
+// ─── Queue Board ──────────────────────────────────────────────
+.queue-board {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  align-items: flex-start;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  &::-webkit-scrollbar { height: 5px; }
+  &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+}
+
+// ─── Doctor Column ────────────────────────────────────────────
+.dq-col {
+  // Color theming per doctor
+  &[data-color='primary'] { --col-accent: var(--color-primary);  --col-subtle: var(--color-primary-subtle); }
+  &[data-color='teal']    { --col-accent: var(--color-teal);     --col-subtle: var(--color-teal-subtle, #f0fdfa); }
+  &[data-color='purple']  { --col-accent: var(--color-purple);   --col-subtle: var(--color-purple-subtle); }
+  &[data-color='warning'] { --col-accent: var(--color-warning);  --col-subtle: var(--color-warning-subtle); }
+  &[data-color='success'] { --col-accent: var(--color-success);  --col-subtle: var(--color-success-subtle); }
+  &[data-color='rose']    { --col-accent: #f43f5e;               --col-subtle: #fff1f2; }
+
+  flex: 0 0 244px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--col-accent, var(--color-primary));
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: slideInRight 0.38s ease both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 12px 8px;
+    cursor: pointer;
+    transition: background 150ms;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--col-subtle, var(--color-primary-subtle));
+    color: var(--col-accent, var(--color-primary));
+    font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+
+  &__name {
+    font-size: 12px; font-weight: 700; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  &__spec {
+    font-size: 10px; color: var(--text-tertiary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  &__badge {
+    display: flex; align-items: center; gap: 2px;
+    font-size: 11px; font-weight: 700;
+    color: var(--col-accent, var(--color-primary));
+    flex-shrink: 0;
+  }
+
+  &__mini-stats {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    padding: 0 10px 8px;
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 500px;
+    padding: 0 8px 10px;
+    display: flex; flex-direction: column; gap: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  }
+}
+
+.dq-mini-stat {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 6px; border-radius: 99px;
+  &--wait   { background: var(--surface-input); color: var(--text-secondary); }
+  &--active { background: var(--color-warning-subtle); color: var(--color-warning); }
+  &--done   { background: var(--color-success-subtle); color: var(--color-success); }
+}
+
+.dq-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 28px 0; color: var(--text-tertiary); font-size: 11px; text-align: center;
+}
+
+// ─── Queue Appointment Cards ──────────────────────────────────
+.dq-card {
+  background: var(--surface-page);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 9px 10px;
+  animation: slideInUp 0.32s ease both;
+  transition: transform 140ms, box-shadow 140ms;
+  cursor: default;
+
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+  &--scheduled   { border-left-color: var(--text-tertiary); }
+  &--confirmed   { border-left-color: var(--color-primary); }
+  &--checked_in  { border-left-color: var(--color-teal); }
+  &--in_progress { border-left-color: var(--color-warning); }
+  &--completed   { border-left-color: var(--color-success); opacity: 0.65; }
+  &--cancelled,
+  &--no_show     { border-left-color: var(--color-danger); opacity: 0.45; }
+
+  &__top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 4px;
+  }
+
+  &__token {
+    font-family: t.$font-mono;
+    font-size: 10px; font-weight: 700; color: var(--text-tertiary);
+  }
+
+  &__time {
+    font-size: 10px; font-weight: 600; color: var(--text-secondary);
+  }
+
+  &__patient {
+    font-size: 12px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  &__bottom {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  &__type { font-size: 10px; color: var(--text-tertiary); }
+
+  &__dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-tertiary);
+    &--scheduled   { background: var(--text-tertiary); }
+    &--confirmed   { background: var(--color-primary); }
+    &--checked_in  { background: var(--color-teal); }
+    &--in_progress { background: var(--color-warning); animation: pulse-dot 1.4s ease infinite; }
+    &--completed   { background: var(--color-success); }
+    &--cancelled,
+    &--no_show     { background: var(--color-danger); }
+  }
+}
+
+// ─── Queue Loading Skeleton ───────────────────────────────────
+.queue-loading {
+  display: flex; gap: 14px; overflow-x: hidden;
+}
+.queue-col-skeleton { flex: 0 0 244px; }
+
+// ─── Queue Detail View ────────────────────────────────────────
+.queue-detail {
+  animation: slideInLeft 0.32s ease both;
+
+  &__nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+
+  &__hero {
+    display: flex; align-items: center; gap: 18px;
+    padding: 20px 24px;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    margin-bottom: 20px;
+  }
+
+  &__avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--color-primary-subtle); color: var(--color-primary);
+    font-size: 18px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1; display: flex; flex-direction: column; gap: 5px;
+  }
+
+  &__name {
+    font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;
+  }
+
+  &__spec {
+    font-size: 13px; color: var(--text-secondary); margin: 0;
+  }
+
+  &__fee {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+    &-lbl { font-size: 11px; color: var(--text-tertiary); }
+    &-val { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+  }
+
+  &__stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+}
+
+// ─── Queue Stats KPIs ─────────────────────────────────────────
+.qstat {
+  padding: 16px 20px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+
+  &--total   { border-top-color: var(--color-primary); }
+  &--waiting { border-top-color: var(--color-warning); }
+  &--active  { border-top-color: var(--color-teal); }
+  &--done    { border-top-color: var(--color-success); }
+
+  &__val {
+    font-size: 30px; font-weight: 800; color: var(--text-primary);
+    line-height: 1; margin-bottom: 4px;
+  }
+
+  &__lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-secondary);
+  }
+}
+
+// ─── Queue Timeline ───────────────────────────────────────────
+.queue-timeline {
+  display: flex; flex-direction: column; gap: 0;
+  max-height: calc(100vh - 400px);
+  min-height: 160px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+}
+
+.qt-card {
+  display: flex; gap: 14px;
+  animation: slideInUp 0.32s ease both;
+
+  &__time-col {
+    display: flex; flex-direction: column; align-items: flex-end;
+    width: 72px; flex-shrink: 0; padding-top: 16px;
+  }
+
+  &__time {
+    font-size: 12px; font-weight: 700; color: var(--text-primary);
+  }
+
+  &__token {
+    font-size: 10px; font-family: t.$font-mono;
+    color: var(--text-tertiary); font-weight: 700; margin-top: 2px;
+  }
+
+  &__connector {
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0; width: 20px;
+
+    &::before {
+      content: '';
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--border);
+      margin-top: 20px; flex-shrink: 0;
+      transition: background 200ms;
+    }
+
+    &::after {
+      content: ''; flex: 1; width: 2px;
+      background: var(--border); margin-top: 4px; min-height: 16px;
+    }
+  }
+
+  &--confirmed   .qt-card__connector::before { background: var(--color-primary); }
+  &--checked_in  .qt-card__connector::before { background: var(--color-teal); }
+  &--in_progress .qt-card__connector::before { background: var(--color-warning); animation: pulse-dot 1.4s ease infinite; }
+  &--completed   .qt-card__connector::before { background: var(--color-success); }
+  &--cancelled   .qt-card__connector::before,
+  &--no_show     .qt-card__connector::before { background: var(--color-danger); }
+
+  &:last-child .qt-card__connector::after { display: none; }
+
+  &__body {
+    flex: 1;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    transition: box-shadow 150ms;
+    &:hover { box-shadow: var(--shadow-sm); }
+  }
+
+  &__header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  &__patient-info {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  &__avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface-input); color: var(--text-secondary);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  &__phone { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
+
+  &__badges {
+    display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__complaint {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-secondary);
+    padding: 8px 10px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    margin-bottom: 10px;
+  }
+
+  &__actions { display: flex; gap: 6px; align-items: center; }
+}
+
+.qt-done-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: var(--color-success);
+}
+
+.qt-noshow-btn {
+  color: var(--color-danger) !important;
+  &:hover { background: var(--color-danger-subtle, #fff1f2) !important; }
+}
+
+.qt-noshow-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: var(--color-danger);
+}
+
+// ─── Slot hint text ───────────────────────────────────────────
+.slots-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 4px 0 8px;
+}
+
+// ─── Badge size variant ───────────────────────────────────────
+.badge--sm {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+// ─── Patient search hint ──────────────────────────────────────
+.patient-search-hint {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+}
+
+// ─── New patient quick-register box ──────────────────────────
+.new-patient-box {
+  border: 1px dashed var(--color-primary-light, var(--color-primary));
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--color-primary-subtle);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
   }
 }

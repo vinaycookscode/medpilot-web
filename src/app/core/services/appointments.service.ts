@@ -10,8 +10,11 @@ export class AppointmentsService {
 
   constructor(private http: HttpClient) {}
 
-  listToday() {
-    return this.http.get<ApiResponse<Appointment[]>>(`${this.api}/today`);
+  listToday(page = 1, limit = 20, date?: string) {
+    const d = new Date();
+    const todayDate = date ?? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    let params = new HttpParams().set('date', todayDate).set('page', page).set('limit', limit);
+    return this.http.get<PaginatedResponse<Appointment>>(`${this.api}/today`, { params });
   }
 
   calendar(startDate: string, endDate: string) {

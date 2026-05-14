@@ -552,6 +552,26 @@ textarea.input {
   position: relative;
 }
 
+.patient-search-wrap {
+  position: relative;
+}
+
+.patient-search-spinner {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.patient-search-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 6px 2px 0;
+}
+
 .patient-selected {
   display: flex;
   align-items: center;
@@ -657,4 +677,64 @@ textarea.input {
   transition: opacity 120ms;
 
   tr:hover & { opacity: 1; }
+}
+
+// ── Sortable table header ──
+.th-sort {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  .sort-icon { opacity: 0.35; vertical-align: middle; margin-left: 3px; transition: opacity 120ms; }
+
+  &:hover { color: var(--text-primary); .sort-icon { opacity: 0.65; } }
+
+  &.th-sort--active {
+    color: var(--color-primary);
+    .sort-icon { opacity: 1; }
+  }
+}
+
+// ── Table pagination row ──
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+  gap: 12px;
+
+  &__info {
+    font-size: 13px;
+    color: var(--text-tertiary);
+  }
+
+  &__size {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__size-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+
+  &__size-select {
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    &:focus { outline: none; border-color: var(--color-primary); }
+  }
+
+  &__controls {
+    display: flex;
+    gap: 6px;
+  }
 }

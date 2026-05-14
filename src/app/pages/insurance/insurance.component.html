@@ -9,7 +9,7 @@
       <button class="btn btn--primary" (click)="openClaimModal()">
         <lucide-icon name="plus" [size]="16" /> New Claim
       </button>
-    } @else {
+    } @else if (auth.isAdmin()) {
       <button class="btn btn--primary" (click)="openProviderModal()">
         <lucide-icon name="plus" [size]="16" /> Add Provider
       </button>
@@ -71,19 +71,19 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Claim #</th>
-                <th>Patient</th>
-                <th>Provider</th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='claimNumber'" (click)="sortClaims('claimNumber')">Claim # <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'claimNumber', claimsSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='patientName'" (click)="sortClaims('patientName')">Patient <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'patientName', claimsSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='providerName'" (click)="sortClaims('providerName')">Provider <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'providerName', claimsSortDir())" [size]="11" /></th>
                 <th>Policy No.</th>
-                <th>Amount</th>
-                <th>Approved</th>
-                <th>Status</th>
-                <th>Date</th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='claimAmount'" (click)="sortClaims('claimAmount')">Amount <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'claimAmount', claimsSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='approvedAmount'" (click)="sortClaims('approvedAmount')">Approved <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'approvedAmount', claimsSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='status'" (click)="sortClaims('status')">Status <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'status', claimsSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="claimsSortCol()==='createdAt'" (click)="sortClaims('createdAt')">Date <lucide-icon class="sort-icon" [name]="sortIcon(claimsSortCol(), 'createdAt', claimsSortDir())" [size]="11" /></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              @for (claim of claims(); track claim.id) {
+              @for (claim of sortedClaims(); track claim.id) {
                 <tr>
                   <td><span class="claim-number">{{ claim.claimNumber }}</span></td>
                   <td>{{ claim.patientName }}</td>
@@ -129,6 +129,26 @@
               }
             </tbody>
           </table>
+        </div>
+        <div class="table-pagination">
+          <span class="table-pagination__info">{{ claimsTotal() }} claims &nbsp;·&nbsp; Page {{ claimsPage() }} of {{ claimsTotalPages || 1 }}</span>
+          <div class="table-pagination__size">
+            <label class="table-pagination__size-label">Rows</label>
+            <select class="table-pagination__size-select" [ngModel]="claimsPageSize()" (ngModelChange)="changeClaimsPageSize($event)" [ngModelOptions]="{standalone:true}">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
+          </div>
+          <div class="table-pagination__controls">
+            <button class="btn btn--secondary btn--sm" [disabled]="claimsPage() === 1" (click)="claimsPrevPage()">
+              <lucide-icon name="chevron-left" [size]="14" /> Prev
+            </button>
+            <button class="btn btn--secondary btn--sm" [disabled]="claimsPage() >= claimsTotalPages" (click)="claimsNextPage()">
+              Next <lucide-icon name="chevron-right" [size]="14" />
+            </button>
+          </div>
         </div>
       </div>
     }
@@ -204,8 +224,18 @@
                     </button>
                   </div>
                 } @else {
-                  <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
-                    placeholder="Search by name or phone…" autocomplete="off" autofocus>
+                  <div class="patient-search-wrap">
+                    <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+                      placeholder="Search by name or phone…" autocomplete="off" autofocus>
+                    @if (patientSearching()) {
+                      <span class="patient-search-spinner"><span class="spinner spinner--sm"></span></span>
+                    }
+                  </div>
+                  @if (patientSearching()) {
+                    <div class="patient-search-status">Searching…</div>
+                  } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
+                    <div class="patient-search-status">No patients found</div>
+                  }
                   @if (patientDropdown().length) {
                     <div class="patient-dropdown">
                       @for (p of patientDropdown(); track p.id) {
@@ -264,7 +294,7 @@
 }
 
 <!-- Add Provider Modal -->
-@if (showProviderModal()) {
+@if (showProviderModal() && auth.isAdmin()) {
   <div class="modal-backdrop" (click)="showProviderModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal__header">

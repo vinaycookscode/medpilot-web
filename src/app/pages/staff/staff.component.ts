@@ -1,10 +1,11 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import { StaffService, Staff, StaffLeave } from '../../core/services/staff.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-staff',
@@ -17,19 +18,77 @@ export class StaffComponent implements OnInit {
   private staffService = inject(StaffService);
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
+  readonly auth = inject(AuthService);
 
   readonly staff = signal<Staff[]>([]);
   readonly leaves = signal<StaffLeave[]>([]);
   readonly loading = signal(false);
   readonly activeTab = signal<'staff' | 'leaves'>('staff');
   readonly showLeaveModal = signal(false);
+  readonly showStaffModal = signal(false);
   readonly saving = signal(false);
+
+  // Staff grid sort
+  readonly staffSortCol = signal<'name' | 'role'>('name');
+  readonly staffSortDir = signal<'asc' | 'desc'>('asc');
+
+  readonly sortedStaff = computed(() => {
+    const col = this.staffSortCol();
+    const dir = this.staffSortDir();
+    return [...this.staff()].sort((a, b) => {
+      const av = col === 'name' ? `${a.firstName} ${a.lastName}` : a.role;
+      const bv = col === 'name' ? `${b.firstName} ${b.lastName}` : b.role;
+      const cmp = av.localeCompare(bv);
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
+
+  // Leaves table sort + pagination
+  readonly leavesSortCol = signal<string>('startDate');
+  readonly leavesSortDir = signal<'asc' | 'desc'>('desc');
+  readonly leavesPage = signal(1);
+  readonly leavesPageSize = signal(15);
+
+  readonly sortedLeaves = computed(() => {
+    const col = this.leavesSortCol();
+    const dir = this.leavesSortDir();
+    return [...this.leaves()].sort((a, b) => {
+      const av = col === 'staffName' ? this.getStaffName(a) : (a as any)[col] ?? '';
+      const bv = col === 'staffName' ? this.getStaffName(b) : (b as any)[col] ?? '';
+      const cmp = String(av).localeCompare(String(bv));
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
+
+  readonly pagedLeaves = computed(() => {
+    const page = this.leavesPage();
+    const size = this.leavesPageSize();
+    return this.sortedLeaves().slice((page - 1) * size, page * size);
+  });
+
+  get leavesTotalPages() { return Math.ceil(this.leaves().length / this.leavesPageSize()); }
+  leavesPrevPage() { if (this.leavesPage() > 1) this.leavesPage.update(p => p - 1); }
+  leavesNextPage() { if (this.leavesPage() < this.leavesTotalPages) this.leavesPage.update(p => p + 1); }
+  changeLeavesPageSize(n: number) { this.leavesPageSize.set(n); this.leavesPage.set(1); }
 
   readonly leaveForm = this.fb.group({
     leaveType: ['', Validators.required],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     reason: [''],
+  });
+
+  readonly staffForm = this.fb.group({
+    firstName:      ['', Validators.required],
+    lastName:       ['', Validators.required],
+    email:          ['', [Validators.required, Validators.email]],
+    password:       ['', [Validators.required, Validators.minLength(6)]],
+    role:           ['doctor', Validators.required],
+    phone:          [''],
+    specialization: [''],
+    qualification:  [''],
+    registrationNo: [''],
+    consultationFee:[''],
   });
 
   ngOnInit() {
@@ -40,7 +99,11 @@ export class StaffComponent implements OnInit {
   loadStaff() {
     this.loading.set(true);
     this.staffService.getStaff().subscribe({
-      next: r => { this.staff.set(r.data ?? []); this.loading.set(false); },
+      next: (r: any) => {
+        const data = r.data?.data ?? r.data ?? [];
+        this.staff.set(Array.isArray(data) ? data : []);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
   }
@@ -60,6 +123,50 @@ export class StaffComponent implements OnInit {
   closeLeaveModal() {
     this.showLeaveModal.set(false);
     this.leaveForm.reset();
+  }
+
+  openStaffModal() {
+    this.staffForm.reset({ role: 'doctor' });
+    this.showStaffModal.set(true);
+  }
+
+  closeStaffModal() {
+    this.showStaffModal.set(false);
+    this.staffForm.reset();
+  }
+
+  get selectedRole() { return this.staffForm.get('role')?.value ?? ''; }
+
+  submitStaff() {
+    if (this.staffForm.invalid || this.saving()) return;
+    this.saving.set(true);
+    const raw = this.staffForm.getRawValue();
+    const payload: any = {
+      firstName: raw.firstName,
+      lastName:  raw.lastName,
+      email:     raw.email,
+      password:  raw.password,
+      role:      raw.role,
+    };
+    if (raw.phone) payload.phone = raw.phone;
+    if (raw.role === 'doctor') {
+      if (raw.specialization) payload.specialization = raw.specialization;
+      if (raw.qualification)  payload.qualification  = raw.qualification;
+      if (raw.registrationNo) payload.registrationNo = raw.registrationNo;
+      if (raw.consultationFee) payload.consultationFee = Number(raw.consultationFee);
+    }
+    this.staffService.createStaff(payload).subscribe({
+      next: r => {
+        this.staff.update(list => [r.data, ...list]);
+        this.saving.set(false);
+        this.showStaffModal.set(false);
+        this.toast.show('Staff member added', 'success');
+      },
+      error: err => {
+        this.saving.set(false);
+        this.toast.show(err?.error?.message ?? 'Failed to add staff', 'danger');
+      },
+    });
   }
 
   submitLeave() {
@@ -139,5 +246,29 @@ export class StaffComponent implements OnInit {
 
   get pendingLeavesCount(): number {
     return this.leaves().filter(l => l.status === 'pending').length;
+  }
+
+  sortStaff(col: 'name' | 'role') {
+    if (this.staffSortCol() === col) {
+      this.staffSortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.staffSortCol.set(col);
+      this.staffSortDir.set('asc');
+    }
+  }
+
+  sortLeaves(col: string) {
+    if (this.leavesSortCol() === col) {
+      this.leavesSortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.leavesSortCol.set(col);
+      this.leavesSortDir.set('asc');
+    }
+    this.leavesPage.set(1);
+  }
+
+  sortIcon(active: string, col: string, dir: string): string {
+    if (active !== col) return 'chevrons-up-down';
+    return dir === 'asc' ? 'chevron-up' : 'chevron-down';
   }
 }

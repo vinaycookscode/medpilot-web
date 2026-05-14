@@ -26,12 +26,12 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Patient</th>
-            <th>Code</th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='firstName'" (click)="sort('firstName')">Patient <lucide-icon class="sort-icon" [name]="sortIcon('firstName')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='patientCode'" (click)="sort('patientCode')">Code <lucide-icon class="sort-icon" [name]="sortIcon('patientCode')" [size]="11" /></th>
             <th>Phone</th>
-            <th>Age / Gender</th>
-            <th>City</th>
-            <th>Registered</th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='age'" (click)="sort('age')">Age / Gender <lucide-icon class="sort-icon" [name]="sortIcon('age')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='city'" (click)="sort('city')">City <lucide-icon class="sort-icon" [name]="sortIcon('city')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='createdAt'" (click)="sort('createdAt')">Registered <lucide-icon class="sort-icon" [name]="sortIcon('createdAt')" [size]="11" /></th>
             <th></th>
           </tr>
         </thead>
@@ -55,7 +55,7 @@
               </td>
             </tr>
           } @else {
-            @for (patient of patients(); track patient.id) {
+            @for (patient of sorted(); track patient.id) {
               <tr>
                 <td>
                   <div class="patients__name-cell">
@@ -95,21 +95,26 @@
     </div>
 
     <!-- Pagination -->
-    @if (totalPages > 1) {
-      <div class="patients__pagination">
-        <span class="patients__pagination-info">
-          Page {{ page() }} of {{ totalPages }}
-        </span>
-        <div class="d-flex gap-2">
-          <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
-            <lucide-icon name="chevron-left" [size]="14" /> Prev
-          </button>
-          <button class="btn btn--secondary btn--sm" [disabled]="page() === totalPages" (click)="nextPage()">
-            Next <lucide-icon name="chevron-right" [size]="14" />
-          </button>
-        </div>
+    <div class="table-pagination">
+      <span class="table-pagination__info">{{ total() }} patients &nbsp;·&nbsp; Page {{ page() }} of {{ totalPages || 1 }}</span>
+      <div class="table-pagination__size">
+        <label class="table-pagination__size-label">Rows</label>
+        <select class="table-pagination__size-select" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)" [ngModelOptions]="{standalone:true}">
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
       </div>
-    }
+      <div class="table-pagination__controls">
+        <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+          <lucide-icon name="chevron-left" [size]="14" /> Prev
+        </button>
+        <button class="btn btn--secondary btn--sm" [disabled]="page() >= totalPages" (click)="nextPage()">
+          Next <lucide-icon name="chevron-right" [size]="14" />
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 

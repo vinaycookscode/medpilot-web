@@ -16,13 +16,13 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Invoice #</th>
-            <th>Patient</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Paid</th>
-            <th>Balance</th>
-            <th>Status</th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='invoiceNumber'" (click)="sort('invoiceNumber')">Invoice # <lucide-icon class="sort-icon" [name]="sortIcon('invoiceNumber')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='patientName'" (click)="sort('patientName')">Patient <lucide-icon class="sort-icon" [name]="sortIcon('patientName')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='invoiceDate'" (click)="sort('invoiceDate')">Date <lucide-icon class="sort-icon" [name]="sortIcon('invoiceDate')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='totalAmount'" (click)="sort('totalAmount')">Amount <lucide-icon class="sort-icon" [name]="sortIcon('totalAmount')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='paidAmount'" (click)="sort('paidAmount')">Paid <lucide-icon class="sort-icon" [name]="sortIcon('paidAmount')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='balanceDue'" (click)="sort('balanceDue')">Balance <lucide-icon class="sort-icon" [name]="sortIcon('balanceDue')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='status'" (click)="sort('status')">Status <lucide-icon class="sort-icon" [name]="sortIcon('status')" [size]="11" /></th>
             <th></th>
           </tr>
         </thead>
@@ -42,7 +42,7 @@
               </div>
             </td></tr>
           } @else {
-            @for (inv of invoices(); track inv.id) {
+            @for (inv of sorted(); track inv.id) {
               <tr class="billing__row" (click)="openDetail(inv)">
                 <td><span class="billing__inv-num">{{ inv.invoiceNumber }}</span></td>
                 <td>
@@ -75,19 +75,26 @@
       </table>
     </div>
 
-    @if (totalPages > 1) {
-      <div class="billing__pagination">
-        <span class="text-sm text-tertiary">Page {{ page() }} of {{ totalPages }}</span>
-        <div class="d-flex gap-2">
-          <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
-            <lucide-icon name="chevron-left" [size]="14" /> Prev
-          </button>
-          <button class="btn btn--secondary btn--sm" [disabled]="page() === totalPages" (click)="nextPage()">
-            Next <lucide-icon name="chevron-right" [size]="14" />
-          </button>
-        </div>
+    <div class="table-pagination">
+      <span class="table-pagination__info">{{ total() }} invoices &nbsp;·&nbsp; Page {{ page() }} of {{ totalPages || 1 }}</span>
+      <div class="table-pagination__size">
+        <label class="table-pagination__size-label">Rows</label>
+        <select class="table-pagination__size-select" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)" [ngModelOptions]="{standalone:true}">
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
       </div>
-    }
+      <div class="table-pagination__controls">
+        <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+          <lucide-icon name="chevron-left" [size]="14" /> Prev
+        </button>
+        <button class="btn btn--secondary btn--sm" [disabled]="page() >= totalPages" (click)="nextPage()">
+          Next <lucide-icon name="chevron-right" [size]="14" />
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 

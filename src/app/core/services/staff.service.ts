@@ -38,8 +38,17 @@ export class StaffService {
     return this.http.get<ApiResponse<Staff[]>>(`${this.api}/users`, { params });
   }
 
+  createStaff(data: {
+    email: string; password: string; role: string;
+    firstName: string; lastName: string; phone?: string;
+    specialization?: string; qualification?: string;
+    registrationNo?: string; consultationFee?: number;
+  }) {
+    return this.http.post<ApiResponse<Staff>>(`${this.api}/users`, data);
+  }
+
   getDoctors() {
-    return this.http.get<ApiResponse<Staff[]>>(`${this.api}/users`, { params: { role: 'doctor' } });
+    return this.http.get<ApiResponse<Staff[]>>(`${this.api}/staff`, { params: { role: 'doctor' } });
   }
 
   getStaffById(id: string) {

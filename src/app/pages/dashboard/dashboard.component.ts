@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
 import { DashboardService } from '../../core/services/dashboard.service';
@@ -11,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, RouterLink, IconsModule],
+  imports: [CommonModule, TitleCasePipe, FormsModule, RouterLink, IconsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -23,34 +24,49 @@ export class DashboardComponent implements OnInit {
   readonly summary    = signal<DashboardSummary | null>(null);
   readonly revenue    = signal<RevenueData | null>(null);
   readonly apptStats  = signal<AppointmentStatusCount[]>([]);
-  readonly todayQueue = signal<Appointment[]>([]);
-  readonly loading    = signal(true);
-  readonly revPeriod  = signal<'today' | 'week' | 'month' | 'year'>('month');
+  readonly todayQueue   = signal<Appointment[]>([]);
+  readonly loading      = signal(true);
+  readonly revPeriod    = signal<'today' | 'week' | 'month' | 'year'>('month');
+
+  readonly queuePage     = signal(1);
+  readonly queuePageSize = signal(10);
+  readonly queueTotal    = signal(0);
+
+  get queueTotalPages() { return Math.ceil(this.queueTotal() / this.queuePageSize()); }
+  queuePrevPage() { if (this.queuePage() > 1) { this.queuePage.update(p => p - 1); this.loadTodayQueue(); } }
+  queueNextPage() { if (this.queuePage() < this.queueTotalPages) { this.queuePage.update(p => p + 1); this.loadTodayQueue(); } }
+  changeQueuePageSize(n: number) { this.queuePageSize.set(n); this.queuePage.set(1); this.loadTodayQueue(); }
 
   ngOnInit() { this.load(); }
 
   load() {
     this.loading.set(true);
     this.dashboardSvc.getSummary().subscribe(r => this.summary.set(r.data));
-    this.dashboardSvc.getRevenue(this.revPeriod()).subscribe(r => this.revenue.set(r.data));
-    // Returns ApiResponse<AppointmentStatusCount[]>
-    this.dashboardSvc.getAppointmentStats().subscribe(r => this.apptStats.set(r.data as any));
-    this.appointmentsSvc.listToday().subscribe({
-      next: r  => { this.todayQueue.set(r.data); this.loading.set(false); },
+    if (this.auth.role() !== 'receptionist') {
+      this.dashboardSvc.getRevenue(this.revPeriod()).subscribe(r => this.revenue.set(r.data));
+      this.dashboardSvc.getAppointmentStats().subscribe(r => this.apptStats.set(r.data as any));
+    }
+    this.loadTodayQueue();
+  }
+
+  loadTodayQueue() {
+    this.appointmentsSvc.listToday(this.queuePage(), this.queuePageSize()).subscribe({
+      next: r => { this.todayQueue.set(r.data); this.queueTotal.set(r.meta?.total ?? 0); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
   }
 
   setPeriod(p: 'today' | 'week' | 'month' | 'year') {
     this.revPeriod.set(p);
-    this.dashboardSvc.getRevenue(p).subscribe(r => this.revenue.set(r.data));
+    if (this.auth.role() !== 'receptionist') {
+      this.dashboardSvc.getRevenue(p).subscribe(r => this.revenue.set(r.data));
+    }
   }
 
   statusClass(status: string): string {
     const map: Record<string, string> = {
       scheduled:   'badge--neutral',
       confirmed:   'badge--primary',
-      checked_in:  'badge--teal',
       in_progress: 'badge--warning',
       completed:   'badge--success',
       cancelled:   'badge--danger',
@@ -65,6 +81,13 @@ export class DashboardComponent implements OnInit {
 
   today() {
     return new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  timeOfDay() {
+    const h = new Date().getHours();
+    if (h < 12) return 'morning';
+    if (h < 17) return 'afternoon';
+    return 'evening';
   }
 
   // Convert [{ status, count }] array to chart rows

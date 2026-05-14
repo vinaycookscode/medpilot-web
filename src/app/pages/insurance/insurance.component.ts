@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
@@ -6,6 +6,7 @@ import { InsuranceService, InsuranceClaim, InsuranceProvider } from '../../core/
 import { PatientsService } from '../../core/services/patients.service';
 import { Patient } from '../../core/models/patient.models';
 import { ToastService } from '../../core/services/toast.service';
+import { AuthService } from '../../core/services/auth.service';
 
 type InsuranceTab = 'claims' | 'providers';
 
@@ -21,6 +22,7 @@ export class InsuranceComponent implements OnInit {
   private patientsService = inject(PatientsService);
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
+  readonly auth = inject(AuthService);
 
   readonly claims = signal<InsuranceClaim[]>([]);
   readonly providers = signal<InsuranceProvider[]>([]);
@@ -31,10 +33,43 @@ export class InsuranceComponent implements OnInit {
   readonly showClaimModal = signal(false);
   readonly showProviderModal = signal(false);
 
+  // Claims server-side pagination + sort
+  readonly claimsTotal    = signal(0);
+  readonly claimsPage     = signal(1);
+  readonly claimsPageSize = signal(20);
+  readonly claimsSortCol  = signal<string>('createdAt');
+  readonly claimsSortDir  = signal<'ASC' | 'DESC'>('DESC');
+
+  // Server-sortable columns — others sort client-side on current page
+  private readonly serverSortCols = new Set(['createdAt', 'claimAmount', 'approvedAmount', 'status', 'policyNumber']);
+
+  readonly sortedClaims = computed(() => {
+    const col = this.claimsSortCol();
+    const dir = this.claimsSortDir();
+    if (this.serverSortCols.has(col)) return this.claims();
+    return [...this.claims()].sort((a, b) => {
+      const av = (a as any)[col] ?? '';
+      const bv = (b as any)[col] ?? '';
+      const cmp = String(av).localeCompare(String(bv));
+      return dir === 'ASC' ? cmp : -cmp;
+    });
+  });
+
+  get claimsTotalPages() { return Math.ceil(this.claimsTotal() / this.claimsPageSize()); }
+
+  claimsPrevPage() {
+    if (this.claimsPage() > 1) { this.claimsPage.update(p => p - 1); this.loadClaims(); }
+  }
+  claimsNextPage() {
+    if (this.claimsPage() < this.claimsTotalPages) { this.claimsPage.update(p => p + 1); this.loadClaims(); }
+  }
+  changeClaimsPageSize(n: number) { this.claimsPageSize.set(n); this.claimsPage.set(1); this.loadClaims(); }
+
   // Patient search
   readonly patientQuery = signal('');
   readonly patientDropdown = signal<Patient[]>([]);
   readonly selectedPatient = signal<Patient | null>(null);
+  readonly patientSearching = signal(false);
   private patientSearchTimer: any;
 
   claimForm: FormGroup = this.fb.group({
@@ -62,15 +97,25 @@ export class InsuranceComponent implements OnInit {
 
   loadClaims() {
     this.loading.set(true);
-    this.insuranceService.getClaims().subscribe({
-      next: (res) => { this.claims.set(res.data ?? []); this.loading.set(false); },
+    const col = this.claimsSortCol();
+    const serverSort = this.serverSortCols.has(col);
+    this.insuranceService.getClaims({
+      page: this.claimsPage(),
+      limit: this.claimsPageSize(),
+      ...(serverSort ? { sortBy: col, sortOrder: this.claimsSortDir() } : {}),
+    }).subscribe({
+      next: (res) => {
+        this.claims.set(res.data ?? []);
+        this.claimsTotal.set(res.meta?.total ?? 0);
+        this.loading.set(false);
+      },
       error: () => { this.loading.set(false); this.toast.show('Failed to load claims', 'danger'); },
     });
   }
 
   loadProviders() {
     this.insuranceService.getProviders().subscribe({
-      next: (res) => this.providers.set(res.data ?? []),
+      next: (res: any) => this.providers.set(res.data?.data ?? res.data ?? []),
       error: () => this.toast.show('Failed to load providers', 'danger'),
     });
   }
@@ -86,6 +131,7 @@ export class InsuranceComponent implements OnInit {
     this.claimForm.reset({ patientId: '', memberName: '', providerId: '', policyNumber: '', claimAmount: 0, notes: '' });
     this.patientQuery.set('');
     this.patientDropdown.set([]);
+    this.patientSearching.set(false);
     this.selectedPatient.set(null);
     this.showClaimModal.set(true);
   }
@@ -94,11 +140,12 @@ export class InsuranceComponent implements OnInit {
     const q = (event.target as HTMLInputElement).value;
     this.patientQuery.set(q);
     clearTimeout(this.patientSearchTimer);
-    if (q.length < 2) { this.patientDropdown.set([]); return; }
+    if (q.length < 2) { this.patientDropdown.set([]); this.patientSearching.set(false); return; }
+    this.patientSearching.set(true);
     this.patientSearchTimer = setTimeout(() => {
       this.patientsService.list({ search: q, limit: 8 }).subscribe({
-        next: (res) => this.patientDropdown.set(res.data ?? []),
-        error: () => {},
+        next: (res) => { this.patientDropdown.set(res.data ?? []); this.patientSearching.set(false); },
+        error: () => { this.patientSearching.set(false); },
       });
     }, 300);
   }
@@ -158,6 +205,22 @@ export class InsuranceComponent implements OnInit {
   openProviderModal() {
     this.providerForm.reset({ name: '', code: '', contactEmail: '', contactPhone: '', address: '' });
     this.showProviderModal.set(true);
+  }
+
+  sortClaims(col: string) {
+    if (this.claimsSortCol() === col) {
+      this.claimsSortDir.update(d => d === 'ASC' ? 'DESC' : 'ASC');
+    } else {
+      this.claimsSortCol.set(col);
+      this.claimsSortDir.set('ASC');
+    }
+    this.claimsPage.set(1);
+    if (this.serverSortCols.has(col)) this.loadClaims();
+  }
+
+  sortIcon(active: string, col: string, dir: string): string {
+    if (active !== col) return 'chevrons-up-down';
+    return dir === 'ASC' ? 'chevron-up' : 'chevron-down';
   }
 
   statusBadge(status: string): string {
