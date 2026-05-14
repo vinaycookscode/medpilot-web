@@ -31,6 +31,10 @@ export class InventoryComponent implements OnInit {
   readonly showForm = signal(false);
   readonly editItem = signal<InventoryItem | null>(null);
   readonly adjustTarget = signal<InventoryItem | null>(null);
+  readonly sortCol = signal<string>('name');
+  readonly sortDir = signal<'asc' | 'desc'>('asc');
+  readonly page = signal(1);
+  readonly pageSize = signal(20);
 
   // Form fields
   form = this.blankForm();
@@ -41,7 +45,9 @@ export class InventoryComponent implements OnInit {
   readonly filtered = computed(() => {
     const q = this.search().toLowerCase();
     const cat = this.category();
-    return this.items().filter(i => {
+    const col = this.sortCol();
+    const dir = this.sortDir();
+    const list = this.items().filter(i => {
       if (q && !i.name.toLowerCase().includes(q) && !(i.manufacturer ?? '').toLowerCase().includes(q)) return false;
       if (cat && i.category !== cat) return false;
       const s = stockStatus(i);
@@ -49,7 +55,39 @@ export class InventoryComponent implements OnInit {
       if (this.tab() === 'out' && s !== 'out') return false;
       return true;
     });
+    return [...list].sort((a, b) => {
+      const av = col === 'status' ? stockStatus(a) : (a as any)[col] ?? '';
+      const bv = col === 'status' ? stockStatus(b) : (b as any)[col] ?? '';
+      const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+      return dir === 'asc' ? cmp : -cmp;
+    });
   });
+
+  readonly paged = computed(() => {
+    const p = this.page();
+    const size = this.pageSize();
+    return this.filtered().slice((p - 1) * size, p * size);
+  });
+
+  get totalPages() { return Math.ceil(this.filtered().length / this.pageSize()); }
+  prevPage() { if (this.page() > 1) this.page.update(p => p - 1); }
+  nextPage() { if (this.page() < this.totalPages) this.page.update(p => p + 1); }
+  changePageSize(n: number) { this.pageSize.set(n); this.page.set(1); }
+
+  sort(col: string) {
+    if (this.sortCol() === col) {
+      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortCol.set(col);
+      this.sortDir.set('asc');
+    }
+    this.page.set(1);
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortCol() !== col) return 'chevrons-up-down';
+    return this.sortDir() === 'asc' ? 'chevron-up' : 'chevron-down';
+  }
 
   ngOnInit() { this.load(); }
 
@@ -85,9 +123,11 @@ export class InventoryComponent implements OnInit {
   saveForm() {
     this.saving.set(true);
     const existing = this.editItem();
+    const payload = { ...this.form };
+    if (!payload.expiryDate) delete (payload as any).expiryDate;
     const req = existing
-      ? this.inventoryService.update(existing.id, this.form)
-      : this.inventoryService.create(this.form);
+      ? this.inventoryService.update(existing.id, payload)
+      : this.inventoryService.create(payload);
 
     req.subscribe({
       next: () => {

@@ -4,9 +4,16 @@
       <h1 class="page-title">Staff Management</h1>
       <p class="page-sub">Manage your team members, roles, and leave requests.</p>
     </div>
-    <button class="btn btn--primary" (click)="openLeaveModal()">
-      <lucide-icon name="plus" [size]="16" /> Request Leave
-    </button>
+    <div class="d-flex gap-2">
+      @if (auth.isAdmin()) {
+        <button class="btn btn--primary" (click)="openStaffModal()">
+          <lucide-icon name="user-plus" [size]="16" /> Add Staff
+        </button>
+      }
+      <button class="btn btn--secondary" (click)="openLeaveModal()">
+        <lucide-icon name="calendar-plus" [size]="16" /> Request Leave
+      </button>
+    </div>
   </div>
 
   <!-- Tab bar -->
@@ -35,8 +42,20 @@
         <p class="empty-state__subtitle">Add team members to start managing your clinic staff.</p>
       </div>
     } @else {
+      <div class="staff-grid-toolbar">
+        <span class="text-sm text-tertiary">{{ staff().length }} members</span>
+        <div class="d-flex gap-2 items-center">
+          <span class="text-sm text-tertiary">Sort:</span>
+          <button class="btn btn--secondary btn--sm" [class.btn--primary]="staffSortCol()==='name'" (click)="sortStaff('name')">
+            Name <lucide-icon class="sort-icon" [name]="sortIcon(staffSortCol(), 'name', staffSortDir())" [size]="11" />
+          </button>
+          <button class="btn btn--secondary btn--sm" [class.btn--primary]="staffSortCol()==='role'" (click)="sortStaff('role')">
+            Role <lucide-icon class="sort-icon" [name]="sortIcon(staffSortCol(), 'role', staffSortDir())" [size]="11" />
+          </button>
+        </div>
+      </div>
       <div class="staff-grid">
-        @for (member of staff(); track member.id) {
+        @for (member of sortedStaff(); track member.id) {
           <div class="staff-card">
             <div class="staff-card__top">
               <div class="staff-avatar" [attr.data-role]="member.role">
@@ -99,17 +118,17 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Staff Member</th>
-                <th>Leave Type</th>
-                <th>From</th>
-                <th>To</th>
+                <th class="th-sort" [class.th-sort--active]="leavesSortCol()==='staffName'" (click)="sortLeaves('staffName')">Staff Member <lucide-icon class="sort-icon" [name]="sortIcon(leavesSortCol(), 'staffName', leavesSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="leavesSortCol()==='leaveType'" (click)="sortLeaves('leaveType')">Leave Type <lucide-icon class="sort-icon" [name]="sortIcon(leavesSortCol(), 'leaveType', leavesSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="leavesSortCol()==='startDate'" (click)="sortLeaves('startDate')">From <lucide-icon class="sort-icon" [name]="sortIcon(leavesSortCol(), 'startDate', leavesSortDir())" [size]="11" /></th>
+                <th class="th-sort" [class.th-sort--active]="leavesSortCol()==='endDate'" (click)="sortLeaves('endDate')">To <lucide-icon class="sort-icon" [name]="sortIcon(leavesSortCol(), 'endDate', leavesSortDir())" [size]="11" /></th>
                 <th>Duration</th>
-                <th>Status</th>
+                <th class="th-sort" [class.th-sort--active]="leavesSortCol()==='status'" (click)="sortLeaves('status')">Status <lucide-icon class="sort-icon" [name]="sortIcon(leavesSortCol(), 'status', leavesSortDir())" [size]="11" /></th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (leave of leaves(); track leave.id) {
+              @for (leave of pagedLeaves(); track leave.id) {
                 <tr>
                   <td>
                     <span class="staff-name-cell">{{ getStaffName(leave) }}</span>
@@ -142,10 +161,112 @@
             </tbody>
           </table>
         </div>
+        <div class="table-pagination">
+          <span class="table-pagination__info">{{ leaves().length }} requests &nbsp;·&nbsp; Page {{ leavesPage() }} of {{ leavesTotalPages || 1 }}</span>
+          <div class="table-pagination__size">
+            <label class="table-pagination__size-label">Rows</label>
+            <select class="table-pagination__size-select" [ngModel]="leavesPageSize()" (ngModelChange)="changeLeavesPageSize($event)" [ngModelOptions]="{standalone:true}">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
+          </div>
+          <div class="table-pagination__controls">
+            <button class="btn btn--secondary btn--sm" [disabled]="leavesPage() === 1" (click)="leavesPrevPage()">
+              <lucide-icon name="chevron-left" [size]="14" /> Prev
+            </button>
+            <button class="btn btn--secondary btn--sm" [disabled]="leavesPage() >= leavesTotalPages" (click)="leavesNextPage()">
+              Next <lucide-icon name="chevron-right" [size]="14" />
+            </button>
+          </div>
+        </div>
       </div>
     }
   }
 </div>
+
+<!-- Add Staff Modal -->
+@if (showStaffModal()) {
+  <div class="modal-backdrop" (click)="closeStaffModal()">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Staff Member</h3>
+        <button class="btn btn--ghost btn--icon" (click)="closeStaffModal()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <form [formGroup]="staffForm" (ngSubmit)="submitStaff()">
+        <div class="modal__body">
+          <div class="form-grid">
+            <div class="field">
+              <label class="field__label">First Name *</label>
+              <input class="input" formControlName="firstName" placeholder="First name" />
+            </div>
+            <div class="field">
+              <label class="field__label">Last Name *</label>
+              <input class="input" formControlName="lastName" placeholder="Last name" />
+            </div>
+            <div class="field">
+              <label class="field__label">Email *</label>
+              <input class="input" type="email" formControlName="email" placeholder="email@clinic.com" />
+            </div>
+            <div class="field">
+              <label class="field__label">Password *</label>
+              <input class="input" type="password" formControlName="password" placeholder="Min 6 characters" />
+            </div>
+            <div class="field">
+              <label class="field__label">Role *</label>
+              <select class="select" formControlName="role">
+                <option value="doctor">Doctor</option>
+                <option value="receptionist">Receptionist</option>
+                <option value="nurse">Nurse</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label">Phone</label>
+              <input class="input" formControlName="phone" placeholder="+91 00000 00000" />
+            </div>
+          </div>
+
+          @if (selectedRole === 'doctor') {
+            <div class="staff-modal-section">
+              <div class="staff-modal-section__label">Doctor Details</div>
+              <div class="form-grid">
+                <div class="field">
+                  <label class="field__label">Specialization</label>
+                  <input class="input" formControlName="specialization" placeholder="e.g. Cardiologist" />
+                </div>
+                <div class="field">
+                  <label class="field__label">Qualification</label>
+                  <input class="input" formControlName="qualification" placeholder="e.g. MBBS, MD" />
+                </div>
+                <div class="field">
+                  <label class="field__label">Registration No.</label>
+                  <input class="input" formControlName="registrationNo" placeholder="Medical council reg. no." />
+                </div>
+                <div class="field">
+                  <label class="field__label">Consultation Fee (₹)</label>
+                  <input class="input" type="number" formControlName="consultationFee" placeholder="500" />
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--secondary" (click)="closeStaffModal()">Cancel</button>
+          <button type="submit" class="btn btn--primary" [disabled]="staffForm.invalid || saving()">
+            @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
+            Add Staff Member
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
 
 <!-- Leave Request Modal -->
 @if (showLeaveModal()) {

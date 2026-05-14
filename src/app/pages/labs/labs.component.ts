@@ -35,6 +35,7 @@ export class LabsComponent implements OnInit {
   readonly patientQuery = signal('');
   readonly patientDropdown = signal<Patient[]>([]);
   readonly selectedPatient = signal<Patient | null>(null);
+  readonly patientSearching = signal(false);
   private patientSearchTimer: any;
 
   // Test selection
@@ -46,7 +47,6 @@ export class LabsComponent implements OnInit {
   });
 
   resultForm: FormGroup = this.fb.group({
-    status: ['completed', Validators.required],
     notes: [''],
   });
 
@@ -65,7 +65,7 @@ export class LabsComponent implements OnInit {
 
   loadCatalog() {
     this.labsService.getTestCatalog().subscribe({
-      next: (res) => this.catalog.set(res.data ?? []),
+      next: (res: any) => this.catalog.set(res.data?.data ?? res.data ?? []),
       error: () => this.toast.show('Failed to load test catalog', 'danger'),
     });
   }
@@ -74,6 +74,7 @@ export class LabsComponent implements OnInit {
     this.orderForm.reset({ patientId: '', notes: '' });
     this.patientQuery.set('');
     this.patientDropdown.set([]);
+    this.patientSearching.set(false);
     this.selectedPatient.set(null);
     this.selectedTestIds.set(new Set());
     this.showOrderModal.set(true);
@@ -83,11 +84,12 @@ export class LabsComponent implements OnInit {
     const q = (event.target as HTMLInputElement).value;
     this.patientQuery.set(q);
     clearTimeout(this.patientSearchTimer);
-    if (q.length < 2) { this.patientDropdown.set([]); return; }
+    if (q.length < 2) { this.patientDropdown.set([]); this.patientSearching.set(false); return; }
+    this.patientSearching.set(true);
     this.patientSearchTimer = setTimeout(() => {
       this.patientsService.list({ search: q, limit: 8 }).subscribe({
-        next: (res) => this.patientDropdown.set(res.data ?? []),
-        error: () => {},
+        next: (res) => { this.patientDropdown.set(res.data ?? []); this.patientSearching.set(false); },
+        error: () => { this.patientSearching.set(false); },
       });
     }, 300);
   }
@@ -136,7 +138,7 @@ export class LabsComponent implements OnInit {
 
   openResultModal(order: LabOrder) {
     this.selectedOrder.set(order);
-    this.resultForm.reset({ status: 'completed', notes: '' });
+    this.resultForm.reset({ notes: '' });
     this.showResultModal.set(true);
   }
 
@@ -144,10 +146,13 @@ export class LabsComponent implements OnInit {
     const order = this.selectedOrder();
     if (!order) return;
     this.saving.set(true);
-    this.labsService.updateResults(order.id, {
-      items: order.items,
-      status: this.resultForm.value.status,
-    }).subscribe({
+    const items = (order.items ?? []).map((item: any) => ({
+      itemId: item.id,
+      result: item.result,
+      isAbnormal: item.isAbnormal,
+      remarks: item.remarks,
+    }));
+    this.labsService.updateResults(order.id, items).subscribe({
       next: () => {
         this.saving.set(false);
         this.showResultModal.set(false);
@@ -181,5 +186,31 @@ export class LabsComponent implements OnInit {
 
   statusLabel(status: string): string {
     return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  orderNumber(order: any): string {
+    return '#' + order.id.slice(0, 8).toUpperCase();
+  }
+
+  patientName(order: any): string {
+    if (order.patient) return order.patient.firstName + ' ' + order.patient.lastName;
+    return '—';
+  }
+
+  doctorName(order: any): string {
+    if (order.orderedBy) return order.orderedBy.firstName + ' ' + order.orderedBy.lastName;
+    return '—';
+  }
+
+  totalAmount(order: any): number {
+    return (order.items ?? []).reduce((sum: number, item: any) => sum + Number(item.test?.price ?? 0), 0);
+  }
+
+  itemCount(order: any): number {
+    return (order.items ?? []).length;
+  }
+
+  itemName(item: any): string {
+    return item.test?.name ?? '—';
   }
 }

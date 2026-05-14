@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/api.models';
+import { ApiResponse, PaginatedResponse } from '../models/api.models';
 
 export interface InsuranceProvider {
   id: string;
@@ -46,8 +46,8 @@ export class InsuranceService {
     return this.http.post<ApiResponse<InsuranceProvider>>(`${this.base}/providers`, data);
   }
 
-  getClaims(params?: Record<string, string>) {
-    return this.http.get<ApiResponse<InsuranceClaim[]>>(`${this.base}/claims`, { params: this.toParams(params) });
+  getClaims(params?: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' } & Record<string, any>) {
+    return this.http.get<PaginatedResponse<InsuranceClaim>>(`${this.base}/claims`, { params: this.toParams(params) });
   }
 
   createClaim(data: Partial<InsuranceClaim>) {
@@ -62,9 +62,9 @@ export class InsuranceService {
     return this.http.get<ApiResponse<any>>(`${this.base}/claims/stats`);
   }
 
-  private toParams(obj?: Record<string, string>): HttpParams {
+  private toParams(obj?: Record<string, any>): HttpParams {
     let p = new HttpParams();
-    if (obj) Object.entries(obj).forEach(([k, v]) => { if (v) p = p.set(k, v); });
+    if (obj) Object.entries(obj).forEach(([k, v]) => { if (v != null && v !== '') p = p.set(k, String(v)); });
     return p;
   }
 }

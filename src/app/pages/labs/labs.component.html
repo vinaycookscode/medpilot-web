@@ -16,11 +16,7 @@
       <span class="status-pill__count">{{ countByStatus('pending') }}</span>
       <span class="status-pill__label">Pending</span>
     </div>
-    <div class="status-pill status-pill--primary">
-      <span class="status-pill__count">{{ countByStatus('processing') }}</span>
-      <span class="status-pill__label">Processing</span>
-    </div>
-    <div class="status-pill status-pill--success">
+<div class="status-pill status-pill--success">
       <span class="status-pill__count">{{ countByStatus('completed') }}</span>
       <span class="status-pill__label">Completed</span>
     </div>
@@ -74,11 +70,11 @@
             <tbody>
               @for (order of orders(); track order.id) {
                 <tr>
-                  <td><span class="order-number">{{ order.orderNumber }}</span></td>
-                  <td>{{ order.patientName }}</td>
-                  <td>{{ order.doctorName || '—' }}</td>
-                  <td>{{ order.items?.length ?? 0 }} test(s)</td>
-                  <td>₹{{ (order.totalAmount ?? 0) | number:'1.0-0' }}</td>
+                  <td><span class="order-number">{{ orderNumber(order) }}</span></td>
+                  <td>{{ patientName(order) }}</td>
+                  <td>{{ doctorName(order) }}</td>
+                  <td>{{ itemCount(order) }} test(s)</td>
+                  <td>₹{{ totalAmount(order) | number:'1.0-0' }}</td>
                   <td>
                     <span class="badge" [class]="statusBadge(order.status)">
                       {{ statusLabel(order.status) }}
@@ -166,8 +162,18 @@
                 </button>
               </div>
             } @else {
-              <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
-                placeholder="Search by name or phone…" autocomplete="off" autofocus>
+              <div class="patient-search-wrap">
+                <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+                  placeholder="Search by name or phone…" autocomplete="off" autofocus>
+                @if (patientSearching()) {
+                  <span class="patient-search-spinner"><span class="spinner spinner--sm"></span></span>
+                }
+              </div>
+              @if (patientSearching()) {
+                <div class="patient-search-status">Searching…</div>
+              } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
+                <div class="patient-search-status">No patients found</div>
+              }
               @if (patientDropdown().length) {
                 <div class="patient-dropdown">
                   @for (p of patientDropdown(); track p.id) {
@@ -235,22 +241,15 @@
       <div class="modal__header">
         <div>
           <h3 class="modal__title">Enter Results</h3>
-          <p class="modal__sub">{{ selectedOrder()?.orderNumber }} — {{ selectedOrder()?.patientName }}</p>
+          <p class="modal__sub">{{ orderNumber(selectedOrder()) }} — {{ patientName(selectedOrder()) }}</p>
         </div>
         <button class="btn btn--ghost btn--icon" (click)="showResultModal.set(false)">
           <lucide-icon name="x" [size]="18" />
         </button>
       </div>
       <div class="modal__body">
+        <div class="field__hint" style="margin-bottom:12px">Saving will mark this order as <strong>Completed</strong>. Use the ✕ button on the orders table to cancel.</div>
         <form [formGroup]="resultForm">
-          <div class="field">
-            <label class="field__label">Update Status</label>
-            <select class="select" formControlName="status">
-              <option value="processing">Processing</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
           <div class="field">
             <label class="field__label">Notes</label>
             <textarea class="input" formControlName="notes" placeholder="Result notes…" rows="3"></textarea>
@@ -261,9 +260,9 @@
         @if (selectedOrder()?.items?.length) {
           <div class="result-items">
             <div class="result-items__title">Tests in this order</div>
-            @for (item of selectedOrder()!.items; track item.testId) {
+            @for (item of selectedOrder()!.items; track item.id) {
               <div class="result-item" [class.result-item--abnormal]="item.isAbnormal">
-                <span class="result-item__name">{{ item.testName }}</span>
+                <span class="result-item__name">{{ itemName(item) }}</span>
                 @if (item.result) {
                   <span class="result-item__result">{{ item.result }} {{ item.unit }}</span>
                 }

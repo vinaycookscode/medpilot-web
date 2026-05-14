@@ -22,6 +22,12 @@ import {
   Package, MapPin, Warehouse,
   // Reports, Labs, Insurance
   ChartBar,
+  // Appointments queue detail
+  ArrowLeft, CalendarDays, LogIn, MessageSquare, UserX,
+  // Sort indicators
+  ChevronUp,
+  // Dashboard quick actions
+  CalendarPlus,
 } from 'lucide-angular';
 
 @NgModule({
@@ -42,6 +48,9 @@ import {
       ArrowRight, TrendingUp, Sparkles,
       Package, MapPin, Warehouse,
       ChartBar,
+      ArrowLeft, CalendarDays, LogIn, MessageSquare, UserX,
+      ChevronUp,
+      CalendarPlus,
     }),
   ],
   exports: [LucideAngularModule],

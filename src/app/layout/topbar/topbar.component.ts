@@ -140,7 +140,7 @@ export class TopbarComponent {
           id: a.id,
           type: 'appointment' as const,
           title: `Appointment — ${a.patient?.firstName ?? ''} ${a.patient?.lastName ?? ''}`,
-          body: `${a.startTime} · ${a.type}`,
+          body: `${a.startTime} · ${a.appointmentType ?? ''}`,
           time: 'Today',
           read: false,
         }));

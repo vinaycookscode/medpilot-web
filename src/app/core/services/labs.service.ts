@@ -14,24 +14,24 @@ export interface LabTest {
 }
 
 export interface LabOrderItem {
+  id: string;
   testId: string;
-  testName: string;
-  price: number;
+  test?: { id: string; name: string; category: string; price: number; };
   result?: string;
-  referenceRange?: string;
+  normalRange?: string;
   unit?: string;
   isAbnormal?: boolean;
+  remarks?: string;
 }
 
 export interface LabOrder {
   id: string;
-  orderNumber: string;
   patientId: string;
-  patientName: string;
-  doctorName?: string;
+  patient?: { id: string; firstName: string; lastName: string; phone?: string; };
+  orderedById: string;
+  orderedBy?: { id: string; firstName: string; lastName: string; role: string; };
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   items: LabOrderItem[];
-  totalAmount: number;
   notes?: string;
   collectedAt?: string;
   completedAt?: string;
@@ -52,8 +52,8 @@ export class LabsService {
     return this.http.post<ApiResponse<LabOrder>>(`${this.base}/orders`, data);
   }
 
-  updateResults(id: string, data: { items: Partial<LabOrderItem>[]; status: string }) {
-    return this.http.patch<ApiResponse<LabOrder>>(`${this.base}/orders/${id}/results`, data);
+  updateResults(id: string, items: { itemId: string; result?: string; isAbnormal?: boolean; remarks?: string }[]) {
+    return this.http.patch<ApiResponse<LabOrder>>(`${this.base}/orders/${id}/results`, { items });
   }
 
   cancelOrder(id: string) {

@@ -1,5 +1,5 @@
-export type AppointmentStatus = 'scheduled' | 'confirmed' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
-export type AppointmentType = 'consultation' | 'follow_up' | 'procedure' | 'emergency' | 'routine_checkup';
+export type AppointmentStatus = 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
+export type AppointmentType = 'new_patient' | 'follow_up' | 'emergency' | 'routine';
 
 export interface Appointment {
   id: string;
@@ -9,9 +9,9 @@ export interface Appointment {
   doctor?: { id: string; firstName: string; lastName: string; specialization?: string };
   appointmentDate: string;
   startTime: string;
-  endTime: string;
+  endTime?: string;
   status: AppointmentStatus;
-  type: AppointmentType;
+  appointmentType: AppointmentType;
   tokenNumber?: number;
   chiefComplaint?: string;
   notes?: string;
@@ -25,8 +25,7 @@ export interface CreateAppointmentDto {
   doctorId: string;
   appointmentDate: string;
   startTime: string;
-  endTime: string;
-  type: AppointmentType;
+  appointmentType?: AppointmentType;
   chiefComplaint?: string;
   notes?: string;
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
@@ -31,7 +31,20 @@ export class PatientsComponent implements OnInit {
   readonly saving      = signal(false);
   readonly searchQuery = signal('');
   readonly page        = signal(1);
-  readonly pageSize    = 20;
+  readonly pageSize    = signal(20);
+  readonly sortCol     = signal<string>('createdAt');
+  readonly sortDir     = signal<'asc' | 'desc'>('desc');
+
+  readonly sorted = computed(() => {
+    const col = this.sortCol();
+    const dir = this.sortDir();
+    return [...this.patients()].sort((a, b) => {
+      const av = (a as any)[col] ?? '';
+      const bv = (b as any)[col] ?? '';
+      const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  });
 
   // Patient detail drawer
   readonly selectedPatient    = signal<Patient | null>(null);
@@ -68,7 +81,7 @@ export class PatientsComponent implements OnInit {
 
   loadPatients() {
     this.loading.set(true);
-    this.patientsSvc.list({ search: this.searchQuery(), page: this.page(), limit: this.pageSize }).subscribe({
+    this.patientsSvc.list({ search: this.searchQuery(), page: this.page(), limit: this.pageSize() }).subscribe({
       next: r => {
         this.patients.set(r.data);
         this.total.set(r.meta.total);
@@ -143,8 +156,23 @@ export class PatientsComponent implements OnInit {
     return `${years} yrs`;
   }
 
-  get totalPages() { return Math.ceil(this.total() / this.pageSize); }
+  get totalPages() { return Math.ceil(this.total() / this.pageSize()); }
 
   prevPage() { if (this.page() > 1) { this.page.update(p => p - 1); this.loadPatients(); } }
   nextPage() { if (this.page() < this.totalPages) { this.page.update(p => p + 1); this.loadPatients(); } }
+  changePageSize(n: number) { this.pageSize.set(n); this.page.set(1); this.loadPatients(); }
+
+  sort(col: string) {
+    if (this.sortCol() === col) {
+      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortCol.set(col);
+      this.sortDir.set('asc');
+    }
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortCol() !== col) return 'chevrons-up-down';
+    return this.sortDir() === 'asc' ? 'chevron-up' : 'chevron-down';
+  }
 }

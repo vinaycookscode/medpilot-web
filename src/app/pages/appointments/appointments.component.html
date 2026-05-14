@@ -3,10 +3,11 @@
   <div class="page__header">
     <div>
       <h2 class="page__title">Appointments</h2>
-      <p class="page__subtitle">{{ appointments().length }} appointments</p>
+      <p class="page__subtitle">
+        @if (viewMode() === 'queue') { Today's doctor queue } @else { {{ appointments().length }} appointments }
+      </p>
     </div>
     <div class="d-flex gap-3 items-center">
-      <!-- View toggle -->
       <div class="appointments__view-toggle">
         <button class="btn btn--sm"
                 [class.btn--primary]="viewMode() === 'today'"
@@ -16,6 +17,13 @@
                 [class.btn--primary]="viewMode() === 'calendar'"
                 [class.btn--ghost]="viewMode() !== 'calendar'"
                 (click)="switchView('calendar')">Calendar</button>
+        <button class="btn btn--sm"
+                [class.btn--primary]="viewMode() === 'queue'"
+                [class.btn--ghost]="viewMode() !== 'queue'"
+                (click)="switchView('queue')">
+          <lucide-icon name="layout-dashboard" [size]="13" />
+          Queue
+        </button>
       </div>
       <button class="btn btn--primary" (click)="openCreate()">
         <lucide-icon name="plus" [size]="16" />
@@ -24,101 +32,434 @@
     </div>
   </div>
 
-  <!-- Calendar date picker (calendar mode) -->
-  @if (viewMode() === 'calendar') {
-    <div class="appointments__date-bar">
-      <lucide-icon name="calendar" [size]="16" />
-      <input class="input appointments__date-input" type="date"
-             [value]="selectedDate()"
-             (change)="onDateChange($event)" />
-    </div>
-  }
-
-  <!-- Appointments list -->
-  <div class="card card--flush">
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Patient</th>
-            <th>Doctor</th>
-            <th>Time</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (loading()) {
-            @for (i of [1,2,3,4,5]; track i) {
-              <tr>
-                @for (j of [1,2,3,4,5,6,7]; track j) {
-                  <td><div class="skeleton" style="height:13px;border-radius:4px"></div></td>
-                }
-              </tr>
-            }
-          } @else if (appointments().length === 0) {
+  <!-- ─── Today table ─────────────────────────────────────── -->
+  @if (viewMode() === 'today') {
+    <div class="card card--flush">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
             <tr>
-              <td colspan="7">
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='tokenNumber'" (click)="sort('tokenNumber')"># <lucide-icon class="sort-icon" [name]="sortIcon('tokenNumber')" [size]="11" /></th>
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='patient'" (click)="sort('patient')">Patient <lucide-icon class="sort-icon" [name]="sortIcon('patient')" [size]="11" /></th>
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='doctor'" (click)="sort('doctor')">Doctor <lucide-icon class="sort-icon" [name]="sortIcon('doctor')" [size]="11" /></th>
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='startTime'" (click)="sort('startTime')">Time <lucide-icon class="sort-icon" [name]="sortIcon('startTime')" [size]="11" /></th>
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='appointmentType'" (click)="sort('appointmentType')">Type <lucide-icon class="sort-icon" [name]="sortIcon('appointmentType')" [size]="11" /></th>
+              <th class="th-sort" [class.th-sort--active]="sortCol()==='status'" (click)="sort('status')">Status <lucide-icon class="sort-icon" [name]="sortIcon('status')" [size]="11" /></th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loading()) {
+              @for (i of [1,2,3,4,5]; track i) {
+                <tr>@for (j of [1,2,3,4,5,6,7]; track j) {
+                  <td><div class="skeleton" style="height:13px;border-radius:4px"></div></td>
+                }</tr>
+              }
+            } @else if (appointments().length === 0) {
+              <tr><td colspan="7">
                 <div class="empty-state">
                   <div class="empty-state__icon"><lucide-icon name="calendar-x" [size]="24" /></div>
                   <p class="empty-state__title">No appointments</p>
                   <p class="empty-state__subtitle">Book a new appointment to get started</p>
                 </div>
-              </td>
-            </tr>
-          } @else {
-            @for (appt of appointments(); track appt.id) {
-              <tr>
-                <td>
-                  @if (appt.tokenNumber) {
-                    <span class="appointments__token">#{{ appt.tokenNumber }}</span>
-                  } @else { — }
-                </td>
-                <td>
-                  <div class="d-flex items-center gap-2">
-                    <div class="avatar avatar--xs">
+              </td></tr>
+            } @else {
+              @for (appt of sortedAppts(); track appt.id) {
+                <tr>
+                  <td>
+                    @if (appt.tokenNumber) {
+                      <span class="appointments__token">#{{ appt.tokenNumber }}</span>
+                    } @else { — }
+                  </td>
+                  <td>
+                    <div class="d-flex items-center gap-2">
+                      <div class="avatar avatar--xs">{{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}</div>
+                      <div>
+                        <div style="font-weight:600;font-size:13px">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</div>
+                        <div style="font-size:11px;color:var(--text-tertiary)">{{ appt.patient?.phone }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Dr. {{ appt.doctor?.firstName }} {{ appt.doctor?.lastName }}</td>
+                  <td>{{ formatTime(appt.startTime) }}</td>
+                  <td>{{ appt.appointmentType?.replace('_', ' ') | titlecase }}</td>
+                  <td><span class="badge" [class]="statusClass(appt.status)">{{ formatStatus(appt.status) }}</span></td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      @if (appt.status === 'scheduled' || appt.status === 'confirmed') {
+                        <button class="btn btn--ghost btn--sm" (click)="updateStatus(appt.id, 'in_progress')">Check In</button>
+                      }
+                      @if (appt.status === 'in_progress') {
+                        <button class="btn btn--ghost btn--sm" (click)="updateStatus(appt.id, 'completed')">Complete</button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <span class="table-pagination__info">{{ total() }} appointments &nbsp;·&nbsp; Page {{ page() }} of {{ totalPages || 1 }}</span>
+        <div class="table-pagination__size">
+          <label class="table-pagination__size-label">Rows</label>
+          <select class="table-pagination__size-select" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)" [ngModelOptions]="{standalone:true}">
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+            <option [ngValue]="100">100</option>
+          </select>
+        </div>
+        <div class="table-pagination__controls">
+          <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+            <lucide-icon name="chevron-left" [size]="14" /> Prev
+          </button>
+          <button class="btn btn--secondary btn--sm" [disabled]="page() >= totalPages" (click)="nextPage()">
+            Next <lucide-icon name="chevron-right" [size]="14" />
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Calendar View ───────────────────────────────────── -->
+  @if (viewMode() === 'calendar') {
+    <div class="cal-view">
+      <div class="cal-nav">
+        <button class="btn btn--ghost btn--icon btn--sm" (click)="prevMonth()">
+          <lucide-icon name="chevron-left" [size]="16" />
+        </button>
+        <span class="cal-nav__label">{{ calendarMonthLabel() }}</span>
+        <button class="btn btn--ghost btn--icon btn--sm" (click)="nextMonth()">
+          <lucide-icon name="chevron-right" [size]="16" />
+        </button>
+        <button class="btn btn--ghost btn--sm" style="margin-left:8px" (click)="goToToday()">
+          Today
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="cal-skeleton">
+          <div class="cal-skeleton__head">
+            @for (d of dowLabels; track d) { <div class="skeleton" style="height:32px;border-radius:6px"></div> }
+          </div>
+          <div class="cal-skeleton__body">
+            @for (i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]; track i) {
+              <div class="skeleton" style="height:88px;border-radius:6px"></div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="cal-grid-wrap card card--flush">
+          <div class="cal-head">
+            @for (d of dowLabels; track d) {
+              <div class="cal-dow">{{ d }}</div>
+            }
+          </div>
+          <div class="cal-body-wrap">
+            <div class="cal-body">
+              @for (day of calendarDays(); track day.date) {
+                @let isPast = day.inMonth && day.date < todayStr() && !day.isToday;
+                <div class="cal-cell"
+                     [class.cal-cell--today]="day.isToday"
+                     [class.cal-cell--other]="!day.inMonth"
+                     [class.cal-cell--past]="isPast"
+                     [class.cal-cell--disabled]="isPast || !day.inMonth"
+                     [class.cal-cell--selected]="selectedCalDay() === day.date"
+                     (click)="(day.inMonth && !isPast) ? selectCalDay(day.date, $event) : null">
+                  <span class="cal-cell__num">{{ day.day }}</span>
+                  @if (day.appts.length > 0) {
+                    <div class="cal-cell__dots">
+                      @for (appt of day.appts.slice(0, 4); track appt.id) {
+                        <span class="cal-dot" [class]="'cal-dot--' + appt.status"></span>
+                      }
+                    </div>
+                    <span class="cal-cell__count">{{ day.appts.length }} appt{{ day.appts.length > 1 ? 's' : '' }}</span>
+                  }
+                </div>
+              }
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <div class="cal-panel"
+           [class.cal-panel--open]="!!selectedCalDay()"
+           [style.left.px]="drawerPos()?.x"
+           [style.top.px]="drawerPos()?.y">
+        <div class="cal-panel__head">
+          <div class="cal-panel__head-top">
+            <div>
+              <div class="cal-panel__date-label">Selected Date</div>
+              <div class="cal-panel__date-val">{{ formatCalendarDay(selectedCalDay() ?? '') }}</div>
+            </div>
+            <button class="cal-panel__close" (click)="selectedCalDay.set(null); drawerPos.set(null)">
+              <lucide-icon name="x" [size]="15" />
+            </button>
+          </div>
+          <div class="cal-panel__head-foot">
+            <span class="cal-panel__count-chip">
+              <lucide-icon name="calendar-days" [size]="11" />
+              {{ drawerAppts().length }} appointment{{ drawerAppts().length !== 1 ? 's' : '' }}
+            </span>
+            <button class="cal-panel__book-btn" (click)="openCreate(selectedCalDay() ?? undefined)">
+              <lucide-icon name="plus" [size]="12" /> Book
+            </button>
+          </div>
+        </div>
+
+        @if (drawerAppts().length === 0) {
+          <div class="cal-panel__empty">
+            <lucide-icon name="calendar-x" [size]="30" />
+            <p class="cal-panel__empty-title">No appointments</p>
+            <p class="cal-panel__empty-sub">Tap Book to schedule one</p>
+          </div>
+        } @else {
+          <div class="cal-panel__list">
+            @for (appt of drawerAppts(); track appt.id) {
+              <div class="cal-pitem" [class]="'cal-pitem--' + appt.status">
+                <div class="cal-pitem__stripe"></div>
+                <div class="cal-pitem__content">
+                  <div class="cal-pitem__row1">
+                    <span class="cal-pitem__time-chip">{{ formatTime(appt.startTime) }}</span>
+                    @if (appt.tokenNumber) {
+                      <span class="cal-pitem__token">#{{ appt.tokenNumber }}</span>
+                    }
+                    <span class="cal-pitem__spacer"></span>
+                    <span class="badge badge--sm" [class]="statusClass(appt.status)">{{ formatStatus(appt.status) }}</span>
+                  </div>
+                  <div class="cal-pitem__patient">
+                    <div class="cal-pitem__avatar">
                       {{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}
                     </div>
-                    <div>
-                      <div style="font-weight:600;font-size:13px">
-                        {{ appt.patient?.firstName }} {{ appt.patient?.lastName }}
-                      </div>
-                      <div style="font-size:11px;color:var(--text-tertiary)">
-                        {{ appt.patient?.phone }}
-                      </div>
+                    <div class="cal-pitem__info">
+                      <div class="cal-pitem__name">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</div>
+                      <div class="cal-pitem__phone">{{ appt.patient?.phone }}</div>
                     </div>
                   </div>
-                </td>
-                <td>Dr. {{ appt.doctor?.firstName }} {{ appt.doctor?.lastName }}</td>
-                <td>{{ formatTime(appt.startTime) }}</td>
-                <td>{{ appt.type | titlecase }}</td>
-                <td><span class="badge" [class]="statusClass(appt.status)">{{ appt.status | titlecase }}</span></td>
-                <td>
-                  <div class="d-flex gap-1">
-                    @if (appt.status === 'scheduled' || appt.status === 'confirmed') {
-                      <button class="btn btn--ghost btn--sm" (click)="updateStatus(appt.id, 'checked_in')">
-                        Check In
-                      </button>
-                    }
-                    @if (appt.status === 'checked_in' || appt.status === 'in_progress') {
-                      <button class="btn btn--ghost btn--sm" (click)="updateStatus(appt.id, 'completed')">
-                        Complete
-                      </button>
+                  <div class="cal-pitem__doctor">
+                    <lucide-icon name="stethoscope" [size]="10" />
+                    Dr. {{ appt.doctor?.firstName }} {{ appt.doctor?.lastName }}
+                    @if (appt.appointmentType) {
+                      <span class="cal-pitem__type">· {{ appt.appointmentType.replace('_', ' ') | titlecase }}</span>
                     }
                   </div>
-                </td>
-              </tr>
+                  @if (appt.status === 'scheduled' || appt.status === 'confirmed') {
+                    <button class="btn btn--ghost cal-pitem__action" (click)="updateStatus(appt.id, 'in_progress')">Check In</button>
+                  }
+                  @if (appt.status === 'in_progress') {
+                    <button class="btn btn--ghost cal-pitem__action" (click)="updateStatus(appt.id, 'completed')">Complete</button>
+                  }
+                </div>
+              </div>
             }
-          }
-        </tbody>
-      </table>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
+
+  <!-- ─── Queue View ──────────────────────────────────────── -->
+  @if (viewMode() === 'queue') {
+    <div class="queue-loading" [style.display]="loading() ? null : 'none'">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="queue-col-skeleton">
+          <div class="skeleton" style="height:90px;border-radius:12px;margin-bottom:8px"></div>
+          @for (j of [1,2,3]; track j) {
+            <div class="skeleton" style="height:72px;border-radius:8px;margin-bottom:6px"></div>
+          }
+        </div>
+      }
+    </div>
+
+    <div [style.display]="loading() ? 'none' : null">
+      @if (queueDoctor(); as doc) {
+      <!-- ── Single doctor detail ── -->
+      <div class="queue-detail">
+        <div class="queue-detail__nav">
+          <button class="btn btn--ghost btn--sm" (click)="clearQueueDoctor()">
+            <lucide-icon name="arrow-left" [size]="14" /> All Doctors
+          </button>
+          <button class="btn btn--primary btn--sm" (click)="openCreate()">
+            <lucide-icon name="plus" [size]="13" /> Book with Dr. {{ doc.lastName }}
+          </button>
+        </div>
+
+        <div class="queue-detail__hero">
+          <div class="queue-detail__avatar">{{ getInitials(doc.firstName, doc.lastName) }}</div>
+          <div class="queue-detail__info">
+            <h3 class="queue-detail__name">Dr. {{ doc.firstName }} {{ doc.lastName }}</h3>
+            <p class="queue-detail__spec">{{ doc.specialization ?? 'General Physician' }}</p>
+            <span class="badge" [class.badge--success]="doc.isActive" [class.badge--neutral]="!doc.isActive">
+              {{ doc.isActive ? 'Available' : 'Inactive' }}
+            </span>
+          </div>
+          @if (doc.consultationFee) {
+            <div class="queue-detail__fee">
+              <span class="queue-detail__fee-lbl">Consultation Fee</span>
+              <span class="queue-detail__fee-val">₹{{ doc.consultationFee | number }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="queue-detail__stats">
+          <div class="qstat qstat--total">
+            <div class="qstat__val">{{ queueDetailStats().total }}</div>
+            <div class="qstat__lbl">Total</div>
+          </div>
+          <div class="qstat qstat--waiting">
+            <div class="qstat__val">{{ queueDetailStats().waiting }}</div>
+            <div class="qstat__lbl">Waiting</div>
+          </div>
+          <div class="qstat qstat--active">
+            <div class="qstat__val">{{ queueDetailStats().active }}</div>
+            <div class="qstat__lbl">In Progress</div>
+          </div>
+          <div class="qstat qstat--done">
+            <div class="qstat__val">{{ queueDetailStats().completed }}</div>
+            <div class="qstat__lbl">Completed</div>
+          </div>
+        </div>
+
+        @if (queueDetailAppts().length === 0) {
+          <div class="empty-state" style="margin-top:48px">
+            <div class="empty-state__icon"><lucide-icon name="calendar-x" [size]="24" /></div>
+            <p class="empty-state__title">No appointments today</p>
+            <p class="empty-state__subtitle">Book an appointment with this doctor to get started.</p>
+          </div>
+        } @else {
+          <div class="queue-timeline">
+            @for (appt of queueDetailAppts(); track appt.id; let i = $index) {
+              <div class="qt-card qt-card--{{ appt.status }}" [style.animation-delay]="(i * 65) + 'ms'">
+                <div class="qt-card__time-col">
+                  <span class="qt-card__time">{{ formatTime(appt.startTime) }}</span>
+                  @if (appt.tokenNumber) {
+                    <span class="qt-card__token">#{{ appt.tokenNumber }}</span>
+                  }
+                </div>
+                <div class="qt-card__connector"></div>
+                <div class="qt-card__body">
+                  <div class="qt-card__header">
+                    <div class="qt-card__patient-info">
+                      <div class="qt-card__avatar">
+                        {{ appt.patient?.firstName?.[0] }}{{ appt.patient?.lastName?.[0] }}
+                      </div>
+                      <div>
+                        <div class="qt-card__name">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</div>
+                        <div class="qt-card__phone">{{ appt.patient?.phone }}</div>
+                      </div>
+                    </div>
+                    <div class="qt-card__badges">
+                      <span class="badge badge--sm badge--neutral">{{ appt.appointmentType?.replace('_', ' ') | titlecase }}</span>
+                      <span class="badge badge--sm" [class]="statusClass(appt.status)">{{ formatStatus(appt.status) }}</span>
+                    </div>
+                  </div>
+                  @if (appt.chiefComplaint) {
+                    <div class="qt-card__complaint">
+                      <lucide-icon name="message-square" [size]="11" />
+                      {{ appt.chiefComplaint }}
+                    </div>
+                  }
+                  <div class="qt-card__actions">
+                    @if (appt.status === 'scheduled' || appt.status === 'confirmed') {
+                      <button class="btn btn--sm btn--primary" (click)="updateStatus(appt.id, 'in_progress')">
+                        <lucide-icon name="log-in" [size]="12" /> Check In
+                      </button>
+                      @if (isPast(appt.startTime)) {
+                        <button class="btn btn--sm btn--ghost qt-noshow-btn"
+                                (click)="updateStatus(appt.id, 'no_show')">
+                          <lucide-icon name="user-x" [size]="12" /> No Show
+                        </button>
+                      }
+                    }
+                    @if (appt.status === 'in_progress') {
+                      <button class="btn btn--sm btn--ghost" style="color:var(--color-success)"
+                              (click)="updateStatus(appt.id, 'completed')">
+                        <lucide-icon name="check-circle" [size]="12" /> Complete
+                      </button>
+                    }
+                    @if (appt.status === 'completed') {
+                      <span class="qt-done-chip">
+                        <lucide-icon name="check-circle-2" [size]="12" /> Done
+                      </span>
+                    }
+                    @if (appt.status === 'no_show') {
+                      <span class="qt-noshow-chip">
+                        <lucide-icon name="user-x" [size]="12" /> No Show
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      } @else {
+      <!-- ── All doctors kanban board ── -->
+      <div>
+        @if (doctorQueues().length === 0) {
+          <div class="empty-state">
+            <div class="empty-state__icon"><lucide-icon name="stethoscope" [size]="24" /></div>
+            <p class="empty-state__title">No doctors found</p>
+            <p class="empty-state__subtitle">Add doctors to your clinic to view their queues.</p>
+          </div>
+        } @else {
+          <div class="queue-board">
+            @for (q of doctorQueues(); track q.doctor.id; let i = $index) {
+              <div class="dq-col" [attr.data-color]="docColor(i)" [style.animation-delay]="(i * 70) + 'ms'">
+                <div class="dq-col__header" (click)="selectQueueDoctor(q.doctor)">
+                  <div class="dq-col__avatar">{{ getInitials(q.doctor.firstName, q.doctor.lastName) }}</div>
+                  <div class="dq-col__info">
+                    <span class="dq-col__name">Dr. {{ q.doctor.firstName }} {{ q.doctor.lastName }}</span>
+                    <span class="dq-col__spec">{{ q.doctor.specialization ?? 'General' }}</span>
+                  </div>
+                  <div class="dq-col__badge">
+                    {{ q.appointments.length }}
+                    <lucide-icon name="chevron-right" [size]="10" />
+                  </div>
+                </div>
+                <div class="dq-col__mini-stats">
+                  <span class="dq-mini-stat dq-mini-stat--wait">{{ queueStats(q.appointments).waiting }} waiting</span>
+                  <span class="dq-mini-stat dq-mini-stat--active">{{ queueStats(q.appointments).active }} active</span>
+                  <span class="dq-mini-stat dq-mini-stat--done">{{ queueStats(q.appointments).completed }} done</span>
+                </div>
+                <div class="dq-col__body">
+                  @if (q.appointments.length === 0) {
+                    <div class="dq-empty">
+                      <lucide-icon name="calendar-x" [size]="18" />
+                      <span>No appointments today</span>
+                    </div>
+                  }
+                  @for (appt of q.appointments; track appt.id; let j = $index) {
+                    <div class="dq-card" [class]="'dq-card--' + appt.status"
+                         [style.animation-delay]="(i * 70 + j * 55) + 'ms'">
+                      <div class="dq-card__top">
+                        <span class="dq-card__token">{{ appt.tokenNumber ? '#' + appt.tokenNumber : '—' }}</span>
+                        <span class="dq-card__time">{{ formatTime(appt.startTime) }}</span>
+                      </div>
+                      <div class="dq-card__patient">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</div>
+                      <div class="dq-card__bottom">
+                        <span class="dq-card__type">{{ appt.appointmentType?.replace('_', ' ') | titlecase }}</span>
+                        <span class="dq-card__dot" [class]="'dq-card__dot--' + appt.status"></span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      }
+    </div>
+  }
 </div>
 
-<!-- Book Appointment Modal -->
+<!-- ─── Book Appointment Modal ────────────────────────────── -->
 @if (showModal()) {
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal modal--lg" (click)="$event.stopPropagation()">
@@ -132,68 +473,154 @@
       <form [formGroup]="form" (ngSubmit)="saveAppointment()">
         <div class="modal__body">
           <div class="form-grid">
+
             <!-- Patient search -->
             <div class="field form-grid__full">
-              <label class="field__label">Search Patient *</label>
-              <div class="input-group">
-                <span class="input-icon"><lucide-icon name="search" [size]="16" /></span>
-                <input class="input" type="search" placeholder="Type patient name or phone…"
-                       (input)="onPatientSearch($event)" />
-              </div>
-              @if (patients().length > 0) {
-                <div class="appointments__patient-list">
-                  @for (p of patients(); track p.id) {
-                    <button type="button" class="appointments__patient-item"
-                            (click)="form.patchValue({ patientId: p.id }); patients.set([])">
-                      <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
-                      <div>
-                        <div style="font-size:13px;font-weight:600">{{ p.firstName }} {{ p.lastName }}</div>
-                        <div style="font-size:11px;color:var(--text-tertiary)">{{ p.phone }} · {{ p.patientCode }}</div>
+              <label class="field__label">Patient *</label>
+              @if (selectedPatient()) {
+                <div class="doctor-selected">
+                  <div class="doctor-selected__avatar">{{ selectedPatient()!.firstName[0] }}{{ selectedPatient()!.lastName[0] }}</div>
+                  <div class="doctor-selected__info">
+                    <span class="doctor-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
+                    <span class="doctor-selected__spec">{{ selectedPatient()!.phone }} · {{ selectedPatient()!.patientCode }}</span>
+                  </div>
+                  <button type="button" class="btn btn--ghost btn--icon btn--sm"
+                          (click)="selectedPatient.set(null); form.patchValue({ patientId: '' })">
+                    <lucide-icon name="x" [size]="14" />
+                  </button>
+                </div>
+              } @else if (newPatientMode()) {
+                <div class="new-patient-box">
+                  <div class="new-patient-box__header">
+                    <span><lucide-icon name="user-plus" [size]="13" /> New Patient Registration</span>
+                    <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatientSearch()">
+                      <lucide-icon name="x" [size]="13" />
+                    </button>
+                  </div>
+                  <div class="form-grid" style="margin-top:10px">
+                    <div class="field">
+                      <label class="field__label">First Name *</label>
+                      <input class="input" [(ngModel)]="quickPatient.firstName" [ngModelOptions]="{standalone:true}" placeholder="First name" autofocus />
+                    </div>
+                    <div class="field">
+                      <label class="field__label">Last Name</label>
+                      <input class="input" [(ngModel)]="quickPatient.lastName" [ngModelOptions]="{standalone:true}" placeholder="Last name" />
+                    </div>
+                    <div class="field form-grid__full">
+                      <label class="field__label">Phone *</label>
+                      <input class="input" [(ngModel)]="quickPatient.phone" [ngModelOptions]="{standalone:true}" placeholder="+91 00000 00000" />
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="input-group">
+                  <span class="input-icon"><lucide-icon name="search" [size]="16" /></span>
+                  <input class="input" type="search" placeholder="Type patient name or phone…"
+                         (input)="onPatientSearch($event)" autofocus />
+                </div>
+                @if (patientSearching()) {
+                  <div class="patient-search-hint"><span class="spinner spinner--sm"></span> Searching…</div>
+                } @else if (patients().length > 0) {
+                  <div class="appointments__patient-list">
+                    @for (p of patients(); track p.id) {
+                      <button type="button" class="appointments__patient-item"
+                              (click)="selectedPatient.set(p); form.patchValue({ patientId: p.id }); patients.set([])">
+                        <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                        <div>
+                          <div style="font-size:13px;font-weight:600">{{ p.firstName }} {{ p.lastName }}</div>
+                          <div style="font-size:11px;color:var(--text-tertiary)">{{ p.phone }} · {{ p.patientCode }}</div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                } @else if (patientSearchQuery().length >= 2) {
+                  <div class="patient-search-hint">
+                    No patients found.
+                    <button type="button" class="btn btn--sm btn--ghost" style="color:var(--color-primary);margin-left:6px"
+                            (click)="startNewPatient()">
+                      <lucide-icon name="user-plus" [size]="13" /> Register as new patient
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+
+            <!-- Doctor picker -->
+            <div class="field form-grid__full">
+              <label class="field__label">Select Doctor *</label>
+              @if (doctorsLoading()) {
+                <div class="doctor-picker-loading">
+                  <span class="spinner spinner--sm"></span> Loading doctors…
+                </div>
+              } @else if (selectedDoctor()) {
+                <div class="doctor-selected">
+                  <div class="doctor-selected__avatar">{{ selectedDoctor()!.firstName[0] }}{{ selectedDoctor()!.lastName[0] }}</div>
+                  <div class="doctor-selected__info">
+                    <span class="doctor-selected__name">{{ selectedDoctor()!.firstName }} {{ selectedDoctor()!.lastName }}</span>
+                    <span class="doctor-selected__spec">{{ selectedDoctor()!.specialization ?? 'General' }}</span>
+                  </div>
+                  <button type="button" class="btn btn--ghost btn--icon btn--sm"
+                          (click)="selectedDoctor.set(null); form.patchValue({ doctorId: '' }); availableSlots.set([])">
+                    <lucide-icon name="x" [size]="14" />
+                  </button>
+                </div>
+              } @else {
+                <div class="doctor-picker">
+                  @for (doc of doctors(); track doc.id) {
+                    <button type="button" class="doctor-card" (click)="selectDoctor(doc)">
+                      <div class="doctor-card__avatar">{{ doc.firstName[0] }}{{ doc.lastName[0] }}</div>
+                      <div class="doctor-card__info">
+                        <span class="doctor-card__name">{{ doc.firstName }} {{ doc.lastName }}</span>
+                        <span class="doctor-card__spec">{{ doc.specialization ?? 'General' }}</span>
                       </div>
+                      @if (doctorApptCounts()[doc.id]) {
+                        <span class="doctor-card__count">{{ doctorApptCounts()[doc.id] }} today</span>
+                      }
+                      <span class="doctor-card__status" [class.doctor-card__status--on]="doc.isActive">
+                        {{ doc.isActive ? 'Available' : 'Inactive' }}
+                      </span>
                     </button>
                   }
                 </div>
               }
             </div>
 
-            <div class="field">
-              <label class="field__label">Doctor ID *</label>
-              <input class="input" formControlName="doctorId" placeholder="Doctor UUID"
-                     (blur)="onDoctorOrDateChange()" />
-            </div>
-
-            <div class="field">
+            <div class="field form-grid__full">
               <label class="field__label">Date *</label>
               <input class="input" type="date" formControlName="appointmentDate"
-                     (change)="onDoctorOrDateChange()" />
+                     [min]="todayStr()" (change)="onDoctorOrDateChange()" style="max-width:220px" />
             </div>
 
             <!-- Time slots -->
             <div class="field form-grid__full">
               <label class="field__label">Time Slot *</label>
               @if (slotsLoading()) {
-                <div class="spinner" style="margin-top:8px"></div>
+                <div class="d-flex items-center gap-2" style="margin-top:8px;color:var(--text-secondary);font-size:13px">
+                  <span class="spinner spinner--sm"></span> Loading slots…
+                </div>
               } @else if (availableSlots().length > 0) {
                 <div class="appointments__slots">
                   @for (slot of availableSlots(); track slot.startTime) {
-                    <button type="button"
-                            class="appointments__slot"
+                    <button type="button" class="appointments__slot"
                             [class.appointments__slot--selected]="form.getRawValue().startTime === slot.startTime"
                             (click)="selectSlot(slot)">
                       {{ formatTime(slot.startTime) }}
                     </button>
                   }
                 </div>
+              } @else if (form.getRawValue().doctorId) {
+                <p class="slots-hint">No schedule found for this doctor today. Enter time manually:</p>
+                <input class="input" formControlName="startTime" placeholder="HH:MM e.g. 09:30" style="max-width:180px" />
               } @else {
-                <input class="input" formControlName="startTime" placeholder="HH:MM (enter doctor ID + date first)" />
+                <p class="slots-hint">Select a doctor and date first to see available slots.</p>
               }
             </div>
 
             <div class="field">
-              <label class="field__label">Type *</label>
-              <select class="select" formControlName="type">
-                @for (t of appointmentTypes; track t) {
-                  <option [value]="t">{{ t | titlecase }}</option>
+              <label class="field__label">Type</label>
+              <select class="select" formControlName="appointmentType">
+                @for (t of appointmentTypes; track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
                 }
               </select>
             </div>
@@ -212,9 +639,9 @@
 
         <div class="modal__footer">
           <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancel</button>
-          <button type="submit" class="btn btn--primary" [disabled]="form.invalid || saving()">
+          <button type="button" class="btn btn--primary" [disabled]="!canBook || saving()" (click)="saveAppointment()">
             @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-            Book Appointment
+            @if (newPatientMode()) { Register &amp; Book } @else { Book Appointment }
           </button>
         </div>
       </form>

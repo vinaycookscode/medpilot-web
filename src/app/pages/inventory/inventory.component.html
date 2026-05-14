@@ -82,18 +82,18 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Category</th>
-            <th>Stock</th>
-            <th>Reorder At</th>
-            <th>Unit Price</th>
-            <th>Expiry</th>
-            <th>Status</th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='name'" (click)="sort('name')">Item <lucide-icon class="sort-icon" [name]="sortIcon('name')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='category'" (click)="sort('category')">Category <lucide-icon class="sort-icon" [name]="sortIcon('category')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='quantity'" (click)="sort('quantity')">Stock <lucide-icon class="sort-icon" [name]="sortIcon('quantity')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='reorderLevel'" (click)="sort('reorderLevel')">Reorder At <lucide-icon class="sort-icon" [name]="sortIcon('reorderLevel')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='sellingPrice'" (click)="sort('sellingPrice')">Unit Price <lucide-icon class="sort-icon" [name]="sortIcon('sellingPrice')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='expiryDate'" (click)="sort('expiryDate')">Expiry <lucide-icon class="sort-icon" [name]="sortIcon('expiryDate')" [size]="11" /></th>
+            <th class="th-sort" [class.th-sort--active]="sortCol()==='status'" (click)="sort('status')">Status <lucide-icon class="sort-icon" [name]="sortIcon('status')" [size]="11" /></th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          @for (item of filtered(); track item.id) {
+          @for (item of paged(); track item.id) {
             <tr>
               <td>
                 <div class="item-name">{{ item.name }}</div>
@@ -134,6 +134,26 @@
           }
         </tbody>
       </table>
+    </div>
+    <div class="table-pagination">
+      <span class="table-pagination__info">{{ filtered().length }} items &nbsp;·&nbsp; Page {{ page() }} of {{ totalPages || 1 }}</span>
+      <div class="table-pagination__size">
+        <label class="table-pagination__size-label">Rows</label>
+        <select class="table-pagination__size-select" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)" [ngModelOptions]="{standalone:true}">
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
+      </div>
+      <div class="table-pagination__controls">
+        <button class="btn btn--secondary btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+          <lucide-icon name="chevron-left" [size]="14" /> Prev
+        </button>
+        <button class="btn btn--secondary btn--sm" [disabled]="page() >= totalPages" (click)="nextPage()">
+          Next <lucide-icon name="chevron-right" [size]="14" />
+        </button>
+      </div>
     </div>
   }
 </div>
