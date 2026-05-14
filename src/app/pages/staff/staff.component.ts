@@ -110,7 +110,11 @@ export class StaffComponent implements OnInit {
 
   loadLeaves() {
     this.staffService.getLeaves().subscribe({
-      next: r => this.leaves.set(r.data ?? []),
+      next: (r: any) => {
+        const raw = r.data;
+        const data = Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+        this.leaves.set(data);
+      },
       error: () => {},
     });
   }
@@ -245,7 +249,8 @@ export class StaffComponent implements OnInit {
   }
 
   get pendingLeavesCount(): number {
-    return this.leaves().filter(l => l.status === 'pending').length;
+    const data = this.leaves();
+    return Array.isArray(data) ? data.filter(l => l.status === 'pending').length : 0;
   }
 
   sortStaff(col: 'name' | 'role') {
