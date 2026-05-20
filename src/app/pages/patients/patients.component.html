@@ -194,13 +194,94 @@
             <lucide-icon name="shield-check" [size]="14" style="color:var(--color-primary)" />
             <p class="label" style="margin:0">ABHA Health ID</p>
           </div>
-          @if (abhaProfile()?.hasAbha && auth.hasRole('admin', 'doctor')) {
-            <button class="btn btn--ghost btn--sm" (click)="downloadCard()" [disabled]="abhaLoading()">
-              <lucide-icon name="download" [size]="13" />
-              Card
+          <div class="d-flex items-center gap-2">
+            <button class="btn btn--ghost btn--icon" [title]="showAbhaInfo() ? 'Hide info' : 'What is ABHA?'"
+                    (click)="showAbhaInfo.set(!showAbhaInfo())">
+              <lucide-icon [name]="showAbhaInfo() ? 'x' : 'info'" [size]="14" />
             </button>
-          }
+            @if (abhaProfile()?.hasAbha && auth.hasRole('admin', 'doctor')) {
+              <button class="btn btn--ghost btn--sm" (click)="downloadCard()" [disabled]="abhaLoading()">
+                <lucide-icon name="download" [size]="13" />
+                Card
+              </button>
+            }
+          </div>
         </div>
+
+        <!-- ABHA Info Panel -->
+        @if (showAbhaInfo()) {
+          <div class="patients__abha-info-panel">
+            <div class="patients__abha-info-panel-header">
+              <lucide-icon name="shield-check" [size]="18" />
+              <div>
+                <p class="patients__abha-info-title">What is ABHA?</p>
+                <p class="patients__abha-info-sub">Ayushman Bharat Health Account</p>
+              </div>
+            </div>
+            <p class="patients__abha-info-desc">
+              ABHA is a 14-digit unique health ID issued by the Government of India under the
+              Ayushman Bharat Digital Mission (ABDM). It gives patients a single digital identity
+              to access and share their health records across any hospital, clinic, or lab in India.
+            </p>
+
+            <p class="patients__abha-info-section-label">Benefits for the patient</p>
+            <div class="patients__abha-benefits">
+              <div class="patients__abha-benefit">
+                <lucide-icon name="file-heart" [size]="14" />
+                <span>All health records — prescriptions, lab reports, consultations — stored in one place</span>
+              </div>
+              <div class="patients__abha-benefit">
+                <lucide-icon name="share-2" [size]="14" />
+                <span>Share records instantly with any doctor or hospital — no need to carry paper files</span>
+              </div>
+              <div class="patients__abha-benefit">
+                <lucide-icon name="lock" [size]="14" />
+                <span>Patient controls who sees their data — consent is always required before sharing</span>
+              </div>
+              <div class="patients__abha-benefit">
+                <lucide-icon name="smartphone" [size]="14" />
+                <span>Accessible via ABDM PHR apps like ABHA App, Aarogya Setu, or any linked health app</span>
+              </div>
+            </div>
+
+            <p class="patients__abha-info-section-label">How enrollment works</p>
+            <div class="patients__abha-steps-info">
+              <div class="patients__abha-step-info">
+                <div class="patients__abha-step-info-num">1</div>
+                <div>
+                  <p class="patients__abha-step-info-title">Enter Aadhaar</p>
+                  <p class="patients__abha-step-info-desc">Patient's 12-digit Aadhaar number is used for KYC verification. An OTP is sent to the Aadhaar-linked mobile.</p>
+                </div>
+              </div>
+              <div class="patients__abha-step-info">
+                <div class="patients__abha-step-info-num">2</div>
+                <div>
+                  <p class="patients__abha-step-info-title">Verify OTP</p>
+                  <p class="patients__abha-step-info-desc">Patient confirms identity via the OTP. Aadhaar data is not stored — only used for one-time verification.</p>
+                </div>
+              </div>
+              <div class="patients__abha-step-info">
+                <div class="patients__abha-step-info-num">3</div>
+                <div>
+                  <p class="patients__abha-step-info-title">ABHA ID created</p>
+                  <p class="patients__abha-step-info-desc">A 14-digit ABHA number and an ABHA address (like name&#64;abdm) are assigned. The patient can use these to log in to any PHR app.</p>
+                </div>
+              </div>
+              <div class="patients__abha-step-info">
+                <div class="patients__abha-step-info-num">4</div>
+                <div>
+                  <p class="patients__abha-step-info-title">Records auto-linked</p>
+                  <p class="patients__abha-step-info-desc">Prescriptions, consultations, and lab reports from this clinic are automatically synced to their ABHA profile.</p>
+                </div>
+              </div>
+            </div>
+
+            <p class="patients__abha-info-note">
+              <lucide-icon name="info" [size]="12" />
+              Already has ABHA? Use <strong>Link Existing</strong> to connect their existing ABHA number to this clinic without creating a new one.
+            </p>
+          </div>
+        }
 
         @if (abhaLoading() && !abhaProfile()) {
           <div class="skeleton" style="height:88px;border-radius:8px"></div>
@@ -234,7 +315,11 @@
           </div>
         } @else {
           <div class="patients__abha-empty">
-            <p class="text-xs text-tertiary mb-2">No ABHA Health ID linked.</p>
+            <p class="text-xs text-secondary mb-1" style="font-weight:500">No ABHA Health ID linked</p>
+            <p class="text-xs text-tertiary mb-3">
+              Create a new ABHA using the patient's Aadhaar, or link their existing ABHA number.
+              Click <lucide-icon name="info" [size]="11" style="vertical-align:-1px" /> above to learn more.
+            </p>
             <div class="d-flex gap-2 flex-wrap">
               <button class="btn btn--primary btn--sm" (click)="openCreateAbha()">
                 <lucide-icon name="shield-check" [size]="13" />
@@ -250,6 +335,53 @@
       </div>
 
       <div class="divider"></div>
+
+      <!-- ABDM Care Contexts -->
+      @if (abhaProfile()?.hasAbha) {
+        <div>
+          <div class="d-flex items-center justify-between mb-3">
+            <div class="d-flex items-center gap-2">
+              <lucide-icon name="link" [size]="14" style="color:var(--color-primary)" />
+              <p class="label" style="margin:0">ABDM Linked Records</p>
+              <span class="badge badge--primary" style="font-size:11px">{{ careContexts().length }}</span>
+            </div>
+            <button class="btn btn--ghost btn--icon" title="Refresh" (click)="loadCareContexts()" [disabled]="careContextsLoading()">
+              <lucide-icon name="refresh-cw" [size]="13" />
+            </button>
+          </div>
+
+          @if (careContextsLoading()) {
+            <div class="skeleton" style="height:60px;border-radius:8px"></div>
+          } @else if (careContexts().length === 0) {
+            <p class="text-xs text-tertiary" style="padding:8px 0">No records synced to ABDM yet.</p>
+          } @else {
+            <div class="patients__cc-list">
+              @for (cc of careContexts(); track cc.id) {
+                <div class="patients__cc-item">
+                  <div class="patients__cc-icon">
+                    <lucide-icon [name]="ccSourceIcon(cc.sourceType)" [size]="13" />
+                  </div>
+                  <div class="patients__cc-body">
+                    <span class="patients__cc-display">{{ cc.display }}</span>
+                    <span class="text-xs text-tertiary">{{ ccSourceLabel(cc.sourceType) }}</span>
+                  </div>
+                  <div class="patients__cc-status">
+                    @if (cc.status === 'linked') {
+                      <span class="badge badge--success" style="font-size:10px">Linked</span>
+                    } @else if (cc.status === 'pending') {
+                      <span class="badge badge--warning" style="font-size:10px">Pending</span>
+                    } @else {
+                      <span class="badge badge--danger" style="font-size:10px" [title]="cc.errorMessage ?? ''">Failed</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="divider"></div>
+      }
 
       <!-- Prescription History -->
       <div>
@@ -488,6 +620,10 @@
 
         <!-- Step 1: Aadhaar -->
         @if (abhaCreateStep() === 1) {
+          <div class="patients__abha-modal-note">
+            <lucide-icon name="lock" [size]="13" />
+            <span>Aadhaar is used only for one-time identity verification. It is not stored. An OTP will be sent to the patient's Aadhaar-linked mobile number.</span>
+          </div>
           <div class="field">
             <label class="field__label">Aadhaar Number *</label>
             <input class="input" type="text" [(ngModel)]="abhaAadhaar" maxlength="12"
@@ -620,6 +756,10 @@
 
       <div class="modal__body">
         @if (abhaVerifyStep() === 1) {
+          <div class="patients__abha-modal-note">
+            <lucide-icon name="info" [size]="13" />
+            <span>Use this if the patient already has an ABHA Health ID from another hospital or the ABHA app. Linking connects their existing health records to this clinic.</span>
+          </div>
           <div class="field">
             <label class="field__label">ABHA Number *</label>
             <input class="input" type="text" [(ngModel)]="abhaVerifyLoginId"

@@ -80,6 +80,7 @@ export class SidebarComponent {
     { label: 'Inventory',     route: '/inventory',     icon: 'package',        roles: ['admin'] },
     { label: 'Labs',          route: '/labs',          icon: 'flask-conical',  roles: ['admin', 'doctor'] },
     { label: 'Insurance',     route: '/insurance',     icon: 'shield-check',   roles: ['admin', 'receptionist'] },
+    { label: 'Consents',      route: '/consents',      icon: 'file-check',     roles: ['admin', 'doctor'] },
     { label: 'Reports',       route: '/reports',       icon: 'chart-bar',      roles: ['admin'] },
     { label: 'Branches',      route: '/branches',      icon: 'building-2',     roles: ['admin'] },
     { label: 'Staff',         route: '/staff',         icon: 'users',          roles: ['admin'] },

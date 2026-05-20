@@ -77,6 +77,10 @@ export const routes: Routes = [
         path: 'insurance',
         loadComponent: () => import('./pages/insurance/insurance.component').then(m => m.InsuranceComponent),
       },
+      {
+        path: 'consents',
+        loadComponent: () => import('./pages/consents/consents.component').then(m => m.ConsentsComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

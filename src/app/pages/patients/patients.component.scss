@@ -252,6 +252,130 @@
 
   // ── ABHA section ──────────────────────────────────────────────────────────
 
+  // ABHA info panel (toggled by ? button)
+  &__abha-info-panel {
+    background: var(--color-primary-subtle);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+    border-radius: var(--radius-md);
+    padding: t.$sp-4;
+    margin-bottom: t.$sp-3;
+    @include m.flex-col(t.$sp-3);
+  }
+
+  &__abha-info-panel-header {
+    @include m.flex(center, flex-start, t.$sp-3);
+    color: var(--color-primary);
+  }
+
+  &__abha-info-title {
+    font-size: t.$text-sm;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  &__abha-info-sub {
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  &__abha-info-desc {
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &__abha-info-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  &__abha-benefits {
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__abha-benefit {
+    @include m.flex(flex-start, flex-start, t.$sp-2);
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    line-height: 1.5;
+
+    lucide-icon {
+      color: var(--color-primary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+
+  &__abha-steps-info {
+    @include m.flex-col(t.$sp-3);
+  }
+
+  &__abha-step-info {
+    @include m.flex(flex-start, flex-start, t.$sp-3);
+  }
+
+  &__abha-step-info-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    @include m.flex(center, center);
+    flex-shrink: 0;
+  }
+
+  &__abha-step-info-title {
+    font-size: t.$text-xs;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+  }
+
+  &__abha-step-info-desc {
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__abha-info-note {
+    @include m.flex(flex-start, flex-start, t.$sp-2);
+    font-size: t.$text-xs;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+    margin: 0;
+
+    lucide-icon { flex-shrink: 0; margin-top: 1px; }
+  }
+
+  // Context note inside modal steps
+  &__abha-modal-note {
+    @include m.flex(flex-start, flex-start, t.$sp-2);
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: t.$sp-3;
+    font-size: t.$text-xs;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: t.$sp-4;
+
+    lucide-icon {
+      color: var(--color-primary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+
   &__abha-card {
     background: var(--surface-input);
     border: 1px solid var(--border);
@@ -279,6 +403,48 @@
     font-weight: 700;
     color: var(--color-primary);
     letter-spacing: 0.04em;
+  }
+
+  // Care Context list
+  &__cc-list {
+    @include m.flex-col(t.$sp-2);
+  }
+
+  &__cc-item {
+    @include m.flex(center, flex-start, t.$sp-3);
+    padding: t.$sp-2 t.$sp-3;
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  &__cc-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    @include m.flex(center, center);
+    flex-shrink: 0;
+  }
+
+  &__cc-body {
+    @include m.flex-col(2px);
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__cc-display {
+    font-size: t.$text-sm;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__cc-status {
+    flex-shrink: 0;
   }
 
   // ABHA modal step indicator

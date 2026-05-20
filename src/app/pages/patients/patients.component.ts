@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angu
 import { IconsModule } from '../../shared/icons';
 import { PatientsService } from '../../core/services/patients.service';
 import { PrescriptionsService } from '../../core/services/prescriptions.service';
-import { AbhaService, AbhaProfile, EnrollAbhaResult, VerifyAbhaResult } from '../../core/services/abha.service';
+import { AbhaService, AbhaProfile, EnrollAbhaResult, VerifyAbhaResult, CareContext } from '../../core/services/abha.service';
 import { Patient, CreatePatientDto, Gender } from '../../core/models/patient.models';
 import { Prescription } from '../../core/models/prescription.models';
 import { ToastService } from '../../core/services/toast.service';
@@ -60,6 +60,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
   // ABHA
   readonly abhaProfile      = signal<AbhaProfile | null>(null);
   readonly abhaLoading      = signal(false);
+  readonly showAbhaInfo     = signal(false);
 
   // Create ABHA modal
   readonly showCreateAbha      = signal(false);
@@ -83,6 +84,10 @@ export class PatientsComponent implements OnInit, OnDestroy {
   abhaVerifyLoginId      = '';
   abhaVerifyOtp          = '';
   abhaVerifySessionToken = '';
+
+  // Care Contexts
+  readonly careContexts        = signal<CareContext[]>([]);
+  readonly careContextsLoading = signal(false);
 
   private search$ = new Subject<string>();
 
@@ -129,6 +134,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.selectedPatient.set(patient);
     this.patientPrescriptions.set([]);
     this.abhaProfile.set(null);
+    this.careContexts.set([]);
     this.rxLoading.set(true);
     this.rxSvc.list({ patientId: patient.id, limit: 50 }).subscribe({
       next: r => { this.patientPrescriptions.set(r.data); this.rxLoading.set(false); },
@@ -139,6 +145,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
       next: r => { this.abhaProfile.set(r.data); this.abhaLoading.set(false); },
       error: () => this.abhaLoading.set(false),
     });
+    this.loadCareContexts(patient.id);
   }
 
   closeDetail() {
@@ -407,6 +414,34 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.abhaSvc.getProfile(patientId).subscribe({
       next: r => this.abhaProfile.set(r.data),
     });
+  }
+
+  loadCareContexts(patientId?: string) {
+    const id = patientId ?? this.selectedPatient()?.id;
+    if (!id) return;
+    this.careContextsLoading.set(true);
+    this.abhaSvc.getCareContexts(id).subscribe({
+      next: r => { this.careContexts.set(r.data ?? []); this.careContextsLoading.set(false); },
+      error: () => this.careContextsLoading.set(false),
+    });
+  }
+
+  ccSourceLabel(sourceType: string): string {
+    const map: Record<string, string> = {
+      appointment: 'Consultation',
+      prescription: 'Prescription',
+      lab_order: 'Lab Report',
+    };
+    return map[sourceType] ?? sourceType;
+  }
+
+  ccSourceIcon(sourceType: string): string {
+    const map: Record<string, string> = {
+      appointment: 'stethoscope',
+      prescription: 'file-text',
+      lab_order: 'flask-conical',
+    };
+    return map[sourceType] ?? 'file';
   }
 
   private startCountdown(type: 'create' | 'verify') {

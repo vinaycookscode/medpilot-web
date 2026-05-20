@@ -30,6 +30,8 @@ import {
   CalendarPlus,
   // ABHA
   Link, Unlink, Download,
+  // Consents
+  FileCheck, Flag,
 } from 'lucide-angular';
 
 @NgModule({
@@ -54,6 +56,7 @@ import {
       ChevronUp,
       CalendarPlus,
       Link, Unlink, Download,
+      FileCheck, Flag,
     }),
   ],
   exports: [LucideAngularModule],

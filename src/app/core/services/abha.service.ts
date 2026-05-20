@@ -38,6 +38,20 @@ export interface VerifyAbhaResult {
   patientId: string | null;
 }
 
+export interface CareContext {
+  id: string;
+  referenceNumber: string;
+  display: string;
+  sourceType: 'appointment' | 'prescription' | 'lab_order';
+  hiTypes: string[];
+  status: 'pending' | 'linked' | 'failed';
+  retryCount: number;
+  linkedAt: string | null;
+  lastAttemptAt: string | null;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AbhaService {
   private readonly api = `${environment.apiUrl}/abha`;
@@ -89,5 +103,9 @@ export class AbhaService {
 
   unlink(patientId: string) {
     return this.http.delete<ApiResponse<void>>(`${this.api}/patients/${patientId}/unlink`);
+  }
+
+  getCareContexts(patientId: string) {
+    return this.http.get<ApiResponse<CareContext[]>>(`${this.api}/patients/${patientId}/care-contexts`);
   }
 }
