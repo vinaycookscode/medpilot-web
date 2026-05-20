@@ -1,0 +1,232 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Consent Dashboard</h1>
+      <p class="page-sub">ABDM health data access consents for this clinic's patients.</p>
+    </div>
+  </div>
+
+  <!-- Summary pills -->
+  <div class="status-pills">
+    <div class="status-pill status-pill--warning" [class.status-pill--active]="filterStatus()==='REQUESTED'" (click)="setStatus('REQUESTED')">
+      <span class="status-pill__count">{{ summary().REQUESTED }}</span>
+      <span class="status-pill__label">Requested</span>
+    </div>
+    <div class="status-pill status-pill--success" [class.status-pill--active]="filterStatus()==='GRANTED'" (click)="setStatus('GRANTED')">
+      <span class="status-pill__count">{{ summary().GRANTED }}</span>
+      <span class="status-pill__label">Granted</span>
+    </div>
+    <div class="status-pill status-pill--danger" [class.status-pill--active]="filterStatus()==='REVOKED'" (click)="setStatus('REVOKED')">
+      <span class="status-pill__count">{{ summary().REVOKED }}</span>
+      <span class="status-pill__label">Revoked</span>
+    </div>
+    <div class="status-pill status-pill--neutral" [class.status-pill--active]="filterStatus()==='EXPIRED'" (click)="setStatus('EXPIRED')">
+      <span class="status-pill__count">{{ summary().EXPIRED }}</span>
+      <span class="status-pill__label">Expired</span>
+    </div>
+    @if (filterStatus()) {
+      <button class="btn btn--ghost btn--sm clear-filter" (click)="setStatus('')">
+        <lucide-icon name="x" [size]="13" /> Clear filter
+      </button>
+    }
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <lucide-icon name="search" [size]="15" class="search-icon" />
+      <input class="input search-input" placeholder="Search by patient ABHA…"
+             [value]="searchQuery()" (input)="onSearch($event)" />
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+  }
+
+  <!-- Table -->
+  @if (!loading()) {
+    @if (!consents().length) {
+      <div class="empty-state">
+        <div class="empty-state__icon"><lucide-icon name="file-check" [size]="28" /></div>
+        <p class="empty-state__title">No consent requests</p>
+        <p class="empty-state__subtitle">
+          @if (filterStatus() || searchQuery()) { Try clearing the filter. }
+          @else { ABDM gateway will push requests here when HIUs request patient records. }
+        </p>
+      </div>
+    } @else {
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Patient ABHA</th>
+                <th>Requester (HIU)</th>
+                <th>Purpose</th>
+                <th>Record Types</th>
+                <th>Date Range</th>
+                <th>Status</th>
+                <th>Expires</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of consents(); track c.id) {
+                <tr [class.row--flagged]="c.isFlagged">
+                  <td>
+                    <span class="abha-addr">{{ c.patientAbha }}</span>
+                    @if (c.isFlagged) {
+                      <lucide-icon name="flag" [size]="13" class="flag-icon" title="Flagged as suspicious" />
+                    }
+                  </td>
+                  <td>
+                    <div class="hiu-cell">
+                      <span class="hiu-name">{{ c.hiuName || c.hiuId }}</span>
+                      <span class="hiu-id text-secondary">{{ c.hiuId }}</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge--primary badge--sm">{{ purposeLabel(c.purposeCode) }}</span></td>
+                  <td class="hi-types">{{ hiTypesLabel(c.hiTypes) }}</td>
+                  <td class="text-secondary date-range">{{ dateRangeLabel(c.dateRangeFrom, c.dateRangeTo) }}</td>
+                  <td>
+                    <span class="badge" [class]="statusBadge(c.status)">{{ c.status }}</span>
+                  </td>
+                  <td class="text-secondary">
+                    @if (c.dataEraseAt) { {{ c.dataEraseAt | date:'dd MMM yy' }} }
+                    @else { — }
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn btn--ghost btn--icon btn--sm" title="View details" (click)="openDetail(c)">
+                        <lucide-icon name="eye" [size]="15" />
+                      </button>
+                      @if (auth.isAdmin()) {
+                        <button class="btn btn--ghost btn--icon btn--sm"
+                                [class.text-danger]="c.isFlagged"
+                                [title]="c.isFlagged ? 'Remove flag' : 'Flag as suspicious'"
+                                [disabled]="saving()"
+                                (click)="toggleFlag(c)">
+                          <lucide-icon name="flag" [size]="15" />
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button class="btn btn--ghost btn--sm" [disabled]="page() === 1" (click)="prevPage()">
+            <lucide-icon name="chevron-left" [size]="15" /> Prev
+          </button>
+          <span class="pagination__info">Page {{ page() }} of {{ totalPages }}</span>
+          <button class="btn btn--ghost btn--sm" [disabled]="page() === totalPages" (click)="nextPage()">
+            Next <lucide-icon name="chevron-right" [size]="15" />
+          </button>
+        </div>
+      }
+    }
+  }
+</div>
+
+<!-- Detail Drawer -->
+@if (selected()) {
+  <div class="modal-backdrop" (click)="closeDetail()">
+    <div class="drawer" (click)="$event.stopPropagation()">
+      <div class="drawer__header">
+        <div>
+          <h3 class="drawer__title">Consent Detail</h3>
+          <p class="drawer__sub">{{ selected()!.consentRequestId }}</p>
+        </div>
+        <button class="btn btn--ghost btn--icon" (click)="closeDetail()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
+
+      <div class="drawer__body">
+        <div class="detail-grid">
+          <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="badge" [class]="statusBadge(selected()!.status)">{{ selected()!.status }}</span>
+          </div>
+          @if (selected()!.isFlagged) {
+            <div class="detail-row detail-row--alert">
+              <lucide-icon name="alert-triangle" [size]="14" />
+              <span>Flagged as suspicious on {{ selected()!.flaggedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+          }
+          <div class="detail-row">
+            <span class="detail-label">Patient ABHA</span>
+            <span class="detail-value mono">{{ selected()!.patientAbha }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Requester (HIU)</span>
+            <div>
+              <div class="detail-value">{{ selected()!.hiuName || '—' }}</div>
+              <div class="detail-value text-secondary mono">{{ selected()!.hiuId }}</div>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Purpose</span>
+            <span class="detail-value">{{ selected()!.purposeText || purposeLabel(selected()!.purposeCode) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Record Types</span>
+            <span class="detail-value">{{ hiTypesLabel(selected()!.hiTypes) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Data Range</span>
+            <span class="detail-value">{{ dateRangeLabel(selected()!.dateRangeFrom, selected()!.dateRangeTo) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Expires</span>
+            <span class="detail-value">
+              @if (selected()!.dataEraseAt) { {{ selected()!.dataEraseAt | date:'dd MMM yyyy' }} }
+              @else { Not set }
+            </span>
+          </div>
+          @if (selected()!.artefactId) {
+            <div class="detail-row">
+              <span class="detail-label">Artefact ID</span>
+              <span class="detail-value mono">{{ selected()!.artefactId }}</span>
+            </div>
+          }
+          @if (selected()!.grantedAt) {
+            <div class="detail-row">
+              <span class="detail-label">Granted At</span>
+              <span class="detail-value">{{ selected()!.grantedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+          }
+          @if (selected()!.revokedAt) {
+            <div class="detail-row">
+              <span class="detail-label">Revoked At</span>
+              <span class="detail-value text-danger">{{ selected()!.revokedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+          }
+          <div class="detail-row">
+            <span class="detail-label">Received</span>
+            <span class="detail-value">{{ selected()!.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      @if (auth.isAdmin()) {
+        <div class="drawer__footer">
+          <button class="btn" [class]="selected()!.isFlagged ? 'btn--ghost' : 'btn--danger-ghost'"
+                  [disabled]="saving()" (click)="toggleFlag(selected()!)">
+            <lucide-icon name="flag" [size]="15" />
+            {{ selected()!.isFlagged ? 'Remove suspicious flag' : 'Flag as suspicious' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
