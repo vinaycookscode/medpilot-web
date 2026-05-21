@@ -1,0 +1,286 @@
+<div class="page opd">
+
+  <!-- Header -->
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">OPD Queue</h2>
+      <p class="page__subtitle">
+        @if (isToday()) { Today's outpatient queue } @else { Queue for {{ date() | date:'dd MMM yyyy' }} }
+        &nbsp;·&nbsp;{{ total() }} appointment{{ total() !== 1 ? 's' : '' }}
+      </p>
+    </div>
+    <div class="d-flex gap-2 items-center">
+      <input type="date" class="form-control" style="width:155px"
+             [value]="date()" (change)="onDateChange($any($event.target).value)" />
+      <button class="btn btn--ghost btn--icon" (click)="load()" title="Refresh">
+        <lucide-icon name="refresh-cw" [size]="15" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="opd-stats">
+    <div class="opd-stat opd-stat--waiting">
+      <div class="opd-stat__icon"><lucide-icon name="clock" [size]="18" /></div>
+      <div>
+        <div class="opd-stat__value">{{ stats().waiting }}</div>
+        <div class="opd-stat__label">Waiting</div>
+      </div>
+    </div>
+    <div class="opd-stat opd-stat--progress">
+      <div class="opd-stat__icon"><lucide-icon name="activity" [size]="18" /></div>
+      <div>
+        <div class="opd-stat__value">{{ stats().inProgress }}</div>
+        <div class="opd-stat__label">In Progress</div>
+      </div>
+    </div>
+    <div class="opd-stat opd-stat--done">
+      <div class="opd-stat__icon"><lucide-icon name="check" [size]="18" /></div>
+      <div>
+        <div class="opd-stat__value">{{ stats().completed }}</div>
+        <div class="opd-stat__label">Completed</div>
+      </div>
+    </div>
+    <div class="opd-stat opd-stat--triaged">
+      <div class="opd-stat__icon"><lucide-icon name="clipboard-check" [size]="18" /></div>
+      <div>
+        <div class="opd-stat__value">{{ stats().triaged }}</div>
+        <div class="opd-stat__label">Triaged</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="opd-filters">
+    @for (f of filterOptions; track f.value) {
+      <button class="filter-pill" [class.filter-pill--active]="filter() === f.value"
+              (click)="setFilter(f.value)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Queue -->
+  <div class="card card--flush">
+    <div class="table-wrap">
+      <table class="table opd-table">
+        <thead>
+          <tr>
+            <th class="col-token">#</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Time</th>
+            <th>Triage / Vitals</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            @for (i of [1,2,3,4,5,6]; track i) {
+              <tr>
+                <td><div class="skeleton" style="width:36px;height:36px;border-radius:50%"></div></td>
+                @for (j of [1,2,3,4,5,6]; track j) {
+                  <td><div class="skeleton" style="height:13px;border-radius:4px"></div></td>
+                }
+              </tr>
+            }
+          } @else if (queue().length === 0) {
+            <tr><td colspan="7">
+              <div class="empty-state">
+                <lucide-icon name="clipboard-list" [size]="36" />
+                <p>No appointments in queue for this date</p>
+                @if (filter()) {
+                  <button class="btn btn--ghost btn--sm" (click)="setFilter('')">Clear filter</button>
+                }
+              </div>
+            </td></tr>
+          } @else {
+            @for (appt of queue(); track appt.id; let i = $index) {
+              <tr [class]="rowClass(appt.status)">
+
+                <!-- Token # -->
+                <td class="col-token">
+                  <div class="token-chip token-chip--{{ appt.status }}">
+                    {{ appt.tokenNumber ?? (rowOffset + i + 1) }}
+                  </div>
+                </td>
+
+                <!-- Patient -->
+                <td>
+                  <div class="fw-medium">{{ appt.patient?.firstName }} {{ appt.patient?.lastName }}</div>
+                  <div class="d-flex gap-2 items-center mt-1">
+                    @if (appt.opdNumber) {
+                      <span class="opd-num">{{ appt.opdNumber }}</span>
+                    }
+                    <span class="text-muted text-sm">{{ appt.patient?.phone }}</span>
+                  </div>
+                </td>
+
+                <!-- Doctor -->
+                <td>
+                  <div class="fw-medium">Dr. {{ appt.doctor?.firstName }} {{ appt.doctor?.lastName }}</div>
+                  @if (appt.doctor?.specialization) {
+                    <div class="text-muted text-sm">{{ appt.doctor?.specialization }}</div>
+                  }
+                </td>
+
+                <!-- Time -->
+                <td>
+                  <div class="fw-medium">{{ formatTime(appt.startTime) }}</div>
+                  @if (appt.appointmentType) {
+                    <div class="text-muted text-sm" style="text-transform:capitalize">
+                      {{ appt.appointmentType?.replace('_', ' ') }}
+                    </div>
+                  }
+                </td>
+
+                <!-- Triage -->
+                <td>
+                  @if (appt.triageAt) {
+                    <div class="vitals-chips">
+                      @if (appt.triageVitals?.bp) {
+                        <span class="vital-chip"><span class="vital-chip__key">BP</span>{{ appt.triageVitals?.bp }}</span>
+                      }
+                      @if (appt.triageVitals?.pulse) {
+                        <span class="vital-chip"><span class="vital-chip__key">PR</span>{{ appt.triageVitals?.pulse }}</span>
+                      }
+                      @if (appt.triageVitals?.spo2) {
+                        <span class="vital-chip"><span class="vital-chip__key">SpO2</span>{{ appt.triageVitals?.spo2 }}%</span>
+                      }
+                      @if (appt.triageVitals?.temperature) {
+                        <span class="vital-chip"><span class="vital-chip__key">T</span>{{ appt.triageVitals?.temperature }}°</span>
+                      }
+                      <button class="btn btn--ghost btn--icon btn--xs" (click)="openTriage(appt)" title="Edit triage">
+                        <lucide-icon name="pencil" [size]="11" />
+                      </button>
+                    </div>
+                  } @else {
+                    <button class="btn btn--sm btn--outline" (click)="openTriage(appt)">
+                      <lucide-icon name="activity" [size]="13" /> Triage
+                    </button>
+                  }
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="badge" [class]="statusClass(appt.status)">
+                    {{ appt.status === 'in_progress' ? 'In Progress' : (appt.status | titlecase) }}
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                  <div class="d-flex gap-1">
+                    @if (appt.status === 'confirmed' || appt.status === 'scheduled') {
+                      <button class="btn btn--sm btn--primary" (click)="updateStatus(appt.id, 'in_progress')">
+                        Start
+                      </button>
+                    }
+                    @if (appt.status === 'in_progress') {
+                      <button class="btn btn--sm btn--success" (click)="updateStatus(appt.id, 'completed')">
+                        Done
+                      </button>
+                    }
+                    @if (appt.status !== 'completed' && appt.status !== 'cancelled' && appt.status !== 'no_show') {
+                      <button class="btn btn--sm btn--ghost" (click)="updateStatus(appt.id, 'no_show')" title="Mark no-show">
+                        NS
+                      </button>
+                    }
+                  </div>
+                </td>
+
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1 || total() > limit()) {
+      <div class="table-pagination">
+        <span class="text-muted text-sm">
+          {{ rowOffset + 1 }}–{{ endRow }} of {{ total() }}
+        </span>
+        <div class="d-flex gap-1 items-center">
+          <button class="btn btn--ghost btn--icon btn--sm" (click)="setPage(page() - 1)" [disabled]="page() === 1">
+            <lucide-icon name="chevron-left" [size]="15" />
+          </button>
+          @for (p of pageRange(); track p) {
+            <button class="btn btn--sm" [class.btn--primary]="p === page()" [class.btn--ghost]="p !== page()"
+                    (click)="setPage(p)">{{ p }}</button>
+          }
+          <button class="btn btn--ghost btn--icon btn--sm" (click)="setPage(page() + 1)" [disabled]="page() === totalPages">
+            <lucide-icon name="chevron-right" [size]="15" />
+          </button>
+        </div>
+        <select class="form-control" style="width:auto;padding:.25rem .5rem;font-size:.8rem"
+                [value]="limit()" (change)="limit.set(+$any($event.target).value); page.set(1); load()">
+          <option value="10">10 / page</option>
+          <option value="20">20 / page</option>
+          <option value="50">50 / page</option>
+        </select>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- Triage Modal -->
+@if (triageModal()) {
+  <div class="modal-backdrop" (click)="triageModal.set(false)"></div>
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <div>
+        <h3>Triage Vitals</h3>
+        @if (triageAppt()) {
+          <p class="text-muted text-sm" style="margin:0">
+            {{ triageAppt()?.patient?.firstName }} {{ triageAppt()?.patient?.lastName }}
+            &nbsp;·&nbsp; Token {{ triageAppt()?.tokenNumber }}
+          </p>
+        }
+      </div>
+      <button class="modal__close" (click)="triageModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid form-grid--2">
+        <div class="form-group">
+          <label class="form-label">Blood Pressure</label>
+          <input class="form-control" placeholder="120/80 mmHg" [(ngModel)]="vitals.bp" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pulse (bpm)</label>
+          <input class="form-control" type="number" placeholder="72" [(ngModel)]="vitals.pulse" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temperature (°F)</label>
+          <input class="form-control" type="number" placeholder="98.6" [(ngModel)]="vitals.temperature" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">SpO2 (%)</label>
+          <input class="form-control" type="number" placeholder="98" [(ngModel)]="vitals.spo2" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Resp. Rate (/min)</label>
+          <input class="form-control" type="number" placeholder="16" [(ngModel)]="vitals.respiratoryRate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight (kg)</label>
+          <input class="form-control" type="number" placeholder="70" [(ngModel)]="vitals.weight" step="0.1" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Triage Notes</label>
+        <textarea class="form-control" rows="2" placeholder="Any observations…" [(ngModel)]="vitals.notes"></textarea>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" (click)="triageModal.set(false)">Cancel</button>
+      <button class="btn btn--primary" (click)="saveTriage()" [disabled]="triageSaving()">
+        @if (triageSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
+        Save Vitals
+      </button>
+    </div>
+  </div>
+}

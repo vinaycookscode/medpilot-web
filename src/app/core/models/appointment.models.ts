@@ -17,7 +17,29 @@ export interface Appointment {
   notes?: string;
   followUpDate?: string;
   cancelledReason?: string;
+  opdNumber?: string;
+  triageAt?: string;
+  triageById?: string;
+  triageVitals?: TriageVitals;
   createdAt: string;
+}
+
+export interface TriageVitals {
+  bp?: string;
+  pulse?: number;
+  temperature?: number;
+  spo2?: number;
+  respiratoryRate?: number;
+  weight?: number;
+  height?: number;
+  notes?: string;
+}
+
+export interface OpdQueueStats {
+  waiting: number;
+  inProgress: number;
+  completed: number;
+  triaged: number;
 }
 
 export interface CreateAppointmentDto {

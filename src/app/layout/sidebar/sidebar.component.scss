@@ -43,10 +43,28 @@
 
   // ── Nav ──
   &__nav {
-    @include m.flex-col(2px);
+    @include m.flex-col(0);
     flex: 1;
     padding: 0 t.$sp-3;
     overflow-y: auto;
+  }
+
+  &__section {
+    @include m.flex-col(1px);
+    padding: t.$sp-3 0 t.$sp-1;
+
+    & + & { border-top: 1px solid var(--border); margin-top: t.$sp-1; }
+  }
+
+  &__section-title {
+    font-size: .65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text-tertiary);
+    padding: 0 t.$sp-3;
+    margin-bottom: t.$sp-1;
+    display: block;
   }
 
   &__nav-item {
@@ -120,6 +138,9 @@
     &__brand-clinic { display: none; }
 
     &__nav { padding: 0 6px; }
+
+    &__section { padding: 6px 0 2px; }
+    &__section-title { display: none; }
 
     &__nav-item {
       justify-content: center;

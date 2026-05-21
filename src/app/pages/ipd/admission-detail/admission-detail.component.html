@@ -1,0 +1,427 @@
+<div class="page admission-detail">
+  <!-- Back + header -->
+  <div class="page__header">
+    <div class="d-flex items-center gap-3">
+      <a class="btn btn--ghost btn--icon" routerLink="/ipd"><lucide-icon name="arrow-left" [size]="18" /></a>
+      <div>
+        <h2 class="page__title">{{ admission()?.admissionNumber ?? 'Loading…' }}</h2>
+        <p class="page__subtitle">
+          {{ admission()?.patient?.firstName }} {{ admission()?.patient?.lastName }}
+          @if (admission()) { · {{ admission()!.ward?.name }} · Bed {{ admission()!.bed?.bedNumber }} }
+        </p>
+      </div>
+    </div>
+    @if (isAdmitted()) {
+      <button class="btn btn--danger" (click)="openDischarge()">
+        <lucide-icon name="log-out" [size]="15" /> Discharge Patient
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><lucide-icon name="loader-2" [size]="28" class="spin" /></div>
+  } @else if (admission()) {
+    <!-- Info cards -->
+    <div class="info-grid">
+      <div class="card info-card">
+        <div class="info-card__label">Patient</div>
+        <div class="info-card__value">{{ admission()!.patient?.firstName }} {{ admission()!.patient?.lastName }}</div>
+        <div class="info-card__sub">{{ admission()!.patient?.phone }}</div>
+      </div>
+      <div class="card info-card">
+        <div class="info-card__label">Admission</div>
+        <div class="info-card__value">{{ admission()!.admissionDate | date:'dd MMM yyyy' }} · {{ admission()!.admissionTime }}</div>
+        <div class="info-card__sub">{{ admission()!.admissionType | titlecase }}</div>
+      </div>
+      <div class="card info-card">
+        <div class="info-card__label">Doctor</div>
+        <div class="info-card__value">Dr. {{ admission()!.admittingDoctor?.firstName }} {{ admission()!.admittingDoctor?.lastName }}</div>
+        <div class="info-card__sub">{{ admission()!.admittingDoctor?.specialization }}</div>
+      </div>
+      <div class="card info-card">
+        <div class="info-card__label">Length of Stay</div>
+        <div class="info-card__value">{{ los(admission()!) }} day{{ los(admission()!) !== 1 ? 's' : '' }}</div>
+        <div class="info-card__sub">Status: {{ admission()!.status | titlecase }}</div>
+      </div>
+      <div class="card info-card">
+        <div class="info-card__label">Total Charges</div>
+        <div class="info-card__value">{{ formatCurrency(chargeTotal()) }}</div>
+        <div class="info-card__sub">{{ charges().length }} line items</div>
+      </div>
+      <div class="card info-card">
+        <div class="info-card__label">Attendant</div>
+        <div class="info-card__value">{{ admission()!.attendantName ?? '—' }}</div>
+        <div class="info-card__sub">{{ admission()!.attendantRelation }} · {{ admission()!.attendantPhone }}</div>
+      </div>
+    </div>
+
+    <!-- Admission diagnosis -->
+    <div class="card" style="margin-bottom:1.25rem;padding:1rem 1.25rem">
+      <div class="text-sm text-muted mb-1">Admission Diagnosis</div>
+      <div class="fw-medium">{{ admission()!.admissionDiagnosis }}</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='notes'" (click)="tab.set('notes')">
+        <lucide-icon name="file-text" [size]="14" /> Daily Notes ({{ notes().length }})
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='charges'" (click)="tab.set('charges')">
+        <lucide-icon name="receipt" [size]="14" /> Charges ({{ formatCurrency(chargeTotal()) }})
+      </button>
+      <button class="tab-btn" [class.tab-btn--active]="tab()==='procedures'" (click)="tab.set('procedures')">
+        <lucide-icon name="activity" [size]="14" /> Procedures ({{ procedures().length }})
+      </button>
+      @if (!isAdmitted()) {
+        <button class="tab-btn" [class.tab-btn--active]="tab()==='summary'" (click)="tab.set('summary')">
+          <lucide-icon name="clipboard-check" [size]="14" /> Discharge Summary
+        </button>
+      }
+    </div>
+
+    <!-- ─── Notes ───────────────────────────────────────────────────────── -->
+    @if (tab() === 'notes') {
+      <div class="d-flex justify-end mb-3">
+        @if (isAdmitted()) {
+          <button class="btn btn--primary" (click)="openNoteModal()">
+            <lucide-icon name="plus" [size]="15" /> Add Note
+          </button>
+        }
+      </div>
+      @if (notes().length === 0) {
+        <div class="empty-state">
+          <lucide-icon name="file-text" [size]="32" />
+          <p>No notes yet</p>
+        </div>
+      }
+      @for (n of notes(); track n.id) {
+        <div class="card note-card">
+          <div class="note-card__header">
+            <div class="d-flex items-center gap-2">
+              <span class="badge" [class]="noteTypeBadge(n.noteType)">{{ noteTypeLabel(n.noteType) }}</span>
+              @if (n.isPrivate) { <span class="badge badge--warning">Private</span> }
+            </div>
+            <div class="d-flex items-center gap-3 text-sm text-muted">
+              <span>{{ n.noteDate | date:'dd MMM' }} {{ n.noteTime }}</span>
+              <span>{{ n.author?.firstName }} {{ n.author?.lastName }}</span>
+            </div>
+          </div>
+          @if (n.vitalsSnapshot) {
+            <div class="vitals-row">
+              @if (n.vitalsSnapshot.bp) { <div class="vital"><span>BP</span>{{ n.vitalsSnapshot.bp }}</div> }
+              @if (n.vitalsSnapshot.pulse) { <div class="vital"><span>Pulse</span>{{ n.vitalsSnapshot.pulse }}</div> }
+              @if (n.vitalsSnapshot.temperature) { <div class="vital"><span>Temp</span>{{ n.vitalsSnapshot.temperature }}°F</div> }
+              @if (n.vitalsSnapshot.spo2) { <div class="vital"><span>SpO2</span>{{ n.vitalsSnapshot.spo2 }}%</div> }
+              @if (n.vitalsSnapshot.respiratoryRate) { <div class="vital"><span>RR</span>{{ n.vitalsSnapshot.respiratoryRate }}/min</div> }
+              @if (n.vitalsSnapshot.bloodSugar) { <div class="vital"><span>BS</span>{{ n.vitalsSnapshot.bloodSugar }}</div> }
+            </div>
+          }
+          <div class="soap-grid">
+            @if (n.subjective) { <div><label>S</label><p>{{ n.subjective }}</p></div> }
+            @if (n.objective)  { <div><label>O</label><p>{{ n.objective }}</p></div> }
+            @if (n.assessment) { <div><label>A</label><p>{{ n.assessment }}</p></div> }
+            @if (n.plan)       { <div><label>P</label><p>{{ n.plan }}</p></div> }
+            @if (n.notes)      { <div class="soap-grid__full"><label>Notes</label><p>{{ n.notes }}</p></div> }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- ─── Charges ──────────────────────────────────────────────────────── -->
+    @if (tab() === 'charges') {
+      <div class="d-flex justify-end mb-3">
+        @if (isAdmitted()) {
+          <button class="btn btn--primary" (click)="openChargeModal()">
+            <lucide-icon name="plus" [size]="15" /> Add Charge
+          </button>
+        }
+      </div>
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th class="text-right">Qty</th>
+                <th class="text-right">Rate</th>
+                <th class="text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (charges().length === 0) {
+                <tr><td colspan="6"><div class="empty-state"><p>No charges yet</p></div></td></tr>
+              }
+              @for (c of charges(); track c.id) {
+                <tr>
+                  <td>{{ c.chargeDate | date:'dd MMM' }}</td>
+                  <td><span class="badge" [class]="chargeTypeBadge(c.chargeType)">{{ chargeTypeLabel(c.chargeType) }}</span></td>
+                  <td>{{ c.description }}</td>
+                  <td class="text-right">{{ c.quantity }}</td>
+                  <td class="text-right">{{ formatCurrency(c.unitPrice) }}</td>
+                  <td class="text-right fw-medium">{{ formatCurrency(c.totalAmount) }}</td>
+                </tr>
+              }
+            </tbody>
+            @if (charges().length > 0) {
+              <tfoot>
+                <tr>
+                  <td colspan="5" class="text-right fw-medium">Total</td>
+                  <td class="text-right fw-bold">{{ formatCurrency(chargeTotal()) }}</td>
+                </tr>
+              </tfoot>
+            }
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ─── Procedures ───────────────────────────────────────────────────── -->
+    @if (tab() === 'procedures') {
+      <div class="card card--flush">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Procedure</th>
+                <th>Performed By</th>
+                <th>Date/Time</th>
+                <th>Anesthesia</th>
+                <th>Duration</th>
+                <th class="text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (procedures().length === 0) {
+                <tr><td colspan="6"><div class="empty-state"><p>No procedures recorded</p></div></td></tr>
+              }
+              @for (p of procedures(); track p.id) {
+                <tr>
+                  <td>
+                    <div class="fw-medium">{{ p.procedureName }}</div>
+                    @if (p.procedureCode) { <div class="text-muted text-sm">{{ p.procedureCode }}</div> }
+                  </td>
+                  <td>Dr. {{ p.performedBy?.firstName }} {{ p.performedBy?.lastName }}</td>
+                  <td>{{ p.performedAt | date:'dd MMM yyyy HH:mm' }}</td>
+                  <td>{{ p.anesthesiaType ?? '—' }}</td>
+                  <td>{{ p.durationMinutes ? p.durationMinutes + ' min' : '—' }}</td>
+                  <td class="text-right">{{ formatCurrency(p.amount) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ─── Discharge Summary ─────────────────────────────────────────────── -->
+    @if (tab() === 'summary' && admission()) {
+      <div class="card discharge-summary">
+        <div class="discharge-summary__header">
+          <lucide-icon name="clipboard-check" [size]="18" />
+          <h3>NABH Discharge Summary</h3>
+        </div>
+        <div class="ds-grid">
+          <div class="ds-field"><label>Final Diagnosis</label><p>{{ admission()!.finalDiagnosis }}</p></div>
+          <div class="ds-field"><label>ICD-10 Codes</label><p>{{ admission()!.icd10Codes?.join(', ') || '—' }}</p></div>
+          <div class="ds-field"><label>Discharge Type</label><p>{{ admission()!.dischargeType | titlecase }}</p></div>
+          <div class="ds-field"><label>Condition at Discharge</label><p>{{ admission()!.conditionAtDischarge | titlecase }}</p></div>
+          <div class="ds-field ds-field--full"><label>Clinical Summary</label><p>{{ admission()!.clinicalSummary }}</p></div>
+          <div class="ds-field ds-field--full"><label>Treatment Given</label><p>{{ admission()!.treatmentGiven }}</p></div>
+          <div class="ds-field ds-field--full"><label>Procedures Performed</label><p>{{ admission()!.procedureSummary }}</p></div>
+          <div class="ds-field ds-field--full"><label>Investigation Summary</label><p>{{ admission()!.investigationSummary }}</p></div>
+          @if (admission()!.dischargeMedications?.length) {
+            <div class="ds-field ds-field--full">
+              <label>Discharge Medications</label>
+              <table class="table" style="margin-top:.5rem">
+                <thead><tr><th>Medicine</th><th>Dose</th><th>Frequency</th><th>Duration</th><th>Instructions</th></tr></thead>
+                <tbody>
+                  @for (m of admission()!.dischargeMedications!; track $index) {
+                    <tr>
+                      <td>{{ m.name }}</td><td>{{ m.dose }}</td><td>{{ m.frequency }}</td>
+                      <td>{{ m.duration }}</td><td>{{ m.instructions || '—' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+          <div class="ds-field"><label>Follow-Up Date</label><p>{{ admission()!.followUpDate | date:'dd MMM yyyy' }}</p></div>
+          <div class="ds-field ds-field--full"><label>Follow-Up Instructions</label><p>{{ admission()!.followUpInstructions }}</p></div>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- ─── Add Note Modal ──────────────────────────────────────────────────── -->
+@if (noteModal()) {
+  <div class="modal-backdrop" (click)="noteModal.set(false)"></div>
+  <div class="modal modal--lg">
+    <div class="modal__header">
+      <h3>Add Daily Note</h3>
+      <button class="modal__close" (click)="noteModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
+    </div>
+    <div class="modal__body">
+      <form [formGroup]="noteForm">
+        <div class="form-grid form-grid--3">
+          <div class="form-group">
+            <label class="form-label required">Date</label>
+            <input type="date" class="form-control" formControlName="noteDate" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Time</label>
+            <input type="time" class="form-control" formControlName="noteTime" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Note Type</label>
+            <select class="form-control" formControlName="noteType">
+              @for (t of noteTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group-title">Vitals</div>
+        <div class="form-grid form-grid--4">
+          <div class="form-group"><label class="form-label">BP</label><input class="form-control" placeholder="120/80" [(ngModel)]="noteVitals.bp" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">Pulse</label><input type="number" class="form-control" [(ngModel)]="noteVitals.pulse" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">Temp (°F)</label><input type="number" class="form-control" step="0.1" [(ngModel)]="noteVitals.temperature" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">SpO2 %</label><input type="number" class="form-control" [(ngModel)]="noteVitals.spo2" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">RR /min</label><input type="number" class="form-control" [(ngModel)]="noteVitals.respiratoryRate" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">Urine Out (ml)</label><input type="number" class="form-control" [(ngModel)]="noteVitals.urineOutput" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">Blood Sugar</label><input type="number" class="form-control" [(ngModel)]="noteVitals.bloodSugar" [ngModelOptions]="{standalone:true}" /></div>
+          <div class="form-group"><label class="form-label">Weight (kg)</label><input type="number" class="form-control" [(ngModel)]="noteVitals.weight" [ngModelOptions]="{standalone:true}" /></div>
+        </div>
+
+        <div class="form-group-title">SOAP Note</div>
+        <div class="form-group"><label class="form-label">Subjective (Patient Complaints)</label><textarea class="form-control" rows="2" formControlName="subjective"></textarea></div>
+        <div class="form-group"><label class="form-label">Objective (Examination Findings)</label><textarea class="form-control" rows="2" formControlName="objective"></textarea></div>
+        <div class="form-group"><label class="form-label">Assessment</label><textarea class="form-control" rows="2" formControlName="assessment"></textarea></div>
+        <div class="form-group"><label class="form-label">Plan</label><textarea class="form-control" rows="2" formControlName="plan"></textarea></div>
+        <div class="form-group"><label class="form-label">Additional Notes</label><textarea class="form-control" rows="2" formControlName="notes"></textarea></div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="private" formControlName="isPrivate" />
+          <label for="private">Private note (nursing staff only)</label>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" (click)="noteModal.set(false)">Cancel</button>
+      <button class="btn btn--primary" (click)="saveNote()" [disabled]="noteForm.invalid || noteSaving()">
+        @if (noteSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> } Save Note
+      </button>
+    </div>
+  </div>
+}
+
+<!-- ─── Add Charge Modal ────────────────────────────────────────────────── -->
+@if (chargeModal()) {
+  <div class="modal-backdrop" (click)="chargeModal.set(false)"></div>
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <h3>Add Charge</h3>
+      <button class="modal__close" (click)="chargeModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
+    </div>
+    <div class="modal__body">
+      <form [formGroup]="chargeForm">
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" formControlName="chargeDate" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Type</label>
+            <select class="form-control" formControlName="chargeType">
+              @for (t of chargeTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label required">Description</label><input class="form-control" formControlName="description" /></div>
+        <div class="form-grid form-grid--2">
+          <div class="form-group"><label class="form-label required">Quantity</label><input type="number" class="form-control" formControlName="quantity" step="0.001" /></div>
+          <div class="form-group"><label class="form-label required">Unit Price (₹)</label><input type="number" class="form-control" formControlName="unitPrice" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" rows="2" formControlName="notes"></textarea></div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" (click)="chargeModal.set(false)">Cancel</button>
+      <button class="btn btn--primary" (click)="saveCharge()" [disabled]="chargeForm.invalid || chargeSaving()">
+        @if (chargeSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> } Add Charge
+      </button>
+    </div>
+  </div>
+}
+
+<!-- ─── Discharge Modal ──────────────────────────────────────────────────── -->
+@if (dischargeModal()) {
+  <div class="modal-backdrop" (click)="dischargeModal.set(false)"></div>
+  <div class="modal modal--xl">
+    <div class="modal__header">
+      <h3>NABH Discharge Summary</h3>
+      <button class="modal__close" (click)="dischargeModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
+    </div>
+    <div class="modal__body">
+      <form [formGroup]="dischargeForm">
+        <div class="form-grid form-grid--3">
+          <div class="form-group"><label class="form-label required">Discharge Date</label><input type="date" class="form-control" formControlName="dischargeDate" /></div>
+          <div class="form-group"><label class="form-label required">Discharge Time</label><input type="time" class="form-control" formControlName="dischargeTime" /></div>
+          <div class="form-group"><label class="form-label required">Discharge Type</label>
+            <select class="form-control" formControlName="dischargeType">
+              @for (t of dischargeTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group"><label class="form-label required">Final Diagnosis</label><textarea class="form-control" rows="2" formControlName="finalDiagnosis"></textarea></div>
+        <div class="form-grid form-grid--2">
+          <div class="form-group"><label class="form-label">ICD-10 Codes (comma-separated)</label><input class="form-control" placeholder="K37, Z87.39" formControlName="icd10Codes" /></div>
+          <div class="form-group"><label class="form-label required">Condition at Discharge</label>
+            <select class="form-control" formControlName="conditionAtDischarge">
+              @for (c of conditions; track c.value) { <option [value]="c.value">{{ c.label }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label required">Clinical Summary</label><textarea class="form-control" rows="3" formControlName="clinicalSummary"></textarea></div>
+        <div class="form-group"><label class="form-label">Treatment Given</label><textarea class="form-control" rows="2" formControlName="treatmentGiven"></textarea></div>
+        <div class="form-group"><label class="form-label">Procedures Performed</label><textarea class="form-control" rows="2" formControlName="procedureSummary"></textarea></div>
+        <div class="form-group"><label class="form-label">Investigation Summary</label><textarea class="form-control" rows="2" formControlName="investigationSummary"></textarea></div>
+
+        <!-- Discharge Medications -->
+        <div class="d-flex justify-between items-center mb-2">
+          <label class="form-label mb-0">Discharge Medications</label>
+          <button type="button" class="btn btn--sm btn--ghost" (click)="addDischargeMed()">
+            <lucide-icon name="plus" [size]="13" /> Add Medicine
+          </button>
+        </div>
+        @if (dischargeMeds.length > 0) {
+          @for (m of dischargeMeds; track $index; let i = $index) {
+            <div class="form-grid form-grid--5 med-row">
+              <div class="form-group"><input class="form-control" placeholder="Medicine name" [(ngModel)]="m.name" [ngModelOptions]="{standalone:true}" /></div>
+              <div class="form-group"><input class="form-control" placeholder="Dose" [(ngModel)]="m.dose" [ngModelOptions]="{standalone:true}" /></div>
+              <div class="form-group"><input class="form-control" placeholder="Frequency" [(ngModel)]="m.frequency" [ngModelOptions]="{standalone:true}" /></div>
+              <div class="form-group"><input class="form-control" placeholder="Duration" [(ngModel)]="m.duration" [ngModelOptions]="{standalone:true}" /></div>
+              <div class="form-group d-flex gap-2">
+                <input class="form-control" placeholder="Instructions" [(ngModel)]="m.instructions" [ngModelOptions]="{standalone:true}" />
+                <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="removeDischargeMed(i)"><lucide-icon name="x" [size]="13" /></button>
+              </div>
+            </div>
+          }
+        }
+
+        <div class="form-grid form-grid--2" style="margin-top:.75rem">
+          <div class="form-group"><label class="form-label">Follow-Up Date</label><input type="date" class="form-control" formControlName="followUpDate" /></div>
+          <div class="form-group"><label class="form-label">Follow-Up Instructions</label><input class="form-control" formControlName="followUpInstructions" /></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" (click)="dischargeModal.set(false)">Cancel</button>
+      <button class="btn btn--danger" (click)="discharge()" [disabled]="dischargeForm.invalid || dischargeSaving()">
+        @if (dischargeSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
+        Confirm Discharge
+      </button>
+    </div>
+  </div>
+}

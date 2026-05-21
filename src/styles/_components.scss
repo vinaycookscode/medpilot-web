@@ -294,12 +294,18 @@ textarea.input {
 }
 
 .modal {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  top: clamp(1rem, 5vh, 3rem);
+  margin: 0 auto;
+  z-index: calc(var(--z-modal) + 1);
   background: #ffffff;
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
-  width: 100%;
+  width: auto;
   max-width: 520px;
-  max-height: 90vh;
+  max-height: calc(100vh - clamp(2rem, 10vh, 6rem));
   overflow: auto;
   animation: slide-up 200ms t.$ease-out both;
 
@@ -329,6 +335,7 @@ textarea.input {
 
   &--sm { max-width: 380px; }
   &--lg { max-width: 720px; }
+  &--xl { max-width: 900px; }
 }
 
 // ── Toast ──

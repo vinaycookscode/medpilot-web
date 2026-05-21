@@ -1,0 +1,60 @@
+.admission-detail {
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  }
+  .info-card {
+    padding: 1rem 1.25rem;
+    &__label { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-bottom: .25rem; }
+    &__value { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+    &__sub { font-size: .78rem; color: var(--text-muted); margin-top: .15rem; }
+  }
+  .tab-bar { display: flex; gap: .5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; padding-bottom: .75rem; }
+  .tab-btn {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .35rem .75rem; border-radius: 6px; border: none;
+    background: transparent; cursor: pointer; font-size: .85rem; color: var(--text-muted);
+    &--active { background: var(--bg-subtle); color: var(--text-primary); font-weight: 500; }
+    &:hover:not(.tab-btn--active) { background: var(--bg-hover); }
+  }
+  .note-card {
+    margin-bottom: 1rem; padding: 1rem 1.25rem;
+    &__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
+  }
+  .vitals-row {
+    display: flex; flex-wrap: wrap; gap: .75rem;
+    background: var(--bg-subtle); border-radius: 6px; padding: .5rem .75rem;
+    margin-bottom: .75rem;
+    .vital {
+      font-size: .8rem;
+      span { font-size: .7rem; color: var(--text-muted); margin-right: .3rem; text-transform: uppercase; }
+    }
+  }
+  .soap-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem;
+    &__full { grid-column: 1/-1; }
+    label { font-size: .7rem; text-transform: uppercase; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: .2rem; }
+    p { margin: 0; font-size: .875rem; white-space: pre-wrap; }
+    @media (max-width: 700px) { grid-template-columns: 1fr; }
+  }
+  .discharge-summary {
+    padding: 1.5rem;
+    &__header { display: flex; align-items: center; gap: .5rem; margin-bottom: 1.25rem; h3 { margin: 0; } }
+  }
+  .ds-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    .ds-field { label { font-size: .7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); } p { margin: .25rem 0 0; } }
+    .ds-field--full { grid-column: 1/-1; }
+    @media (max-width: 700px) { grid-template-columns: 1fr; }
+  }
+  .form-group-title {
+    font-size: .7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--text-muted);
+    margin: 1rem 0 .5rem;
+  }
+  .med-row { align-items: end; margin-bottom: .5rem; }
+  .checkbox-group { display: flex; align-items: center; gap: .5rem; label { margin: 0; } }
+}

@@ -1,0 +1,161 @@
+.opd {
+  // ─── Stats bar ─────────────────────────────────────────────────────────────
+  .opd-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .75rem;
+    margin-bottom: 1.25rem;
+    @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .opd-stat {
+    display: flex; align-items: center; gap: .875rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    border-left: 4px solid transparent;
+
+    &__icon {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    &__value { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+    &__label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-top: .2rem; }
+
+    &--waiting  { border-left-color: var(--color-primary);
+      .opd-stat__icon { background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary); }
+      .opd-stat__value { color: var(--color-primary); }
+    }
+    &--progress { border-left-color: var(--color-warning);
+      .opd-stat__icon { background: color-mix(in srgb, var(--color-warning) 12%, transparent); color: var(--color-warning); }
+      .opd-stat__value { color: var(--color-warning); }
+    }
+    &--done     { border-left-color: var(--color-success);
+      .opd-stat__icon { background: color-mix(in srgb, var(--color-success) 12%, transparent); color: var(--color-success); }
+      .opd-stat__value { color: var(--color-success); }
+    }
+    &--triaged  { border-left-color: var(--color-info, #6366f1);
+      .opd-stat__icon { background: color-mix(in srgb, var(--color-info, #6366f1) 12%, transparent); color: var(--color-info, #6366f1); }
+      .opd-stat__value { color: var(--color-info, #6366f1); }
+    }
+  }
+
+  // ─── Filters ───────────────────────────────────────────────────────────────
+  .opd-filters {
+    display: flex; flex-wrap: wrap; gap: .4rem;
+    margin-bottom: 1rem;
+  }
+
+  .filter-pill {
+    padding: .3rem .875rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    font-size: .8rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all .15s;
+
+    &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    &--active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; font-weight: 500; }
+  }
+
+  // ─── Table ─────────────────────────────────────────────────────────────────
+  .opd-table {
+    .col-token { width: 56px; text-align: center; }
+
+    tbody tr {
+      border-left: 3px solid transparent;
+      transition: background .1s;
+
+      &.row--inprogress {
+        border-left-color: var(--color-warning);
+        background: color-mix(in srgb, var(--color-warning) 4%, transparent);
+      }
+      &.row--completed {
+        border-left-color: var(--color-success);
+        opacity: .7;
+      }
+      &.row--noshow {
+        border-left-color: var(--color-danger);
+        opacity: .6;
+      }
+    }
+  }
+
+  // ─── Token chip ────────────────────────────────────────────────────────────
+  .token-chip {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700;
+    background: var(--bg-subtle); color: var(--text-muted);
+    margin: auto;
+
+    &--scheduled, &--confirmed {
+      background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+      color: var(--color-primary);
+    }
+    &--in_progress {
+      background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+      color: var(--color-warning);
+      animation: pulse-ring 2s infinite;
+    }
+    &--completed {
+      background: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+    }
+    &--no_show, &--cancelled {
+      background: var(--bg-subtle); color: var(--text-muted);
+      text-decoration: line-through;
+    }
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-warning) 40%, transparent); }
+    50%       { box-shadow: 0 0 0 5px transparent; }
+  }
+
+  // ─── OPD number badge ──────────────────────────────────────────────────────
+  .opd-num {
+    font-family: var(--font-mono, monospace);
+    font-size: .7rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text-muted);
+  }
+
+  // ─── Vitals chips ──────────────────────────────────────────────────────────
+  .vitals-chips {
+    display: flex; flex-wrap: wrap; gap: .3rem; align-items: center;
+  }
+
+  .vital-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: .72rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+
+    &__key {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: .65rem;
+    }
+  }
+
+  // ─── Pagination ────────────────────────────────────────────────────────────
+  .table-pagination {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    gap: .75rem;
+    padding: .75rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+}

@@ -1,0 +1,330 @@
+<div class="page ipd">
+
+  <!-- Header -->
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">In-Patient Department</h2>
+      <p class="page__subtitle">Bed management · admissions · patient care</p>
+    </div>
+    <button class="btn btn--primary" (click)="openAdmitModal()">
+      <lucide-icon name="plus" [size]="15" /> Admit Patient
+    </button>
+  </div>
+
+  <!-- Stats bar -->
+  @if (stats()) {
+    <div class="ipd-stats">
+      <div class="ipd-stat ipd-stat--current">
+        <div class="ipd-stat__icon"><lucide-icon name="bed" [size]="18" /></div>
+        <div>
+          <div class="ipd-stat__value">{{ stats()!.currentAdmissions }}</div>
+          <div class="ipd-stat__label">Current Admissions</div>
+        </div>
+      </div>
+      <div class="ipd-stat ipd-stat--admitted">
+        <div class="ipd-stat__icon"><lucide-icon name="log-in" [size]="18" /></div>
+        <div>
+          <div class="ipd-stat__value">{{ stats()!.todayAdmissions }}</div>
+          <div class="ipd-stat__label">Admitted Today</div>
+        </div>
+      </div>
+      <div class="ipd-stat ipd-stat--discharged">
+        <div class="ipd-stat__icon"><lucide-icon name="log-out" [size]="18" /></div>
+        <div>
+          <div class="ipd-stat__value">{{ stats()!.todayDischarges }}</div>
+          <div class="ipd-stat__label">Discharged Today</div>
+        </div>
+      </div>
+      <div class="ipd-stat ipd-stat--pending">
+        <div class="ipd-stat__icon"><lucide-icon name="clock" [size]="18" /></div>
+        <div>
+          <div class="ipd-stat__value">{{ stats()!.pendingDischarges }}</div>
+          <div class="ipd-stat__label">Pending Discharge</div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tabs -->
+  <div class="ipd-tabs">
+    <button class="ipd-tab" [class.ipd-tab--active]="tab()==='admissions'" (click)="switchTab('admissions')">
+      <lucide-icon name="users" [size]="14" /> Admissions
+    </button>
+    <button class="ipd-tab" [class.ipd-tab--active]="tab()==='beds'" (click)="switchTab('beds')">
+      <lucide-icon name="layout-grid" [size]="14" /> Beds
+    </button>
+    <button class="ipd-tab" [class.ipd-tab--active]="tab()==='wards'" (click)="switchTab('wards')">
+      <lucide-icon name="building-2" [size]="14" /> Wards
+    </button>
+  </div>
+
+  <!-- ─── Admissions Tab ─────────────────────────────────────────────────── -->
+  @if (tab() === 'admissions') {
+
+    <div class="ipd-filters">
+      @for (f of filterOptions; track f.value) {
+        <button class="filter-pill" [class.filter-pill--active]="filterStatus() === f.value"
+                (click)="setFilter(f.value)">
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <div class="card card--flush">
+      <div class="table-wrap">
+        <table class="table ipd-table">
+          <thead>
+            <tr>
+              <th>Adm. No.</th>
+              <th>Patient</th>
+              <th>Ward / Bed</th>
+              <th>Doctor</th>
+              <th>Admitted</th>
+              <th>LOS</th>
+              <th>Diagnosis</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loading()) {
+              @for (i of [1,2,3,4,5]; track i) {
+                <tr>@for (j of [1,2,3,4,5,6,7,8,9]; track j) {
+                  <td><div class="skeleton" style="height:13px;border-radius:4px"></div></td>
+                }</tr>
+              }
+            } @else if (admissions().length === 0) {
+              <tr><td colspan="9">
+                <div class="empty-state">
+                  <lucide-icon name="bed" [size]="36" />
+                  <p>No admissions found</p>
+                  @if (filterStatus()) {
+                    <button class="btn btn--ghost btn--sm" (click)="setFilter('')">Clear filter</button>
+                  }
+                </div>
+              </td></tr>
+            } @else {
+              @for (a of admissions(); track a.id) {
+                <tr [class]="admissionRowClass(a.status)">
+                  <td>
+                    <span class="adm-num">{{ a.admissionNumber }}</span>
+                  </td>
+                  <td>
+                    <div class="fw-medium">{{ a.patient?.firstName }} {{ a.patient?.lastName }}</div>
+                    <div class="text-muted text-sm">{{ a.patient?.phone }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-medium">{{ a.ward?.name }}</div>
+                    <div class="text-muted text-sm">Bed {{ a.bed?.bedNumber }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-medium">Dr. {{ a.admittingDoctor?.firstName }} {{ a.admittingDoctor?.lastName }}</div>
+                    @if (a.admittingDoctor?.specialization) {
+                      <div class="text-muted text-sm">{{ a.admittingDoctor?.specialization }}</div>
+                    }
+                  </td>
+                  <td>{{ a.admissionDate | date:'dd MMM yyyy' }}</td>
+                  <td>
+                    <span class="los-badge">{{ los(a) }}d</span>
+                  </td>
+                  <td>
+                    <div class="text-sm" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                         [title]="a.admissionDiagnosis">
+                      {{ a.admissionDiagnosis }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" [class]="admissionStatusClass(a.status)">
+                      {{ a.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <a class="btn btn--sm btn--ghost" [routerLink]="['/ipd/admission', a.id]">
+                      <lucide-icon name="eye" [size]="13" /> View
+                    </a>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Beds Tab ───────────────────────────────────────────────────────── -->
+  @if (tab() === 'beds') {
+    @if (beds().length === 0) {
+      <div class="empty-state">
+        <lucide-icon name="layout-grid" [size]="36" />
+        <p>No beds configured</p>
+      </div>
+    } @else {
+      <div class="bed-grid">
+        @for (b of beds(); track b.id) {
+          <div class="bed-card bed-card--{{ b.status }}">
+            <div class="bed-card__header">
+              <span class="bed-card__number">{{ b.bedNumber }}</span>
+              <span class="bed-card__status">{{ b.status | titlecase }}</span>
+            </div>
+            <div class="bed-card__ward">{{ b.ward?.name }}</div>
+            <div class="bed-card__meta">
+              <span>{{ b.bedType | titlecase }}</span>
+              @if (b.floor) { <span>Floor {{ b.floor }}</span> }
+            </div>
+            <div class="bed-card__rate">{{ formatCurrency(b.defaultRate) }}/day</div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ─── Wards Tab ──────────────────────────────────────────────────────── -->
+  @if (tab() === 'wards') {
+    @if (occupancy().length === 0) {
+      <div class="empty-state">
+        <lucide-icon name="building-2" [size]="36" />
+        <p>No wards configured</p>
+      </div>
+    } @else {
+      <div class="ward-grid">
+        @for (o of occupancy(); track o.ward.id) {
+          <div class="ward-card">
+            <div class="ward-card__header">
+              <div>
+                <div class="ward-card__name">{{ o.ward.name }}</div>
+                <div class="ward-card__type">{{ o.ward.type | titlecase }}</div>
+              </div>
+              <div class="ward-card__rate">{{ o.occupancyRate }}%</div>
+            </div>
+            <div class="ward-card__bar">
+              <div class="ward-card__fill" [style.width.%]="o.occupancyRate"></div>
+            </div>
+            <div class="ward-card__counts">
+              <div class="ward-count ward-count--occupied">
+                <span class="ward-count__num">{{ o.occupied }}</span>
+                <span class="ward-count__label">Occupied</span>
+              </div>
+              <div class="ward-count ward-count--available">
+                <span class="ward-count__num">{{ o.available }}</span>
+                <span class="ward-count__label">Available</span>
+              </div>
+              <div class="ward-count ward-count--total">
+                <span class="ward-count__num">{{ o.total }}</span>
+                <span class="ward-count__label">Total</span>
+              </div>
+              @if (o.maintenance > 0) {
+                <div class="ward-count ward-count--maintenance">
+                  <span class="ward-count__num">{{ o.maintenance }}</span>
+                  <span class="ward-count__label">Maint.</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<!-- ─── Admit Patient Modal ──────────────────────────────────────────────── -->
+@if (admitModal()) {
+  <div class="modal-backdrop" (click)="admitModal.set(false)"></div>
+  <div class="modal">
+    <div class="modal__header">
+      <h3>Admit Patient</h3>
+      <button class="modal__close" (click)="admitModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
+    </div>
+    <div class="modal__body">
+      <form [formGroup]="admitForm">
+        <div class="form-section-label">Patient</div>
+        <div class="form-group" style="position:relative">
+          <label class="form-label required">Search Patient</label>
+          <input class="form-control" placeholder="Name or phone number…"
+                 [value]="patientQuery()"
+                 (input)="onPatientSearch($any($event.target).value)" />
+          @if (patients().length > 0) {
+            <div class="autocomplete-dropdown">
+              @for (p of patients(); track p.id) {
+                <div class="autocomplete-item" (click)="selectPatient(p)">
+                  <div class="fw-medium">{{ p.firstName }} {{ p.lastName }}</div>
+                  <div class="text-muted text-sm">{{ p.phone }} · {{ p.patientCode }}</div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-section-label" style="margin-top:1rem">Admission Details</div>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label required">Available Bed</label>
+            <select class="form-control" formControlName="bedId">
+              <option value="">Select bed…</option>
+              @for (b of availableBeds(); track b.id) {
+                <option [value]="b.id">{{ b.ward?.name }} — Bed {{ b.bedNumber }} ({{ b.bedType | titlecase }})</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Admitting Doctor</label>
+            <select class="form-control" formControlName="admittingDoctorId">
+              <option value="">Select doctor…</option>
+              @for (d of doctors(); track d.id) {
+                <option [value]="d.id">Dr. {{ d.firstName }} {{ d.lastName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Admission Date</label>
+            <input type="date" class="form-control" formControlName="admissionDate" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Time</label>
+            <input type="time" class="form-control" formControlName="admissionTime" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Admission Type</label>
+            <select class="form-control" formControlName="admissionType">
+              @for (t of admissionTypes; track t.value) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">Provisional Diagnosis</label>
+          <input class="form-control" placeholder="e.g. Acute appendicitis" formControlName="admissionDiagnosis" />
+        </div>
+
+        <div class="form-section-label" style="margin-top:1rem">Attendant / Next of Kin</div>
+        <div class="form-grid form-grid--3">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input class="form-control" formControlName="attendantName" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-control" formControlName="attendantPhone" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Relation</label>
+            <input class="form-control" placeholder="e.g. Spouse" formControlName="attendantRelation" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="2" formControlName="notes"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" (click)="admitModal.set(false)">Cancel</button>
+      <button class="btn btn--primary" (click)="admit()" [disabled]="admitForm.invalid || saving()">
+        @if (saving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
+        Admit Patient
+      </button>
+    </div>
+  </div>
+}

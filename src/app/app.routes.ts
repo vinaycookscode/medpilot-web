@@ -77,6 +77,18 @@ export const routes: Routes = [
         path: 'insurance',
         loadComponent: () => import('./pages/insurance/insurance.component').then(m => m.InsuranceComponent),
       },
+      {
+        path: 'opd',
+        loadComponent: () => import('./pages/opd/opd.component').then(m => m.OpdComponent),
+      },
+      {
+        path: 'ipd',
+        loadComponent: () => import('./pages/ipd/ipd.component').then(m => m.IpdComponent),
+      },
+      {
+        path: 'ipd/admission/:id',
+        loadComponent: () => import('./pages/ipd/admission-detail/admission-detail.component').then(m => m.AdmissionDetailComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

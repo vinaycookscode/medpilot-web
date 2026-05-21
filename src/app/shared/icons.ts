@@ -28,6 +28,8 @@ import {
   ChevronUp,
   // Dashboard quick actions
   CalendarPlus,
+  // OPD / IPD
+  Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
 } from 'lucide-angular';
 
 @NgModule({
@@ -51,6 +53,7 @@ import {
       ArrowLeft, CalendarDays, LogIn, MessageSquare, UserX,
       ChevronUp,
       CalendarPlus,
+      Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
     }),
   ],
   exports: [LucideAngularModule],
