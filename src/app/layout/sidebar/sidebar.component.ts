@@ -10,6 +10,11 @@ interface NavItem {
   roles?: string[];
 }
 
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -29,14 +34,19 @@ interface NavItem {
 
       <!-- Navigation -->
       <nav class="sidebar__nav">
-        @for (item of visibleItems(); track item.route) {
-          <a class="sidebar__nav-item"
-             [routerLink]="item.route"
-             routerLinkActive="sidebar__nav-item--active"
-             [routerLinkActiveOptions]="{ exact: item.route === '/' }">
-            <lucide-icon [name]="item.icon" [size]="18" />
-            <span>{{ item.label }}</span>
-          </a>
+        @for (section of visibleSections(); track section.title) {
+          <div class="sidebar__section">
+            <span class="sidebar__section-title">{{ section.title }}</span>
+            @for (item of section.items; track item.route) {
+              <a class="sidebar__nav-item"
+                 [routerLink]="item.route"
+                 routerLinkActive="sidebar__nav-item--active"
+                 [routerLinkActiveOptions]="{ exact: item.route === '/' }">
+                <lucide-icon [name]="item.icon" [size]="17" />
+                <span>{{ item.label }}</span>
+              </a>
+            }
+          </div>
         }
       </nav>
 
@@ -69,26 +79,63 @@ export class SidebarComponent {
     return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
   });
 
-  private readonly navItems: NavItem[] = [
-    { label: 'Dashboard',     route: '/dashboard',     icon: 'layout-dashboard' },
-    { label: 'Patients',      route: '/patients',      icon: 'users' },
-    { label: 'Appointments',  route: '/appointments',  icon: 'calendar' },
-    { label: 'Billing',       route: '/billing',       icon: 'receipt',        roles: ['admin'] },
-    { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'] },
-    { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',      roles: ['admin', 'doctor'] },
-    { label: 'Schedules',     route: '/schedules',     icon: 'clock',          roles: ['admin'] },
-    { label: 'Inventory',     route: '/inventory',     icon: 'package',        roles: ['admin'] },
-    { label: 'Labs',          route: '/labs',          icon: 'flask-conical',  roles: ['admin', 'doctor'] },
-    { label: 'Insurance',     route: '/insurance',     icon: 'shield-check',   roles: ['admin', 'receptionist'] },
-    { label: 'Reports',       route: '/reports',       icon: 'chart-bar',      roles: ['admin'] },
-    { label: 'Branches',      route: '/branches',      icon: 'building-2',     roles: ['admin'] },
-    { label: 'Staff',         route: '/staff',         icon: 'users',          roles: ['admin'] },
-    { label: 'Notifications', route: '/notifications', icon: 'bell',           roles: ['admin', 'doctor'] },
-    { label: 'Settings',      route: '/settings',      icon: 'settings',       roles: ['admin', 'doctor'] },
+  private readonly sections: NavSection[] = [
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', route: '/dashboard', icon: 'layout-dashboard' },
+      ],
+    },
+    {
+      title: 'Patient Care',
+      items: [
+        { label: 'Patients',      route: '/patients',      icon: 'users' },
+        { label: 'Appointments',  route: '/appointments',  icon: 'calendar' },
+        { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'] },
+        { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'] },
+        { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'] },
+      ],
+    },
+    {
+      title: 'Clinical',
+      items: [
+        { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'] },
+        { label: 'Labs',          route: '/labs',           icon: 'flask-conical', roles: ['admin', 'doctor'] },
+      ],
+    },
+    {
+      title: 'Finance',
+      items: [
+        { label: 'Billing',   route: '/billing',   icon: 'receipt',      roles: ['admin'] },
+        { label: 'Insurance', route: '/insurance', icon: 'shield-check', roles: ['admin', 'receptionist'] },
+      ],
+    },
+    {
+      title: 'Operations',
+      items: [
+        { label: 'Inventory', route: '/inventory', icon: 'package',    roles: ['admin'] },
+        { label: 'Schedules', route: '/schedules', icon: 'clock',      roles: ['admin'] },
+        { label: 'Staff',     route: '/staff',     icon: 'user-check', roles: ['admin'] },
+        { label: 'Branches',  route: '/branches',  icon: 'building-2', roles: ['admin'] },
+        { label: 'Reports',   route: '/reports',   icon: 'chart-bar',  roles: ['admin'] },
+      ],
+    },
+    {
+      title: 'System',
+      items: [
+        { label: 'Notifications', route: '/notifications', icon: 'bell',     roles: ['admin', 'doctor'] },
+        { label: 'Settings',      route: '/settings',      icon: 'settings', roles: ['admin', 'doctor'] },
+      ],
+    },
   ];
 
-  readonly visibleItems = computed(() => {
+  readonly visibleSections = computed(() => {
     const role = this.auth.role();
-    return this.navItems.filter(item => !item.roles || (role && item.roles.includes(role)));
+    return this.sections
+      .map(s => ({
+        ...s,
+        items: s.items.filter(i => !i.roles || (role && i.roles.includes(role))),
+      }))
+      .filter(s => s.items.length > 0);
   });
 }
