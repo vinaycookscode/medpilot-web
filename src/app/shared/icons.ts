@@ -30,6 +30,8 @@ import {
   CalendarPlus,
   // OPD / IPD
   Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
+  // Landing page vitals & hero
+  HeartPulse, Gauge, Thermometer, Zap, Play,
 } from 'lucide-angular';
 
 @NgModule({
@@ -54,6 +56,7 @@ import {
       ChevronUp,
       CalendarPlus,
       Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
+      HeartPulse, Gauge, Thermometer, Zap, Play,
     }),
   ],
   exports: [LucideAngularModule],

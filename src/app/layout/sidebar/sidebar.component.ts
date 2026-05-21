@@ -27,7 +27,7 @@ interface NavSection {
           <lucide-icon name="stethoscope" [size]="20" />
         </div>
         <div class="sidebar__brand-text">
-          <span class="sidebar__brand-name">MedPilot</span>
+          <span class="sidebar__brand-name">GotWell</span>
           <span class="sidebar__brand-clinic">{{ user()?.clinicId ? 'Demo Clinic' : '' }}</span>
         </div>
       </div>

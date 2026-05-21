@@ -5,178 +5,233 @@
     <div class="hn__inner">
       <a class="hn__brand" routerLink="/">
         <div class="hn__logo"><lucide-icon name="stethoscope" [size]="18" /></div>
-        <span>MedPilot</span>
+        <span>GotWell</span>
       </a>
-      <a routerLink="/login" class="btn btn--primary">Sign In</a>
+      <a routerLink="/login" class="hero-btn hero-btn--primary hero-btn--sm">Get Started</a>
     </div>
   </nav>
 
   <!-- ── Hero ── -->
   <section class="hero">
-    <div class="hero__left">
-      <div class="hero__badge">
-        <lucide-icon name="sparkles" [size]="13" />
-        <span>Complete clinic management, zero complexity</span>
-      </div>
-      <h1 class="hero__h1">
-        Your clinic,<br>running at its<br>
-        <span class="hero__h1-grad">best.</span>
-      </h1>
-      <p class="hero__sub">
-        MedPilot brings appointments, patients, prescriptions, and billing
-        into one seamless workflow — built for doctors and receptionists
-        who value their time.
-      </p>
-      <div class="hero__ctas">
-        <a routerLink="/login" class="btn btn--primary btn--lg hero__cta-primary">
-          Get Started Free
-          <lucide-icon name="arrow-right" [size]="16" />
-        </a>
-        <a href="#features" class="btn btn--ghost btn--lg">Explore Features</a>
-      </div>
-      <div class="hero__trust">
-        <div class="hero__trust-item">
-          <lucide-icon name="shield-check" [size]="14" />
-          <span>Secure &amp; private</span>
-        </div>
-        <div class="hero__trust-sep"></div>
-        <div class="hero__trust-item">
-          <lucide-icon name="check-circle-2" [size]="14" />
-          <span>No credit card needed</span>
-        </div>
-        <div class="hero__trust-sep"></div>
-        <div class="hero__trust-item">
-          <lucide-icon name="trending-up" [size]="14" />
-          <span>Live in 3 minutes</span>
-        </div>
+
+    <!-- Background layers (decorative) -->
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__glow hero__glow--1"></div>
+      <div class="hero__glow hero__glow--2"></div>
+      <div class="hero__grid"></div>
+      <div class="hero__ecg-wrap">
+        <svg class="hero__ecg-svg" viewBox="0 0 1440 80" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polyline class="hero__ecg-line"
+            points="0,50 80,50 90,42 100,50 140,50 145,54 148,8 151,60 155,50 165,50 175,50 185,38 200,50
+                    360,50 440,50 450,42 460,50 500,50 505,54 508,8 511,60 515,50 525,50 535,50 545,38 560,50
+                    720,50 800,50 810,42 820,50 860,50 865,54 868,8 871,60 875,50 885,50 895,50 905,38 920,50
+                    1080,50 1160,50 1170,42 1180,50 1220,50 1225,54 1228,8 1231,60 1235,50 1245,50 1255,50 1265,38 1280,50
+                    1440,50"/>
+        </svg>
       </div>
     </div>
 
-    <div class="hero__right">
-      <!-- Floating mock dashboard UI -->
-      <div class="mockui">
-        <div class="mockui__bar">
-          <span class="mockui__dot mockui__dot--r"></span>
-          <span class="mockui__dot mockui__dot--y"></span>
-          <span class="mockui__dot mockui__dot--g"></span>
-          <span class="mockui__bar-title">MedPilot — Dashboard</span>
+    <div class="hero__inner">
+
+      <!-- Left: copy -->
+      <div class="hero__left">
+        <div class="hero__badge">
+          <span class="hero__badge-pulse"></span>
+          ABDM ready · HIPAA compliant
         </div>
-        <div class="mockui__body">
-          <div class="mockui__stats">
-            <div class="mockui__stat mockui__stat--blue">
-              <div class="mockui__stat-val">24</div>
-              <div class="mockui__stat-lbl">Appointments</div>
-            </div>
-            <div class="mockui__stat mockui__stat--green">
-              <div class="mockui__stat-val">₹1.2L</div>
-              <div class="mockui__stat-lbl">Revenue</div>
-            </div>
-            <div class="mockui__stat mockui__stat--purple">
-              <div class="mockui__stat-val">156</div>
-              <div class="mockui__stat-lbl">Patients</div>
-            </div>
+        <h1 class="hero__h1">
+          Smarter care,<br>
+          <span class="hero__accent">faster clinics.</span>
+        </h1>
+        <p class="hero__sub">
+          GotWell brings appointments, patients, prescriptions,
+          billing, OPD queues, and IPD management into one seamless
+          workflow — built for India's modern hospitals.
+        </p>
+        <div class="hero__ctas">
+          <a routerLink="/login" class="hero-btn hero-btn--primary">
+            Start Free
+            <lucide-icon name="arrow-right" [size]="15" />
+          </a>
+          <a href="#demo" class="hero-btn hero-btn--ghost">
+            <lucide-icon name="play" [size]="15" />
+            Watch Demo
+          </a>
+        </div>
+        <div class="hero__trust">
+          <div class="hero__trust-item">
+            <lucide-icon name="shield-check" [size]="13" />
+            ABDM Ready
           </div>
-
-          <div class="mockui__section-title">Today's Appointments</div>
-          <div class="mockui__list">
-            <div class="mockui__row">
-              <div class="mockui__av mockui__av--blue">AK</div>
-              <div class="mockui__info">
-                <div class="mockui__name">Arjun Kumar</div>
-                <div class="mockui__meta">9:30 AM · General</div>
-              </div>
-              <div class="mockui__pill mockui__pill--green">Confirmed</div>
-            </div>
-            <div class="mockui__row">
-              <div class="mockui__av mockui__av--purple">PS</div>
-              <div class="mockui__info">
-                <div class="mockui__name">Priya Sharma</div>
-                <div class="mockui__meta">10:15 AM · Follow-up</div>
-              </div>
-              <div class="mockui__pill mockui__pill--yellow">Pending</div>
-            </div>
-            <div class="mockui__row">
-              <div class="mockui__av mockui__av--teal">RV</div>
-              <div class="mockui__info">
-                <div class="mockui__name">Rahul Verma</div>
-                <div class="mockui__meta">11:00 AM · Cardiology</div>
-              </div>
-              <div class="mockui__pill mockui__pill--blue">Confirmed</div>
-            </div>
+          <span class="hero__trust-sep"></span>
+          <div class="hero__trust-item">
+            <lucide-icon name="zap" [size]="13" />
+            No setup fee
           </div>
-
-          <div class="mockui__section-title" style="margin-top: 12px">Recent Billing</div>
-          <div class="mockui__billing">
-            <div class="mockui__bill-row">
-              <span class="mockui__bill-name">Invoice #1042</span>
-              <span class="mockui__bill-amt">₹850</span>
-              <span class="mockui__pill mockui__pill--green">Paid</span>
-            </div>
-            <div class="mockui__bill-row">
-              <span class="mockui__bill-name">Invoice #1041</span>
-              <span class="mockui__bill-amt">₹1,200</span>
-              <span class="mockui__pill mockui__pill--yellow">Pending</span>
-            </div>
+          <span class="hero__trust-sep"></span>
+          <div class="hero__trust-item">
+            <lucide-icon name="clock" [size]="13" />
+            Live in 3 min
           </div>
         </div>
       </div>
 
-      <!-- Floating accent cards -->
-      <div class="hero__float-card hero__float-card--rx">
-        <lucide-icon name="file-text" [size]="16" />
-        <div>
-          <div class="hero__float-card-title">Prescription written</div>
-          <div class="hero__float-card-sub">Amoxicillin 500mg · 5 days</div>
-        </div>
-      </div>
+      <!-- Right: vitals + mock dashboard -->
+      <div class="hero__right">
 
-      <div class="hero__float-card hero__float-card--followup">
-        <lucide-icon name="calendar-check" [size]="16" />
-        <div>
-          <div class="hero__float-card-title">3 follow-ups today</div>
-          <div class="hero__float-card-sub">2 overdue · 1 upcoming</div>
+        <!-- Floating vital sign cards -->
+        <div class="vital vital--hr">
+          <lucide-icon name="heart-pulse" [size]="18" class="vital__icon" />
+          <div class="vital__data">
+            <span class="vital__val">72</span>
+            <span class="vital__unit">bpm</span>
+          </div>
+          <div class="vital__lbl">Heart Rate</div>
         </div>
+
+        <div class="vital vital--spo2">
+          <lucide-icon name="activity" [size]="18" class="vital__icon" />
+          <div class="vital__data">
+            <span class="vital__val">98</span>
+            <span class="vital__unit">%</span>
+          </div>
+          <div class="vital__lbl">SpO₂</div>
+        </div>
+
+        <div class="vital vital--bp">
+          <lucide-icon name="gauge" [size]="18" class="vital__icon" />
+          <div class="vital__data">
+            <span class="vital__val">120/80</span>
+          </div>
+          <div class="vital__lbl">Blood Pressure</div>
+        </div>
+
+        <div class="vital vital--temp">
+          <lucide-icon name="thermometer" [size]="18" class="vital__icon" />
+          <div class="vital__data">
+            <span class="vital__val">98.6</span>
+            <span class="vital__unit">°F</span>
+          </div>
+          <div class="vital__lbl">Temperature</div>
+        </div>
+
+        <!-- Dark mock dashboard -->
+        <div class="mockui">
+          <div class="mockui__bar">
+            <span class="mockui__dot mockui__dot--r"></span>
+            <span class="mockui__dot mockui__dot--y"></span>
+            <span class="mockui__dot mockui__dot--g"></span>
+            <span class="mockui__bar-title">GotWell — Dashboard</span>
+          </div>
+          <div class="mockui__body">
+            <div class="mockui__stats">
+              <div class="mockui__stat mockui__stat--blue">
+                <div class="mockui__stat-val">24</div>
+                <div class="mockui__stat-lbl">Appointments</div>
+              </div>
+              <div class="mockui__stat mockui__stat--green">
+                <div class="mockui__stat-val">₹1.2L</div>
+                <div class="mockui__stat-lbl">Revenue</div>
+              </div>
+              <div class="mockui__stat mockui__stat--purple">
+                <div class="mockui__stat-val">8</div>
+                <div class="mockui__stat-lbl">IPD Beds</div>
+              </div>
+            </div>
+            <div class="mockui__section-title">Today's OPD Queue</div>
+            <div class="mockui__list">
+              <div class="mockui__row">
+                <div class="mockui__av mockui__av--blue">AK</div>
+                <div class="mockui__info">
+                  <div class="mockui__name">Arjun Kumar</div>
+                  <div class="mockui__meta">Token #1 · 9:30 AM</div>
+                </div>
+                <div class="mockui__pill mockui__pill--green">In Progress</div>
+              </div>
+              <div class="mockui__row">
+                <div class="mockui__av mockui__av--purple">PS</div>
+                <div class="mockui__info">
+                  <div class="mockui__name">Priya Sharma</div>
+                  <div class="mockui__meta">Token #2 · 10:15 AM</div>
+                </div>
+                <div class="mockui__pill mockui__pill--yellow">Waiting</div>
+              </div>
+              <div class="mockui__row">
+                <div class="mockui__av mockui__av--teal">RV</div>
+                <div class="mockui__info">
+                  <div class="mockui__name">Rahul Verma</div>
+                  <div class="mockui__meta">Token #3 · 11:00 AM</div>
+                </div>
+                <div class="mockui__pill mockui__pill--sky">Waiting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ── Product Video ── -->
-  <section class="video-section">
-    <div class="video-section__inner">
-      <div class="video-section__head">
-        <div class="sec-badge">Product Demo</div>
-        <h2 class="video-section__h2">See MedPilot in action</h2>
-        <p class="video-section__sub">Watch how a clinic runs end-to-end — from check-in to billing — in minutes.</p>
+  <!-- ── Stats strip ── -->
+  <div class="stats-strip">
+    <div class="stats-strip__inner">
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">10,000+</div>
+        <div class="stats-strip__lbl">Appointments managed</div>
       </div>
-      <div class="video-frame">
-        <div class="video-frame__chrome">
-          <span class="video-frame__dot video-frame__dot--r"></span>
-          <span class="video-frame__dot video-frame__dot--y"></span>
-          <span class="video-frame__dot video-frame__dot--g"></span>
-          <span class="video-frame__chrome-title">MedPilot — Live Demo</span>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">500+</div>
+        <div class="stats-strip__lbl">Clinics onboarded</div>
+      </div>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">98%</div>
+        <div class="stats-strip__lbl">Satisfaction rate</div>
+      </div>
+      <div class="stats-strip__div"></div>
+      <div class="stats-strip__item">
+        <div class="stats-strip__val">&lt;3 min</div>
+        <div class="stats-strip__lbl">Average setup time</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Features ── -->
+  <section class="feats" id="features">
+    <div class="feats__head">
+      <div class="sec-badge">Features</div>
+      <h2 class="feats__h2">Everything your clinic needs</h2>
+      <p class="feats__sub">From the first appointment to the final invoice — GotWell handles it all.</p>
+    </div>
+    <div class="feats__grid">
+      @for (f of features; track f.title) {
+        <div class="fc">
+          <div class="fc__icon" [style.background]="f.bg" [style.color]="f.color">
+            <lucide-icon [name]="f.icon" [size]="22" />
+          </div>
+          <h3 class="fc__title">{{ f.title }}</h3>
+          <p class="fc__desc">{{ f.desc }}</p>
         </div>
-        <video class="video-frame__video" controls muted loop playsinline>
-          <source src="demo.mov" type="video/mp4">
-        </video>
-      </div>
+      }
     </div>
   </section>
 
   <!-- ── Clinic Demo Animation ── -->
-  <section class="demo">
+  <section class="demo" id="demo">
     <div class="demo__inner">
       <div class="demo__head">
         <div class="sec-badge">Patient Journey</div>
-        <h2 class="demo__h2">Watch MedPilot in action</h2>
+        <h2 class="demo__h2">Watch GotWell in action</h2>
         <p class="demo__sub">Every patient visit — from check-in to discharge — guided seamlessly in real time.</p>
       </div>
 
       <div class="demo__layout">
 
-        <!-- ── Animated Clinic Scene ── -->
+        <!-- Animated Clinic Scene -->
         <div class="demo__scene">
 
-          <!-- ECG monitor (top-right) -->
+          <!-- ECG monitor -->
           <div class="ecg-mon" [class.ecg-mon--active]="activeStep() === 1">
             <div class="ecg-mon__top">
               <span class="ecg-mon__status-dot"></span>
@@ -193,9 +248,7 @@
 
           <!-- Doctor figure -->
           <div class="fig fig--doc" [class.fig--examining]="activeStep() === 1" [class.fig--writing]="activeStep() === 2">
-            <div class="fig__head">
-              <div class="fig__hair"></div>
-            </div>
+            <div class="fig__head"><div class="fig__hair"></div></div>
             <div class="fig__body fig__body--coat">
               <div class="fig__stripe"></div>
               <div class="fig__id-badge"></div>
@@ -215,9 +268,7 @@
 
           <!-- Patient figure -->
           <div class="fig fig--patient" [class.fig--arrived]="activeStep() >= 0">
-            <div class="fig__head fig__head--pt">
-              <div class="fig__hair fig__hair--pt"></div>
-            </div>
+            <div class="fig__head fig__head--pt"><div class="fig__hair fig__hair--pt"></div></div>
             <div class="fig__body fig__body--pt"></div>
             <div class="fig__arm fig__arm--pl"></div>
             @if (activeStep() === 1) {
@@ -241,7 +292,7 @@
             </div>
           }
 
-          <!-- Activity cards (one per step, positioned around scene) -->
+          <!-- Activity cards -->
           <div class="act act--tl" [class.act--on]="activeStep() === 0">
             <lucide-icon name="calendar-check" [size]="14" />
             <div>
@@ -271,9 +322,9 @@
             </div>
           </div>
 
-        </div><!-- /demo__scene -->
+        </div>
 
-        <!-- ── Step Progress Panel ── -->
+        <!-- Step Progress Panel -->
         <div class="demo__steps">
           @for (step of demoSteps; track step.id; let i = $index) {
             <div class="dstep"
@@ -297,52 +348,7 @@
           }
         </div>
 
-      </div><!-- /demo__layout -->
-    </div>
-  </section>
-
-  <!-- ── Stats strip ── -->
-  <div class="stats-strip">
-    <div class="stats-strip__inner">
-      <div class="stats-strip__item">
-        <div class="stats-strip__val">10,000+</div>
-        <div class="stats-strip__lbl">Appointments managed</div>
       </div>
-      <div class="stats-strip__div"></div>
-      <div class="stats-strip__item">
-        <div class="stats-strip__val">500+</div>
-        <div class="stats-strip__lbl">Clinics onboarded</div>
-      </div>
-      <div class="stats-strip__div"></div>
-      <div class="stats-strip__item">
-        <div class="stats-strip__val">98%</div>
-        <div class="stats-strip__lbl">Satisfaction rate</div>
-      </div>
-      <div class="stats-strip__div"></div>
-      <div class="stats-strip__item">
-        <div class="stats-strip__val">&lt; 3 min</div>
-        <div class="stats-strip__lbl">Average setup time</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Features ── -->
-  <section class="feats" id="features">
-    <div class="feats__head">
-      <div class="sec-badge">Features</div>
-      <h2 class="feats__h2">Everything your clinic needs</h2>
-      <p class="feats__sub">From the first appointment to the final invoice — MedPilot handles it all.</p>
-    </div>
-    <div class="feats__grid">
-      @for (f of features; track f.title) {
-        <div class="fc">
-          <div class="fc__icon" [style.background]="f.bg" [style.color]="f.color">
-            <lucide-icon [name]="f.icon" [size]="22" />
-          </div>
-          <h3 class="fc__title">{{ f.title }}</h3>
-          <p class="fc__desc">{{ f.desc }}</p>
-        </div>
-      }
     </div>
   </section>
 
@@ -365,11 +371,15 @@
 
   <!-- ── CTA ── -->
   <section class="cta-band">
+    <div class="cta-band__bg" aria-hidden="true">
+      <div class="cta-band__glow"></div>
+      <div class="cta-band__grid"></div>
+    </div>
     <div class="cta-band__inner">
       <div class="cta-band__icon"><lucide-icon name="stethoscope" [size]="30" /></div>
       <h2 class="cta-band__h2">Ready to transform your clinic?</h2>
-      <p class="cta-band__sub">Join clinics using MedPilot to deliver better care, faster.</p>
-      <a routerLink="/login" class="btn btn--lg cta-band__btn">
+      <p class="cta-band__sub">Join 500+ clinics using GotWell to deliver better care, faster.</p>
+      <a routerLink="/login" class="hero-btn hero-btn--primary hero-btn--lg">
         Get Started Free
         <lucide-icon name="arrow-right" [size]="16" />
       </a>
@@ -381,9 +391,9 @@
     <div class="hf__inner">
       <div class="hf__brand">
         <div class="hf__logo"><lucide-icon name="stethoscope" [size]="15" /></div>
-        <span>MedPilot</span>
+        <span>GotWell</span>
       </div>
-      <p class="hf__copy">© 2026 MedPilot · Built for modern healthcare</p>
+      <p class="hf__copy">© 2026 GotWell · Built for modern healthcare</p>
     </div>
   </footer>
 
