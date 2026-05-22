@@ -125,6 +125,7 @@ export class SidebarComponent {
       items: [
         { label: 'Notifications', route: '/notifications', icon: 'bell',     roles: ['admin', 'doctor'] },
         { label: 'Settings',      route: '/settings',      icon: 'settings', roles: ['admin', 'doctor'] },
+        { label: 'Super Admin',   route: '/super-admin',   icon: 'shield-check', roles: ['admin', 'super_admin'] },
       ],
     },
   ];

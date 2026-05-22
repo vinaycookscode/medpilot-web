@@ -89,6 +89,10 @@ export const routes: Routes = [
         path: 'ipd/admission/:id',
         loadComponent: () => import('./pages/ipd/admission-detail/admission-detail.component').then(m => m.AdmissionDetailComponent),
       },
+      {
+        path: 'super-admin',
+        loadComponent: () => import('./pages/super-admin/super-admin.component').then(m => m.SuperAdminComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
