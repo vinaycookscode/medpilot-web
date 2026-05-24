@@ -214,5 +214,6 @@ export interface AddChargeDto {
   quantity?: number;
   unitPrice: number;
   serviceId?: string;
+  departmentId?: string;
   notes?: string;
 }

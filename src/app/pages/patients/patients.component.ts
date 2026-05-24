@@ -8,6 +8,7 @@ import { Patient, CreatePatientDto, Gender } from '../../core/models/patient.mod
 import { Prescription } from '../../core/models/prescription.models';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
@@ -22,7 +23,11 @@ export class PatientsComponent implements OnInit {
   private rxSvc       = inject(PrescriptionsService);
   private toast       = inject(ToastService);
   readonly auth       = inject(AuthService);
+  private appMeta     = inject(AppMetaService);
   private fb          = inject(FormBuilder);
+
+  readonly canCreate  = computed(() => this.appMeta.canDo('patients', 'canCreate'));
+  readonly canEdit    = computed(() => this.appMeta.canDo('patients', 'canEdit'));
 
   readonly patients    = signal<Patient[]>([]);
   readonly total       = signal(0);

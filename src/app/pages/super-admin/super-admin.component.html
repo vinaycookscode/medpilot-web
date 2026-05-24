@@ -31,7 +31,9 @@
 
   <!-- Tab Content -->
   <div class="sa-content">
-    @if (activeTab() === 'charge-master') {
+    @if (activeTab() === 'master-data') {
+      <app-master-data />
+    } @else if (activeTab() === 'charge-master') {
       <app-charge-master />
     } @else if (activeTab() === 'permissions') {
       <app-permissions />

@@ -1,0 +1,207 @@
+$bg:     #030D1A;
+$bg2:    #061525;
+$accent: #22D3EE;
+$accent2:#67E8F9;
+$border: rgba(34,211,238,0.15);
+$card-bg: rgba(6,21,37,0.92);
+$text:   #fff;
+$text2:  rgba(255,255,255,0.6);
+
+.sal-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg;
+  position: relative;
+  overflow: hidden;
+}
+
+.sal-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  margin: 24px;
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: 20px;
+  padding: 40px 36px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 0 60px rgba(34,211,238,0.06), 0 24px 48px rgba(0,0,0,0.4);
+}
+
+.sal-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(34,211,238,0.05));
+    border: 1px solid rgba(34,211,238,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: $accent;
+  }
+
+  h1 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    font-size: 0.8125rem;
+    color: $text2;
+    margin: 0;
+  }
+}
+
+.sal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .form-label {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8125rem;
+  }
+}
+
+.sal-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sal-input-icon {
+  position: absolute;
+  left: 12px;
+  color: rgba(34,211,238,0.5);
+  pointer-events: none;
+}
+
+.sal-input {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(34,211,238,0.15) !important;
+  color: $text !important;
+  padding-left: 38px !important;
+
+  &:focus {
+    border-color: $accent !important;
+    box-shadow: 0 0 0 3px rgba(34,211,238,0.1) !important;
+    background: rgba(34,211,238,0.03) !important;
+  }
+
+  &::placeholder { color: rgba(255,255,255,0.25) !important; }
+}
+
+.sal-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+
+  &:hover { color: $accent; }
+}
+
+.sal-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #f87171;
+}
+
+.sal-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 46px;
+  background: linear-gradient(135deg, $accent, #0ea5e9);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 4px;
+
+  &:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  &:active:not(:disabled) { transform: translateY(0); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.sal-spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sal-footer {
+  text-align: center;
+  margin-top: 20px;
+
+  a {
+    font-size: 0.8125rem;
+    color: $text2;
+    text-decoration: none;
+    transition: color 0.15s;
+
+    &:hover { color: $accent; }
+  }
+}
+
+// Background decorations
+.sal-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sal-bg__circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+
+  &--1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    right: -100px;
+    background: rgba(34,211,238,0.06);
+  }
+
+  &--2 {
+    width: 300px;
+    height: 300px;
+    bottom: -80px;
+    left: -80px;
+    background: rgba(14,165,233,0.05);
+  }
+}
+
+.sal-bg__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}

@@ -9,6 +9,7 @@ import { StaffService, Staff } from '../../core/services/staff.service';
 import { Appointment, CreateAppointmentDto, AppointmentStatus, AvailableSlot } from '../../core/models/appointment.models';
 import { Patient } from '../../core/models/patient.models';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { ToastService } from '../../core/services/toast.service';
 import { debounceTime, distinctUntilChanged, Subject, forkJoin } from 'rxjs';
 
@@ -28,6 +29,7 @@ export class AppointmentsComponent implements OnInit {
   private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
   readonly auth = inject(AuthService);
+  private appMeta = inject(AppMetaService);
   private fb = inject(FormBuilder);
 
   readonly viewMode = signal<ViewMode>('today');
@@ -185,12 +187,8 @@ export class AppointmentsComponent implements OnInit {
     notes: [''],
   });
 
-  readonly appointmentTypes = [
-    { value: 'new_patient', label: 'New Patient' },
-    { value: 'follow_up', label: 'Follow Up' },
-    { value: 'emergency', label: 'Emergency' },
-    { value: 'routine', label: 'Routine' },
-  ];
+  readonly appointmentTypes = this.appMeta.appointmentTypes;
+  readonly canCreate = computed(() => this.appMeta.canDo('appointments', 'canCreate'));
 
   readonly colColors = ['primary', 'teal', 'purple', 'warning', 'success', 'rose'];
   readonly dowLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

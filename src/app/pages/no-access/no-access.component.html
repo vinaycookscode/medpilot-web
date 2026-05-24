@@ -1,0 +1,34 @@
+<div class="no-access">
+  <div class="no-access__card">
+    <div class="no-access__halo">
+      <div class="no-access__icon">
+        <lucide-icon name="lock" [size]="32" />
+      </div>
+    </div>
+
+    <h1 class="no-access__title">Access Restricted</h1>
+
+    <p class="no-access__subtitle">
+      You don't have permission to view this page.
+    </p>
+
+    <div class="no-access__chip">
+      <lucide-icon name="user" [size]="13" />
+      Signed in as <strong>{{ roleLabel }}</strong>
+    </div>
+
+    <div class="no-access__divider"></div>
+
+    <p class="no-access__help">
+      Your administrator has restricted access to this section.
+      If you believe this is a mistake, please contact them to update your role permissions.
+    </p>
+
+    <div class="no-access__actions">
+      <button class="btn btn--ghost" (click)="auth.logout()">
+        <lucide-icon name="log-out" [size]="15" />
+        Sign out
+      </button>
+    </div>
+  </div>
+</div>

@@ -117,7 +117,7 @@
   <div class="modal-backdrop" (click)="showChargeModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal__header">
-        <h3>{{ editingCharge() ? 'Edit Charge' : 'Add Charge' }}</h3>
+        <h3 class="modal__title">{{ editingCharge() ? 'Edit Charge' : 'Add Charge' }}</h3>
         <button class="icon-btn" (click)="showChargeModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
       </div>
       <div class="modal__body">
@@ -184,7 +184,7 @@
   <div class="modal-backdrop" (click)="showDeptModal.set(false)">
     <div class="modal modal--sm" (click)="$event.stopPropagation()">
       <div class="modal__header">
-        <h3>{{ editingDept() ? 'Edit Department' : 'Add Department' }}</h3>
+        <h3 class="modal__title">{{ editingDept() ? 'Edit Department' : 'Add Department' }}</h3>
         <button class="icon-btn" (click)="showDeptModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
       </div>
       <div class="modal__body">
@@ -220,7 +220,7 @@
   <div class="modal-backdrop" (click)="showAuditModal.set(false)">
     <div class="modal modal--lg" (click)="$event.stopPropagation()">
       <div class="modal__header">
-        <h3>Audit Log</h3>
+        <h3 class="modal__title">Audit Log</h3>
         <button class="icon-btn" (click)="showAuditModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
       </div>
       <div class="modal__body">
@@ -237,6 +237,9 @@
             }
           </div>
         }
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showAuditModal.set(false)">Close</button>
       </div>
     </div>
   </div>

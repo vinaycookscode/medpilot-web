@@ -32,6 +32,8 @@ import {
   Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
   // Landing page vitals & hero
   HeartPulse, Gauge, Thermometer, Zap, Play,
+  // Master Data / HMS Config
+  Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
 } from 'lucide-angular';
 
 @NgModule({
@@ -57,6 +59,7 @@ import {
       CalendarPlus,
       Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
       HeartPulse, Gauge, Thermometer, Zap, Play,
+      Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
     }),
   ],
   exports: [LucideAngularModule],

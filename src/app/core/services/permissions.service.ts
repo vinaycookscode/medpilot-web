@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../models/api.models';
 
 export interface PermMatrix {
   [role: string]: {
@@ -29,15 +31,15 @@ export class PermissionsService {
   constructor(private http: HttpClient) {}
 
   getMatrix() {
-    return this.http.get<PermMatrix>(`${this.api}/matrix`);
+    return this.http.get<ApiResponse<PermMatrix>>(`${this.api}/matrix`).pipe(map(r => r.data));
   }
   getRoles() {
-    return this.http.get<string[]>(`${this.api}/roles`);
+    return this.http.get<ApiResponse<string[]>>(`${this.api}/roles`).pipe(map(r => r.data));
   }
   getModules() {
-    return this.http.get<string[]>(`${this.api}/modules`);
+    return this.http.get<ApiResponse<string[]>>(`${this.api}/modules`).pipe(map(r => r.data));
   }
   bulkUpdate(updates: RolePermUpdate[]) {
-    return this.http.put<any>(`${this.api}/bulk`, { updates });
+    return this.http.put<ApiResponse<void>>(`${this.api}/bulk`, { updates }).pipe(map(r => r.data));
   }
 }

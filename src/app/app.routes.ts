@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { permissionGuard } from './core/guards/permission.guard';
+import { noAccessGuard } from './core/guards/no-access.guard';
 
 export const routes: Routes = [
   {
@@ -12,6 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
   },
   {
+    path: 'super-admin-login',
+    loadComponent: () => import('./pages/super-admin-login/super-admin-login.component').then(m => m.SuperAdminLoginComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     canActivate: [authGuard],
@@ -19,79 +25,124 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
+        canActivate: [permissionGuard],
+        data: { module: 'dashboard' },
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
       },
       {
         path: 'patients',
+        canActivate: [permissionGuard],
+        data: { module: 'patients' },
         loadComponent: () => import('./pages/patients/patients.component').then(m => m.PatientsComponent),
       },
       {
         path: 'appointments',
+        canActivate: [permissionGuard],
+        data: { module: 'appointments' },
         loadComponent: () => import('./pages/appointments/appointments.component').then(m => m.AppointmentsComponent),
       },
       {
         path: 'billing',
+        canActivate: [permissionGuard],
+        data: { module: 'billing' },
         loadComponent: () => import('./pages/billing/billing.component').then(m => m.BillingComponent),
       },
       {
         path: 'prescriptions',
+        canActivate: [permissionGuard],
+        data: { module: 'prescriptions' },
         loadComponent: () => import('./pages/prescriptions/prescriptions.component').then(m => m.PrescriptionsComponent),
       },
       {
         path: 'followups',
+        canActivate: [permissionGuard],
+        data: { module: 'appointments' },
         loadComponent: () => import('./pages/followups/followups.component').then(m => m.FollowupsComponent),
       },
       {
         path: 'settings',
+        canActivate: [permissionGuard],
+        data: { module: 'settings' },
         loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent),
       },
       {
         path: 'schedules',
+        canActivate: [permissionGuard],
+        data: { module: 'schedules' },
         loadComponent: () => import('./pages/schedules/schedules.component').then(m => m.SchedulesComponent),
       },
       {
         path: 'inventory',
+        canActivate: [permissionGuard],
+        data: { module: 'inventory' },
         loadComponent: () => import('./pages/inventory/inventory.component').then(m => m.InventoryComponent),
       },
       {
         path: 'branches',
+        canActivate: [permissionGuard],
+        data: { module: 'settings' },
         loadComponent: () => import('./pages/branches/branches.component').then(m => m.BranchesComponent),
       },
       {
         path: 'staff',
+        canActivate: [permissionGuard],
+        data: { module: 'staff' },
         loadComponent: () => import('./pages/staff/staff.component').then(m => m.StaffComponent),
       },
       {
         path: 'notifications',
+        canActivate: [permissionGuard],
+        data: { module: 'notifications' },
         loadComponent: () => import('./pages/notifications/notifications.component').then(m => m.NotificationsComponent),
       },
       {
         path: 'reports',
+        canActivate: [permissionGuard],
+        data: { module: 'reports' },
         loadComponent: () => import('./pages/reports/reports.component').then(m => m.ReportsComponent),
       },
       {
         path: 'labs',
+        canActivate: [permissionGuard],
+        data: { module: 'labs' },
         loadComponent: () => import('./pages/labs/labs.component').then(m => m.LabsComponent),
       },
       {
         path: 'insurance',
+        canActivate: [permissionGuard],
+        data: { module: 'insurance' },
         loadComponent: () => import('./pages/insurance/insurance.component').then(m => m.InsuranceComponent),
       },
       {
         path: 'opd',
+        canActivate: [permissionGuard],
+        data: { module: 'opd' },
         loadComponent: () => import('./pages/opd/opd.component').then(m => m.OpdComponent),
       },
       {
         path: 'ipd',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
         loadComponent: () => import('./pages/ipd/ipd.component').then(m => m.IpdComponent),
       },
       {
         path: 'ipd/admission/:id',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
         loadComponent: () => import('./pages/ipd/admission-detail/admission-detail.component').then(m => m.AdmissionDetailComponent),
       },
       {
         path: 'super-admin',
         loadComponent: () => import('./pages/super-admin/super-admin.component').then(m => m.SuperAdminComponent),
+      },
+      {
+        path: 'no-access',
+        canActivate: [noAccessGuard],
+        loadComponent: () => import('./pages/no-access/no-access.component').then(m => m.NoAccessComponent),
+      },
+      {
+        path: '**',
+        loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent),
       },
     ],
   },

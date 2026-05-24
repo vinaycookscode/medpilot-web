@@ -1,8 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { IconsModule } from '../../../shared/icons';
 import { PermissionsService, PermMatrix, RolePermUpdate } from '../../../core/services/permissions.service';
+import { AppMetaService } from '../../../core/services/app-meta.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-permissions',
@@ -40,19 +43,27 @@ export class PermissionsComponent implements OnInit {
     charge_master: 'Charge Master', permissions: 'Permissions', nabh: 'NABH',
   };
 
+  private appMeta = inject(AppMetaService);
+  private toast = inject(ToastService);
+
   constructor(private svc: PermissionsService) {}
 
   ngOnInit() {
     this.loading.set(true);
-    this.svc.getRoles().subscribe(r => {
-      this.roles.set(r);
-      this.selectedRole.set(r[0] ?? '');
-    });
-    this.svc.getModules().subscribe(m => this.modules.set(m));
-    this.svc.getMatrix().subscribe(m => {
-      this.matrix.set(m);
-      this.localMatrix = JSON.parse(JSON.stringify(m));
-      this.loading.set(false);
+    forkJoin({
+      roles:   this.svc.getRoles(),
+      modules: this.svc.getModules(),
+      matrix:  this.svc.getMatrix(),
+    }).subscribe({
+      next: ({ roles, modules, matrix }) => {
+        this.roles.set(roles);
+        this.selectedRole.set(roles[0] ?? '');
+        this.modules.set(modules);
+        this.matrix.set(matrix);
+        this.localMatrix = JSON.parse(JSON.stringify(matrix));
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
   }
 
@@ -84,8 +95,20 @@ export class PermissionsComponent implements OnInit {
     }
     this.saving.set(true);
     this.svc.bulkUpdate(updates).subscribe({
-      next: () => { this.saving.set(false); this.dirty.set(false); },
-      error: () => this.saving.set(false),
+      next: () => {
+        this.saving.set(false);
+        this.dirty.set(false);
+        // Refresh the in-memory matrix so the saved state is the new baseline
+        this.matrix.set(JSON.parse(JSON.stringify(this.localMatrix)));
+        // Push the change into the current session immediately. Other active
+        // sessions will pick it up via the version-stamp poll within ~5s.
+        this.appMeta.load().subscribe({ error: () => {} });
+        this.toast.success('Permissions updated');
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('Failed to save permissions');
+      },
     });
   }
 

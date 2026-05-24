@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.models';
 
@@ -50,13 +51,13 @@ export class ChargeMasterService {
 
   // Departments
   listDepartments() {
-    return this.http.get<Department[]>(`${this.api}/departments`);
+    return this.http.get<ApiResponse<Department[]>>(`${this.api}/departments`).pipe(map(r => r.data));
   }
   createDepartment(body: Partial<Department>) {
-    return this.http.post<Department>(`${this.api}/departments`, body);
+    return this.http.post<ApiResponse<Department>>(`${this.api}/departments`, body).pipe(map(r => r.data));
   }
   updateDepartment(id: string, body: Partial<Department>) {
-    return this.http.put<Department>(`${this.api}/departments/${id}`, body);
+    return this.http.put<ApiResponse<Department>>(`${this.api}/departments/${id}`, body).pipe(map(r => r.data));
   }
   deleteDepartment(id: string) {
     return this.http.delete<void>(`${this.api}/departments/${id}`);
@@ -66,18 +67,18 @@ export class ChargeMasterService {
   list(category?: string) {
     let params = new HttpParams();
     if (category) params = params.set('category', category);
-    return this.http.get<ChargeMaster[]>(this.api, { params });
+    return this.http.get<ApiResponse<ChargeMaster[]>>(this.api, { params }).pipe(map(r => r.data));
   }
   create(body: Partial<ChargeMaster>) {
-    return this.http.post<ChargeMaster>(this.api, body);
+    return this.http.post<ApiResponse<ChargeMaster>>(this.api, body).pipe(map(r => r.data));
   }
   update(id: string, body: Partial<ChargeMaster>) {
-    return this.http.put<ChargeMaster>(`${this.api}/${id}`, body);
+    return this.http.put<ApiResponse<ChargeMaster>>(`${this.api}/${id}`, body).pipe(map(r => r.data));
   }
   remove(id: string) {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
   getAuditLog(id: string) {
-    return this.http.get<ChargeMasterAudit[]>(`${this.api}/${id}/audit`);
+    return this.http.get<ApiResponse<ChargeMasterAudit[]>>(`${this.api}/${id}/audit`).pipe(map(r => r.data));
   }
 }

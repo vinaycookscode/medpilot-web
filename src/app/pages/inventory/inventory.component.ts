@@ -4,6 +4,7 @@ import { DecimalPipe, DatePipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
 import { InventoryService } from '../../core/services/inventory.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { InventoryItem, InventorySummary, stockStatus } from '../../core/models/inventory.models';
 
 type StockTab = 'all' | 'low' | 'out';
@@ -17,7 +18,10 @@ type StockTab = 'all' | 'low' | 'out';
 })
 export class InventoryComponent implements OnInit {
   private inventoryService = inject(InventoryService);
-  private toast = inject(ToastService);
+  private toast            = inject(ToastService);
+  private appMeta          = inject(AppMetaService);
+
+  readonly canCreate = computed(() => this.appMeta.canDo('inventory', 'canCreate'));
 
   readonly stockStatus = stockStatus;
 

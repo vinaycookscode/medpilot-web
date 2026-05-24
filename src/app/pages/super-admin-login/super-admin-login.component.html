@@ -1,0 +1,73 @@
+<div class="sal-page">
+  <div class="sal-card">
+
+    <!-- Header -->
+    <div class="sal-header">
+      <div class="sal-header__icon">
+        <lucide-icon name="shield-check" [size]="28" />
+      </div>
+      <h1>Super Admin Portal</h1>
+      <p>Centralized configuration &amp; system management</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="sal-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="sal-input-wrap">
+          <lucide-icon name="mail" [size]="15" class="sal-input-icon" />
+          <input
+            class="form-control sal-input"
+            type="email"
+            formControlName="email"
+            placeholder="super@super.com"
+            autocomplete="username" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="sal-input-wrap">
+          <lucide-icon name="lock" [size]="15" class="sal-input-icon" />
+          <input
+            class="form-control sal-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter password"
+            autocomplete="current-password" />
+          <button type="button" class="sal-eye-btn" (click)="togglePassword()">
+            <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="15" />
+          </button>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="sal-error">
+          <lucide-icon name="alert-circle" [size]="14" />
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <button type="submit" class="sal-submit" [disabled]="loading()">
+        @if (loading()) {
+          <lucide-icon name="loader-2" [size]="16" class="sal-spin" />
+          Authenticating…
+        } @else {
+          <lucide-icon name="shield-check" [size]="16" />
+          Sign in to Portal
+        }
+      </button>
+    </form>
+
+    <div class="sal-footer">
+      <a href="/login">← Back to clinic login</a>
+    </div>
+  </div>
+
+  <!-- Background decoration -->
+  <div class="sal-bg">
+    <div class="sal-bg__circle sal-bg__circle--1"></div>
+    <div class="sal-bg__circle sal-bg__circle--2"></div>
+    <div class="sal-bg__grid"></div>
+  </div>
+</div>

@@ -207,7 +207,7 @@
   <div class="modal-backdrop" (click)="showItemModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal__header">
-        <h3>{{ editingItem() ? 'Edit Checklist Item' : 'Add Checklist Item' }}</h3>
+        <h3 class="modal__title">{{ editingItem() ? 'Edit Checklist Item' : 'Add Checklist Item' }}</h3>
         <button class="icon-btn" (click)="showItemModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
       </div>
       <div class="modal__body">

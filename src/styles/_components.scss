@@ -308,7 +308,8 @@ textarea.input {
   top: clamp(1rem, 5vh, 3rem);
   margin: 0 auto;
   z-index: calc(var(--z-modal) + 1);
-  background: #ffffff;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
   width: auto;
@@ -323,22 +324,43 @@ textarea.input {
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-    background: #ffffff;
+    background: var(--bg-card, #ffffff);
     z-index: 1;
   }
 
   &__title {
     font-size: t.$text-lg;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--text-primary);
     letter-spacing: -0.02em;
+    margin: 0;
   }
 
-  &__body { padding: t.$sp-6; }
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    &:hover { background: var(--surface-input); color: var(--text-primary); }
+  }
+
+  &__body {
+    padding: t.$sp-6;
+    color: var(--text-primary);
+  }
 
   &__footer {
     @include m.flex(center, flex-end, t.$sp-3);
     padding: t.$sp-4 t.$sp-6;
     border-top: 1px solid var(--border);
+    background: var(--bg-card, #ffffff);
   }
 
   &--sm { max-width: 380px; }

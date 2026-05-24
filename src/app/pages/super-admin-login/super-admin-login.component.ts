@@ -5,19 +5,19 @@ import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-super-admin-login',
   standalone: true,
   imports: [ReactiveFormsModule, IconsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './super-admin-login.component.html',
+  styleUrl: './super-admin-login.component.scss',
 })
-export class LoginComponent {
+export class SuperAdminLoginComponent {
   private auth   = inject(AuthService);
   private router = inject(Router);
   private fb     = inject(FormBuilder);
 
   readonly form = this.fb.nonNullable.group({
-    email:    ['', [Validators.required, Validators.email]],
+    email:    ['super@super.com', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
 
@@ -33,24 +33,19 @@ export class LoginComponent {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
-        const role = this.auth.role();
-        this.router.navigate([role === 'super_admin' ? '/super-admin' : '/dashboard']);
+        if (this.auth.role() === 'super_admin') {
+          this.router.navigate(['/super-admin']);
+        } else {
+          this.auth.logout();
+          this.errorMessage.set('This portal is for Super Admins only.');
+        }
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(err?.error?.message ?? 'Invalid email or password');
+        this.errorMessage.set(err?.error?.message ?? 'Invalid credentials');
       },
     });
   }
 
   togglePassword() { this.showPassword.update(v => !v); }
-
-  fillDemo(role: 'admin' | 'doctor' | 'receptionist') {
-    const creds = {
-      admin:        { email: 'admin@democlinic.com',     password: 'Admin@123' },
-      doctor:       { email: 'doctor@democlinic.com',    password: 'Admin@123' },
-      receptionist: { email: 'reception@democlinic.com', password: 'Admin@123' },
-    };
-    this.form.patchValue(creds[role]);
-  }
 }

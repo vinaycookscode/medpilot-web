@@ -4,9 +4,11 @@
       <h1 class="page-title">Pharmacy &amp; Inventory</h1>
       <p class="page-sub">Track medicine stock, flag low items, and manage supply levels.</p>
     </div>
-    <button class="btn btn--primary" (click)="openAdd()">
-      <lucide-icon name="plus" [size]="16" /> Add Item
-    </button>
+    @if (canCreate()) {
+      <button class="btn btn--primary" (click)="openAdd()">
+        <lucide-icon name="plus" [size]="16" /> Add Item
+      </button>
+    }
   </div>
 
   <!-- Summary strip -->
