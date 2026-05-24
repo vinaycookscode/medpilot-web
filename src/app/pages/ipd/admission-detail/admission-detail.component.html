@@ -277,7 +277,7 @@
           <div class="form-group">
             <label class="form-label">Note Type</label>
             <select class="form-control" formControlName="noteType">
-              @for (t of noteTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+              @for (t of noteTypes(); track t.value) { <option [value]="t.value">{{ t.label }}</option> }
             </select>
           </div>
         </div>
@@ -320,7 +320,7 @@
   <div class="modal-backdrop" (click)="chargeModal.set(false)"></div>
   <div class="modal modal--sm">
     <div class="modal__header">
-      <h3>Add Charge</h3>
+      <h3 class="modal__title">Add Charge</h3>
       <button class="modal__close" (click)="chargeModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
     </div>
     <div class="modal__body">
@@ -331,11 +331,20 @@
             <input type="date" class="form-control" formControlName="chargeDate" />
           </div>
           <div class="form-group">
-            <label class="form-label required">Type</label>
+            <label class="form-label required">Category</label>
             <select class="form-control" formControlName="chargeType">
-              @for (t of chargeTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+              @for (t of chargeTypes(); track t.value) { <option [value]="t.value">{{ t.label }}</option> }
             </select>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <select class="form-control" formControlName="departmentId">
+            <option value="">— Select Department —</option>
+            @for (d of appMeta.departments(); track d.id) {
+              <option [value]="d.id">{{ d.name }}</option>
+            }
+          </select>
         </div>
         <div class="form-group"><label class="form-label required">Description</label><input class="form-control" formControlName="description" /></div>
         <div class="form-grid form-grid--2">
@@ -348,7 +357,8 @@
     <div class="modal__footer">
       <button class="btn btn--ghost" (click)="chargeModal.set(false)">Cancel</button>
       <button class="btn btn--primary" (click)="saveCharge()" [disabled]="chargeForm.invalid || chargeSaving()">
-        @if (chargeSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> } Add Charge
+        @if (chargeSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
+        <span>Add Charge</span>
       </button>
     </div>
   </div>
@@ -369,7 +379,7 @@
           <div class="form-group"><label class="form-label required">Discharge Time</label><input type="time" class="form-control" formControlName="dischargeTime" /></div>
           <div class="form-group"><label class="form-label required">Discharge Type</label>
             <select class="form-control" formControlName="dischargeType">
-              @for (t of dischargeTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+              @for (t of dischargeTypes(); track t.value) { <option [value]="t.value">{{ t.label }}</option> }
             </select>
           </div>
         </div>
@@ -379,7 +389,7 @@
           <div class="form-group"><label class="form-label">ICD-10 Codes (comma-separated)</label><input class="form-control" placeholder="K37, Z87.39" formControlName="icd10Codes" /></div>
           <div class="form-group"><label class="form-label required">Condition at Discharge</label>
             <select class="form-control" formControlName="conditionAtDischarge">
-              @for (c of conditions; track c.value) { <option [value]="c.value">{{ c.label }}</option> }
+              @for (c of conditions(); track c.value) { <option [value]="c.value">{{ c.label }}</option> }
             </select>
           </div>
         </div>

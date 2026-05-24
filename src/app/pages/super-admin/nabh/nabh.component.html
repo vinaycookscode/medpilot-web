@@ -1,0 +1,257 @@
+<div class="nabh-wrap">
+
+  <!-- Sub-nav -->
+  <div class="nabh-subnav">
+    <button class="nabh-subnav__btn" [class.active]="view() === 'daily'" (click)="setView('daily')">
+      <lucide-icon name="calendar-check" [size]="14" /> Daily Tracking
+    </button>
+    <button class="nabh-subnav__btn" [class.active]="view() === 'items'" (click)="setView('items')">
+      <lucide-icon name="clipboard-list" [size]="14" /> Checklist Items
+    </button>
+    <button class="nabh-subnav__btn" [class.active]="view() === 'report'" (click)="setView('report')">
+      <lucide-icon name="chart-bar" [size]="14" /> Monthly Report
+    </button>
+  </div>
+
+  <!-- ── DAILY VIEW ── -->
+  @if (view() === 'daily') {
+    <!-- Stats -->
+    <div class="nabh-stats">
+      <div class="nabh-stat nabh-stat--total">
+        <span class="nabh-stat__num">{{ dailyStats().total }}</span>
+        <span class="nabh-stat__label">Total Tasks</span>
+      </div>
+      <div class="nabh-stat nabh-stat--done">
+        <span class="nabh-stat__num">{{ dailyStats().completed }}</span>
+        <span class="nabh-stat__label">Completed</span>
+      </div>
+      <div class="nabh-stat nabh-stat--pending">
+        <span class="nabh-stat__num">{{ dailyStats().pending }}</span>
+        <span class="nabh-stat__label">Pending</span>
+      </div>
+      <div class="nabh-stat nabh-stat--missed">
+        <span class="nabh-stat__num">{{ dailyStats().missed }}</span>
+        <span class="nabh-stat__label">Missed</span>
+      </div>
+      <div class="nabh-stat nabh-stat--rate">
+        <span class="nabh-stat__num">
+          {{ dailyStats().total > 0 ? ((dailyStats().completed / dailyStats().total) * 100 | number:'1.0-0') : 0 }}%
+        </span>
+        <span class="nabh-stat__label">Compliance</span>
+      </div>
+    </div>
+
+    <div class="nabh-toolbar">
+      <div class="nabh-toolbar__left">
+        <input type="date" class="form-control" [value]="selectedDate()" (change)="selectedDate.set($any($event.target).value); loadDaily()" />
+        <select class="form-control nabh-filter" [value]="filterDept()" (change)="filterDept.set($any($event.target).value)">
+          <option value="">All departments</option>
+          @for (d of departments(); track d) { <option [value]="d">{{ d }}</option> }
+        </select>
+      </div>
+      <button class="btn btn--ghost btn--sm" (click)="loadDaily()"><lucide-icon name="refresh-cw" [size]="14" /> Refresh</button>
+    </div>
+
+    @if (loading()) {
+      <p class="text-center py-8 text-secondary">Loading…</p>
+    } @else if (filteredRows().length === 0) {
+      <div class="nabh-empty">
+        <lucide-icon name="clipboard-check" [size]="40" />
+        <p>No checklist items configured yet.</p>
+        <button class="btn btn--primary btn--sm" (click)="setView('items')">Configure Items</button>
+      </div>
+    } @else {
+      <div class="nabh-checklist">
+        @for (row of filteredRows(); track row.item.id) {
+          <div class="nabh-row">
+            <div class="nabh-row__info">
+              <span class="nabh-row__dept badge badge--blue">{{ row.item.department }}</span>
+              <span class="nabh-row__task">{{ row.item.task }}</span>
+              <span class="badge badge--gray">{{ row.item.frequency }}</span>
+            </div>
+            <div class="nabh-row__shifts">
+              @for (ss of row.shiftStatuses; track ss.shift) {
+                <button
+                  class="nabh-shift-btn"
+                  [ngClass]="statusClass(ss.status)"
+                  [title]="ss.completedByName ? 'By ' + ss.completedByName : ss.shift"
+                  (click)="markComplete(row, ss)">
+                  <span class="nabh-shift-btn__shift">{{ ss.shift }}</span>
+                  <lucide-icon
+                    [name]="ss.status === 'completed' ? 'check-circle-2' : ss.status === 'missed' ? 'x' : 'clock'"
+                    [size]="13" />
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ── ITEMS VIEW ── -->
+  @if (view() === 'items') {
+    <div class="cm-toolbar">
+      <span class="text-secondary text-sm">{{ items().length }} checklist items</span>
+      <button class="btn btn--primary btn--sm" (click)="openAddItem()">
+        <lucide-icon name="plus" [size]="14" /> Add Item
+      </button>
+    </div>
+    <div class="nabh-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Task</th>
+            <th>Frequency</th>
+            <th>Shift</th>
+            <th>Escalate To</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (items().length === 0) {
+            <tr><td colspan="7" class="empty-state">No items yet</td></tr>
+          }
+          @for (item of items(); track item.id) {
+            <tr>
+              <td><span class="badge badge--blue">{{ item.department }}</span></td>
+              <td class="fw-500">{{ item.task }}</td>
+              <td>{{ item.frequency }}</td>
+              <td>{{ item.shift }}</td>
+              <td>{{ item.escalateTo || '—' }}</td>
+              <td><span class="badge" [ngClass]="item.isActive ? 'badge--green' : 'badge--gray'">{{ item.isActive ? 'Active' : 'Inactive' }}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn" (click)="openEditItem(item)"><lucide-icon name="pencil" [size]="14" /></button>
+                  <button class="icon-btn icon-btn--danger" (click)="deleteItem(item.id)"><lucide-icon name="trash-2" [size]="14" /></button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- ── REPORT VIEW ── -->
+  @if (view() === 'report') {
+    <div class="report-toolbar">
+      <select class="form-control" [value]="reportMonth()" (change)="reportMonth.set(+$any($event.target).value)">
+        @for (m of MONTHS; track $index) { <option [value]="$index + 1">{{ m }}</option> }
+      </select>
+      <input type="number" class="form-control" style="width:90px" [value]="reportYear()" (change)="reportYear.set(+$any($event.target).value)" />
+      <button class="btn btn--primary btn--sm" (click)="loadReport()"><lucide-icon name="chart-bar" [size]="14" /> Generate</button>
+    </div>
+
+    @if (loading()) {
+      <p class="text-center py-8 text-secondary">Generating report…</p>
+    } @else if (report()) {
+      <div class="report-summary">
+        <div class="report-big-rate">
+          <svg viewBox="0 0 120 120" class="report-donut">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="var(--border)" stroke-width="12" />
+            <circle cx="60" cy="60" r="48" fill="none"
+              [attr.stroke]="complianceColor(report()!.complianceRate)"
+              stroke-width="12"
+              stroke-dasharray="301.6"
+              [attr.stroke-dashoffset]="301.6 * (1 - report()!.complianceRate / 100)"
+              stroke-linecap="round"
+              transform="rotate(-90 60 60)" />
+          </svg>
+          <div class="report-big-rate__text">
+            <span class="report-rate-num" [style.color]="complianceColor(report()!.complianceRate)">{{ report()!.complianceRate }}%</span>
+            <span>Compliance</span>
+          </div>
+        </div>
+        <div class="report-cards">
+          <div class="report-card">
+            <span class="report-card__num">{{ report()!.summary.total }}</span>
+            <span>Total Tasks</span>
+          </div>
+          <div class="report-card report-card--green">
+            <span class="report-card__num">{{ report()!.summary.completed }}</span>
+            <span>Completed</span>
+          </div>
+          <div class="report-card report-card--red">
+            <span class="report-card__num">{{ report()!.summary.missed }}</span>
+            <span>Missed</span>
+          </div>
+          <div class="report-card report-card--orange">
+            <span class="report-card__num">{{ report()!.summary.pending }}</span>
+            <span>Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="dept-report-title">By Department</h4>
+      <div class="dept-report-list">
+        @for (d of report()!.byDepartment; track d.department) {
+          <div class="dept-report-row">
+            <span class="dept-report-row__name">{{ d.department }}</span>
+            <div class="dept-report-row__bar">
+              <div class="dept-report-row__fill" [style.width.%]="d.rate" [style.background]="complianceColor(d.rate)"></div>
+            </div>
+            <span class="dept-report-row__rate" [style.color]="complianceColor(d.rate)">{{ d.rate }}%</span>
+            <span class="dept-report-row__counts">{{ d.completed }}/{{ d.total }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Item Modal -->
+@if (showItemModal()) {
+  <div class="modal-backdrop" (click)="showItemModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ editingItem() ? 'Edit Checklist Item' : 'Add Checklist Item' }}</h3>
+        <button class="icon-btn" (click)="showItemModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
+      </div>
+      <div class="modal__body">
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label required">Department</label>
+            <input class="form-control" [(ngModel)]="itemForm.department" placeholder="e.g. ICU, OT, Ward A" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Frequency</label>
+            <select class="form-control" [(ngModel)]="itemForm.frequency">
+              @for (f of FREQUENCIES; track f) { <option [value]="f">{{ f | titlecase }}</option> }
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1">
+            <label class="form-label required">Task Description</label>
+            <input class="form-control" [(ngModel)]="itemForm.task" placeholder="e.g. Check crash cart medication expiry" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Shift</label>
+            <select class="form-control" [(ngModel)]="itemForm.shift">
+              @for (s of SHIFTS; track s) { <option [value]="s">{{ s | titlecase }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Escalate To</label>
+            <input class="form-control" [(ngModel)]="itemForm.escalateTo" placeholder="Dept head email or name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input class="form-control" type="number" [(ngModel)]="itemForm.displayOrder" />
+          </div>
+        </div>
+        <div class="form-group mt-2">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="itemForm.isActive" />
+            <span>Active</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showItemModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" (click)="saveItem()">{{ editingItem() ? 'Update' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+}

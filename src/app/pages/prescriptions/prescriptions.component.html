@@ -4,7 +4,7 @@
       <h2 class="page__title">Prescriptions</h2>
       <p class="page__subtitle">{{ total() }} total</p>
     </div>
-    @if (isDoctor()) {
+    @if (isDoctor() && canCreate()) {
       <button class="btn btn--primary" (click)="openCreate()">
         <lucide-icon name="plus" [size]="16" />
         New Prescription

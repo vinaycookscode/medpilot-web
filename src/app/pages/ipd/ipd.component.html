@@ -6,9 +6,11 @@
       <h2 class="page__title">In-Patient Department</h2>
       <p class="page__subtitle">Bed management · admissions · patient care</p>
     </div>
-    <button class="btn btn--primary" (click)="openAdmitModal()">
-      <lucide-icon name="plus" [size]="15" /> Admit Patient
-    </button>
+    @if (canCreate()) {
+      <button class="btn btn--primary" (click)="openAdmitModal()">
+        <lucide-icon name="plus" [size]="15" /> Admit Patient
+      </button>
+    }
   </div>
 
   <!-- Stats bar -->

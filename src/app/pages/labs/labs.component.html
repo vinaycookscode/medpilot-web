@@ -5,9 +5,11 @@
       <h1 class="page-title">Lab Orders</h1>
       <p class="page-sub">Manage laboratory test orders and results.</p>
     </div>
-    <button class="btn btn--primary" (click)="openOrderModal()">
-      <lucide-icon name="plus" [size]="16" /> New Order
-    </button>
+    @if (canCreate()) {
+      <button class="btn btn--primary" (click)="openOrderModal()">
+        <lucide-icon name="plus" [size]="16" /> New Order
+      </button>
+    }
   </div>
 
   <!-- Status pills -->

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { IconsModule } from '../../../shared/icons';
 import { IpdService } from '../../../core/services/ipd.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AppMetaService } from '../../../core/services/app-meta.service';
 import {
   IpdAdmission, IpdDailyNote, IpdCharge, IpdProcedure,
   DischargePatientDto, CreateDailyNoteDto, AddChargeDto,
@@ -23,11 +24,12 @@ type DetailTab = 'notes' | 'charges' | 'procedures' | 'summary';
   styleUrl: './admission-detail.component.scss',
 })
 export class AdmissionDetailComponent implements OnInit {
-  private route   = inject(ActivatedRoute);
-  private ipdSvc  = inject(IpdService);
-  private toast   = inject(ToastService);
-  readonly auth   = inject(AuthService);
-  private fb      = inject(FormBuilder);
+  private route    = inject(ActivatedRoute);
+  private ipdSvc   = inject(IpdService);
+  private toast    = inject(ToastService);
+  readonly auth    = inject(AuthService);
+  readonly appMeta = inject(AppMetaService);
+  private fb       = inject(FormBuilder);
 
   readonly admission  = signal<IpdAdmission | null>(null);
   readonly notes      = signal<IpdDailyNote[]>([]);
@@ -57,12 +59,13 @@ export class AdmissionDetailComponent implements OnInit {
   readonly chargeModal  = signal(false);
   readonly chargeSaving = signal(false);
   readonly chargeForm = this.fb.nonNullable.group({
-    chargeDate:  [this.todayStr()],
-    chargeType:  ['service', Validators.required],
-    description: ['', Validators.required],
-    quantity:    [1, [Validators.required, Validators.min(0.001)]],
-    unitPrice:   [0, [Validators.required, Validators.min(0)]],
-    notes:       [''],
+    chargeDate:   [this.todayStr()],
+    chargeType:   ['service', Validators.required],
+    departmentId: ['' as string],
+    description:  ['', Validators.required],
+    quantity:     [1, [Validators.required, Validators.min(0.001)]],
+    unitPrice:    [0, [Validators.required, Validators.min(0)]],
+    notes:        [''],
   });
 
   // Discharge form
@@ -84,41 +87,10 @@ export class AdmissionDetailComponent implements OnInit {
     followUpInstructions:  [''],
   });
 
-  readonly noteTypes = [
-    { value: 'doctor_round',   label: 'Doctor Round' },
-    { value: 'nursing',        label: 'Nursing Note' },
-    { value: 'procedure_note', label: 'Procedure Note' },
-    { value: 'incident',       label: 'Incident' },
-    { value: 'handover',       label: 'Handover' },
-  ];
-
-  readonly chargeTypes = [
-    { value: 'room',      label: 'Room' },
-    { value: 'procedure', label: 'Procedure' },
-    { value: 'medicine',  label: 'Medicine' },
-    { value: 'lab',       label: 'Lab' },
-    { value: 'nursing',   label: 'Nursing' },
-    { value: 'service',   label: 'Service' },
-    { value: 'other',     label: 'Other' },
-  ];
-
-  readonly dischargeTypes  = [
-    { value: 'recovered', label: 'Recovered' },
-    { value: 'improved',  label: 'Improved' },
-    { value: 'referred',  label: 'Referred' },
-    { value: 'lama',      label: 'LAMA (Left Against Medical Advice)' },
-    { value: 'deceased',  label: 'Deceased' },
-    { value: 'absconded', label: 'Absconded' },
-  ];
-
-  readonly conditions = [
-    { value: 'good',         label: 'Good' },
-    { value: 'satisfactory', label: 'Satisfactory' },
-    { value: 'stable',       label: 'Stable' },
-    { value: 'serious',      label: 'Serious' },
-    { value: 'critical',     label: 'Critical' },
-    { value: 'poor',         label: 'Poor' },
-  ];
+  readonly noteTypes      = this.appMeta.noteTypes;
+  readonly chargeTypes    = this.appMeta.ipdChargeTypes;
+  readonly dischargeTypes = this.appMeta.dischargeTypes;
+  readonly conditions     = this.appMeta.patientConditions;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -198,12 +170,13 @@ export class AdmissionDetailComponent implements OnInit {
     this.chargeSaving.set(true);
     const v = this.chargeForm.getRawValue();
     const dto: AddChargeDto = {
-      chargeDate:  v.chargeDate || undefined,
-      chargeType:  v.chargeType as ChargeType,
-      description: v.description,
-      quantity:    v.quantity,
-      unitPrice:   v.unitPrice,
-      notes:       v.notes || undefined,
+      chargeDate:   v.chargeDate || undefined,
+      chargeType:   v.chargeType as ChargeType,
+      departmentId: v.departmentId || undefined,
+      description:  v.description,
+      quantity:     v.quantity,
+      unitPrice:    v.unitPrice,
+      notes:        v.notes || undefined,
     };
     this.ipdSvc.addCharge(this.admission()!.id, dto).subscribe({
       next: r => {
@@ -276,7 +249,7 @@ export class AdmissionDetailComponent implements OnInit {
 
   // ─── Helpers ─────────────────────────────────────────────────────────────
 
-  noteTypeLabel(t: string) { return this.noteTypes.find(n => n.value === t)?.label ?? t; }
+  noteTypeLabel(t: string) { return this.noteTypes().find(n => n.value === t)?.label ?? t; }
   noteTypeBadge(t: string) {
     const m: Record<string, string> = {
       doctor_round: 'badge--primary', nursing: 'badge--neutral',
@@ -284,7 +257,7 @@ export class AdmissionDetailComponent implements OnInit {
     };
     return m[t] ?? 'badge--neutral';
   }
-  chargeTypeLabel(t: string) { return this.chargeTypes.find(c => c.value === t)?.label ?? t; }
+  chargeTypeLabel(t: string) { return this.chargeTypes().find(c => c.value === t)?.label ?? t; }
   chargeTypeBadge(t: string) {
     const m: Record<string, string> = {
       room: 'badge--neutral', procedure: 'badge--warning', medicine: 'badge--primary',

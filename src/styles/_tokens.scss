@@ -93,6 +93,10 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --surface-topbar:   rgba(255, 255, 255, 0.85);
   --surface-input:    #{$surface-input};
   --surface-overlay:  rgba(0, 0, 0, 0.36);
+  --bg-card:          var(--surface-card);
+  --bg-page:          #F5F5F7;
+  --bg-hover:         rgba(0, 0, 0, 0.04);
+  --bg-input:         #ffffff;
 
   // Text
   --text-primary:   #{$text-primary};

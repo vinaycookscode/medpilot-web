@@ -1,0 +1,44 @@
+<div class="sa-page">
+  <div class="sa-header">
+    <div class="sa-header__title">
+      <div class="sa-header__icon">
+        <lucide-icon name="settings" [size]="20" />
+      </div>
+      <div>
+        <h1>Super Admin</h1>
+        <p>Centralized configuration — charge types, role permissions, and compliance monitoring</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Nav -->
+  <div class="sa-tabs">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="sa-tab"
+        [class.sa-tab--active]="activeTab() === tab.id"
+        (click)="setTab(tab.id)">
+        <div class="sa-tab__icon">
+          <lucide-icon [name]="tab.icon" [size]="16" />
+        </div>
+        <div class="sa-tab__text">
+          <span class="sa-tab__label">{{ tab.label }}</span>
+          <span class="sa-tab__desc">{{ tab.desc }}</span>
+        </div>
+      </button>
+    }
+  </div>
+
+  <!-- Tab Content -->
+  <div class="sa-content">
+    @if (activeTab() === 'master-data') {
+      <app-master-data />
+    } @else if (activeTab() === 'charge-master') {
+      <app-charge-master />
+    } @else if (activeTab() === 'permissions') {
+      <app-permissions />
+    } @else if (activeTab() === 'nabh') {
+      <app-nabh />
+    }
+  </div>
+</div>

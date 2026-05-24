@@ -25,10 +25,12 @@
           Queue
         </button>
       </div>
-      <button class="btn btn--primary" (click)="openCreate()">
-        <lucide-icon name="plus" [size]="16" />
-        Book Appointment
-      </button>
+      @if (canCreate()) {
+        <button class="btn btn--primary" (click)="openCreate()">
+          <lucide-icon name="plus" [size]="16" />
+          Book Appointment
+        </button>
+      }
     </div>
   </div>
 
@@ -204,9 +206,11 @@
               <lucide-icon name="calendar-days" [size]="11" />
               {{ drawerAppts().length }} appointment{{ drawerAppts().length !== 1 ? 's' : '' }}
             </span>
-            <button class="cal-panel__book-btn" (click)="openCreate(selectedCalDay() ?? undefined)">
-              <lucide-icon name="plus" [size]="12" /> Book
-            </button>
+            @if (canCreate()) {
+              <button class="cal-panel__book-btn" (click)="openCreate(selectedCalDay() ?? undefined)">
+                <lucide-icon name="plus" [size]="12" /> Book
+              </button>
+            }
           </div>
         </div>
 
@@ -282,9 +286,11 @@
           <button class="btn btn--ghost btn--sm" (click)="clearQueueDoctor()">
             <lucide-icon name="arrow-left" [size]="14" /> All Doctors
           </button>
-          <button class="btn btn--primary btn--sm" (click)="openCreate()">
-            <lucide-icon name="plus" [size]="13" /> Book with Dr. {{ doc.lastName }}
-          </button>
+          @if (canCreate()) {
+            <button class="btn btn--primary btn--sm" (click)="openCreate()">
+              <lucide-icon name="plus" [size]="13" /> Book with Dr. {{ doc.lastName }}
+            </button>
+          }
         </div>
 
         <div class="queue-detail__hero">
@@ -619,7 +625,7 @@
             <div class="field">
               <label class="field__label">Type</label>
               <select class="select" formControlName="appointmentType">
-                @for (t of appointmentTypes; track t.value) {
+                @for (t of appointmentTypes(); track t.value) {
                   <option [value]="t.value">{{ t.label }}</option>
                 }
               </select>

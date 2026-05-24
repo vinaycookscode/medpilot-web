@@ -1,0 +1,112 @@
+.cm-wrap { padding: 20px 24px; }
+
+.cm-subnav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: none;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+
+    &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    &.active { background: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary); }
+  }
+}
+
+.cm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  &__left { display: flex; align-items: center; gap: 10px; }
+}
+
+.cm-filter { width: 160px; }
+
+.cm-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: auto;
+}
+
+.dept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.dept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--color-primary-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+  }
+
+  h4 { font-size: 0.9375rem; font-weight: 600; margin: 0 0 4px; }
+  code { font-size: 0.75rem; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; }
+  p { font-size: 0.8125rem; color: var(--text-secondary); margin: 6px 0 0; }
+
+  &__actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.audit-list { display: flex; flex-direction: column; gap: 8px; }
+.audit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+
+  &__who { font-weight: 500; }
+  &__when { margin-left: auto; color: var(--text-tertiary); }
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }

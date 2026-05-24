@@ -1,0 +1,246 @@
+<div class="cm-wrap">
+
+  <!-- Sub-nav -->
+  <div class="cm-subnav">
+    <button class="cm-subnav__btn" [class.active]="view() === 'charges'" (click)="view.set('charges')">
+      <lucide-icon name="indian-rupee" [size]="14" /> Charge Master
+    </button>
+    <button class="cm-subnav__btn" [class.active]="view() === 'departments'" (click)="view.set('departments')">
+      <lucide-icon name="building-2" [size]="14" /> Departments
+    </button>
+  </div>
+
+  <!-- ── CHARGES VIEW ── -->
+  @if (view() === 'charges') {
+    <div class="cm-toolbar">
+      <div class="cm-toolbar__left">
+        <div class="search-box">
+          <lucide-icon name="search" [size]="15" />
+          <input type="text" placeholder="Search name or code…" [value]="searchQ()" (input)="searchQ.set($any($event.target).value)" />
+        </div>
+        <select class="form-control cm-filter" [value]="filterCategory()" (change)="filterCategory.set($any($event.target).value)">
+          <option value="">All categories</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat | titlecase }}</option>
+          }
+        </select>
+      </div>
+      <button class="btn btn--primary btn--sm" (click)="openAddCharge()">
+        <lucide-icon name="plus" [size]="14" /> Add Charge
+      </button>
+    </div>
+
+    <div class="cm-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Category</th>
+            <th>Department</th>
+            <th>Unit</th>
+            <th class="text-right">Base Price</th>
+            <th class="text-right">GST %</th>
+            <th>Effective From</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr><td colspan="10" class="text-center py-8">Loading…</td></tr>
+          } @else if (filteredCharges().length === 0) {
+            <tr><td colspan="10" class="empty-state">No charge entries found</td></tr>
+          } @else {
+            @for (c of filteredCharges(); track c.id) {
+              <tr>
+                <td class="fw-500">{{ c.name }}</td>
+                <td><code>{{ c.code }}</code></td>
+                <td><span class="badge" [ngClass]="categoryBadgeClass(c.category)">{{ c.category }}</span></td>
+                <td>{{ deptName(c.departmentId) }}</td>
+                <td>{{ c.unit || '—' }}</td>
+                <td class="text-right fw-600">₹{{ c.basePrice | number:'1.2-2' }}</td>
+                <td class="text-right">{{ c.gstRate }}%</td>
+                <td>{{ c.effectiveFrom | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="c.isActive ? 'badge--green' : 'badge--gray'">
+                    {{ c.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button class="icon-btn" title="Edit" (click)="openEditCharge(c)"><lucide-icon name="pencil" [size]="14" /></button>
+                    <button class="icon-btn" title="Audit log" (click)="openAudit(c)"><lucide-icon name="clock" [size]="14" /></button>
+                    <button class="icon-btn icon-btn--danger" title="Delete" (click)="deleteCharge(c.id)"><lucide-icon name="trash-2" [size]="14" /></button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- ── DEPARTMENTS VIEW ── -->
+  @if (view() === 'departments') {
+    <div class="cm-toolbar">
+      <div class="cm-toolbar__left">
+        <span class="text-secondary text-sm">{{ departments().length }} departments configured</span>
+      </div>
+      <button class="btn btn--primary btn--sm" (click)="openAddDept()">
+        <lucide-icon name="plus" [size]="14" /> Add Department
+      </button>
+    </div>
+    <div class="dept-grid">
+      @for (d of departments(); track d.id) {
+        <div class="dept-card">
+          <div class="dept-card__top">
+            <div class="dept-card__icon"><lucide-icon name="building-2" [size]="18" /></div>
+            <span class="badge" [ngClass]="d.isActive ? 'badge--green' : 'badge--gray'">{{ d.isActive ? 'Active' : 'Inactive' }}</span>
+          </div>
+          <h4>{{ d.name }}</h4>
+          @if (d.code) { <code>{{ d.code }}</code> }
+          @if (d.description) { <p>{{ d.description }}</p> }
+          <div class="dept-card__actions">
+            <button class="btn btn--ghost btn--sm" (click)="openEditDept(d)"><lucide-icon name="pencil" [size]="13" /> Edit</button>
+            <button class="btn btn--ghost btn--sm text-danger" (click)="deleteDept(d.id)"><lucide-icon name="trash-2" [size]="13" /></button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Charge Modal -->
+@if (showChargeModal()) {
+  <div class="modal-backdrop" (click)="showChargeModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ editingCharge() ? 'Edit Charge' : 'Add Charge' }}</h3>
+        <button class="icon-btn" (click)="showChargeModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
+      </div>
+      <div class="modal__body">
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label required">Name</label>
+            <input class="form-control" [(ngModel)]="chargeForm.name" placeholder="e.g. General Ward Bed" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Code</label>
+            <input class="form-control" [(ngModel)]="chargeForm.code" placeholder="e.g. ROOM-GW-01" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Category</label>
+            <select class="form-control" [(ngModel)]="chargeForm.category">
+              @for (cat of categories; track cat) { <option [value]="cat">{{ cat | titlecase }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-control" [(ngModel)]="chargeForm.departmentId">
+              <option [ngValue]="undefined">None</option>
+              @for (d of departments(); track d.id) { <option [value]="d.id">{{ d.name }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Base Price (₹)</label>
+            <input class="form-control" type="number" min="0" [(ngModel)]="chargeForm.basePrice" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">GST Rate (%)</label>
+            <input class="form-control" type="number" min="0" max="100" [(ngModel)]="chargeForm.gstRate" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unit</label>
+            <input class="form-control" [(ngModel)]="chargeForm.unit" placeholder="e.g. per day, per test" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Effective From</label>
+            <input class="form-control" type="date" [(ngModel)]="chargeForm.effectiveFrom" />
+          </div>
+        </div>
+        <div class="form-group mt-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="chargeForm.description"></textarea>
+        </div>
+        <div class="form-group mt-2">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="chargeForm.isActive" />
+            <span>Active</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showChargeModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" (click)="saveCharge()">{{ editingCharge() ? 'Update' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Department Modal -->
+@if (showDeptModal()) {
+  <div class="modal-backdrop" (click)="showDeptModal.set(false)">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ editingDept() ? 'Edit Department' : 'Add Department' }}</h3>
+        <button class="icon-btn" (click)="showDeptModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
+      </div>
+      <div class="modal__body">
+        <div class="form-group">
+          <label class="form-label required">Name</label>
+          <input class="form-control" [(ngModel)]="deptForm.name" placeholder="e.g. Cardiology" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Code</label>
+          <input class="form-control" [(ngModel)]="deptForm.code" placeholder="e.g. CARD" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="deptForm.description"></textarea>
+        </div>
+        <div class="form-group mt-2">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="deptForm.isActive" />
+            <span>Active</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showDeptModal.set(false)">Cancel</button>
+        <button class="btn btn--primary" (click)="saveDept()">{{ editingDept() ? 'Update' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Audit Log Modal -->
+@if (showAuditModal()) {
+  <div class="modal-backdrop" (click)="showAuditModal.set(false)">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Audit Log</h3>
+        <button class="icon-btn" (click)="showAuditModal.set(false)"><lucide-icon name="x" [size]="16" /></button>
+      </div>
+      <div class="modal__body">
+        @if (auditLogs().length === 0) {
+          <p class="text-secondary text-center py-4">No audit records found</p>
+        } @else {
+          <div class="audit-list">
+            @for (log of auditLogs(); track log.id) {
+              <div class="audit-item">
+                <span class="badge" [ngClass]="log.action === 'create' ? 'badge--green' : log.action === 'delete' ? 'badge--red' : 'badge--blue'">{{ log.action }}</span>
+                <span class="audit-item__who">{{ log.changedByName }}</span>
+                <span class="audit-item__when">{{ log.changedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" (click)="showAuditModal.set(false)">Close</button>
+      </div>
+    </div>
+  </div>
+}

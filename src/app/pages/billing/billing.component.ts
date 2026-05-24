@@ -10,6 +10,7 @@ import { Invoice, Service } from '../../core/models/billing.models';
 import { Patient } from '../../core/models/patient.models';
 import { Prescription } from '../../core/models/prescription.models';
 import { ToastService } from '../../core/services/toast.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { printInvoice } from '../../shared/print-invoice';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
@@ -26,7 +27,10 @@ export class BillingComponent implements OnInit {
   private rxSvc       = inject(PrescriptionsService);
   private clinicSvc   = inject(ClinicService);
   private toast       = inject(ToastService);
+  private appMeta     = inject(AppMetaService);
   private fb          = inject(FormBuilder);
+
+  readonly canCreate  = computed(() => this.appMeta.canDo('billing', 'canCreate'));
 
   readonly invoices       = signal<Invoice[]>([]);
   readonly total          = signal(0);

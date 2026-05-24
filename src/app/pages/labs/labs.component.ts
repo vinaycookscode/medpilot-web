@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
@@ -6,6 +6,7 @@ import { LabsService, LabOrder, LabTest } from '../../core/services/labs.service
 import { PatientsService } from '../../core/services/patients.service';
 import { Patient } from '../../core/models/patient.models';
 import { ToastService } from '../../core/services/toast.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 
 type LabTab = 'orders' | 'catalog';
 
@@ -19,8 +20,11 @@ type LabTab = 'orders' | 'catalog';
 export class LabsComponent implements OnInit {
   private labsService = inject(LabsService);
   private patientsService = inject(PatientsService);
-  private toast = inject(ToastService);
-  private fb = inject(FormBuilder);
+  private toast    = inject(ToastService);
+  private appMeta  = inject(AppMetaService);
+  private fb       = inject(FormBuilder);
+
+  readonly canCreate = computed(() => this.appMeta.canDo('labs', 'canCreate'));
 
   readonly orders = signal<LabOrder[]>([]);
   readonly catalog = signal<LabTest[]>([]);

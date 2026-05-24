@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
@@ -8,6 +8,7 @@ import { Prescription, Medicine, CreatePrescriptionDto, PrescriptionMedicineDto,
 import { Patient } from '../../core/models/patient.models';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
@@ -22,7 +23,10 @@ export class PrescriptionsComponent implements OnInit {
   private patientsSvc = inject(PatientsService);
   private toast       = inject(ToastService);
   readonly auth       = inject(AuthService);
+  private appMeta     = inject(AppMetaService);
   private fb          = inject(FormBuilder);
+
+  readonly canCreate  = computed(() => this.appMeta.canDo('prescriptions', 'canCreate'));
 
   readonly prescriptions = signal<Prescription[]>([]);
   readonly total         = signal(0);

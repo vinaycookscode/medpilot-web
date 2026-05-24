@@ -1,0 +1,75 @@
+<div class="perm-wrap">
+
+  <div class="perm-header">
+    <div class="perm-roles">
+      @for (role of roles(); track role) {
+        <button
+          class="perm-role-btn"
+          [class.active]="selectedRole() === role"
+          (click)="selectedRole.set(role)">
+          {{ roleLabels[role] || role }}
+        </button>
+      }
+    </div>
+    @if (dirty()) {
+      <div class="perm-actions">
+        <button class="btn btn--ghost btn--sm" (click)="reset()">Reset</button>
+        <button class="btn btn--primary btn--sm" [disabled]="saving()" (click)="save()">
+          @if (saving()) { <lucide-icon name="loader-2" [size]="14" class="spin" /> } Save Changes
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="perm-loading">Loading permission matrix…</div>
+  } @else {
+    <div class="perm-matrix-wrap">
+      <table class="perm-matrix">
+        <thead>
+          <tr>
+            <th class="module-col">Module</th>
+            @for (p of PERMS; track p) {
+              <th class="perm-col">{{ PERM_LABELS[p] }}</th>
+            }
+            <th class="all-col">All</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mod of modules(); track mod) {
+            <tr>
+              <td class="module-col">
+                <span class="module-label">{{ moduleLabels[mod] || mod }}</span>
+              </td>
+              @for (p of PERMS; track p) {
+                <td class="perm-col">
+                  <label class="perm-toggle">
+                    <input
+                      type="checkbox"
+                      [checked]="getPerm(selectedRole(), mod, p)"
+                      (change)="setPerm(selectedRole(), mod, p, $any($event.target).checked)" />
+                    <span class="perm-toggle__track"></span>
+                  </label>
+                </td>
+              }
+              <td class="all-col">
+                <label class="perm-toggle perm-toggle--all">
+                  <input
+                    type="checkbox"
+                    [checked]="isAllEnabled(selectedRole(), mod)"
+                    (change)="toggleAll(selectedRole(), mod, $any($event.target).checked)" />
+                  <span class="perm-toggle__track"></span>
+                </label>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="perm-hint">
+      <lucide-icon name="info" [size]="13" />
+      Changes apply to the <strong>{{ roleLabels[selectedRole()] }}</strong> role. Click Save to persist.
+    </p>
+  }
+</div>

@@ -2,12 +2,15 @@ import { Component, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 
 interface NavItem {
   label: string;
   route: string;
   icon: any;
   roles?: string[];
+  /** Permission module key — item hidden when user lacks canView for this module. */
+  module?: string;
 }
 
 interface NavSection {
@@ -71,6 +74,7 @@ interface NavSection {
 })
 export class SidebarComponent {
   readonly auth = inject(AuthService);
+  private readonly appMeta = inject(AppMetaService);
   readonly user = this.auth.user;
 
   readonly userInitials = computed(() => {
@@ -83,58 +87,69 @@ export class SidebarComponent {
     {
       title: 'Overview',
       items: [
-        { label: 'Dashboard', route: '/dashboard', icon: 'layout-dashboard' },
+        { label: 'Dashboard', route: '/dashboard', icon: 'layout-dashboard', module: 'dashboard' },
       ],
     },
     {
       title: 'Patient Care',
       items: [
-        { label: 'Patients',      route: '/patients',      icon: 'users' },
-        { label: 'Appointments',  route: '/appointments',  icon: 'calendar' },
-        { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'] },
-        { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'] },
-        { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'] },
+        { label: 'Patients',      route: '/patients',      icon: 'users',          module: 'patients' },
+        { label: 'Appointments',  route: '/appointments',  icon: 'calendar',       module: 'appointments' },
+        { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'], module: 'opd' },
+        { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'], module: 'ipd' },
+        { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'], module: 'appointments' },
       ],
     },
     {
       title: 'Clinical',
       items: [
-        { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'] },
-        { label: 'Labs',          route: '/labs',           icon: 'flask-conical', roles: ['admin', 'doctor'] },
+        { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'], module: 'prescriptions' },
+        { label: 'Labs',          route: '/labs',           icon: 'flask-conical', roles: ['admin', 'doctor'], module: 'labs' },
       ],
     },
     {
       title: 'Finance',
       items: [
-        { label: 'Billing',   route: '/billing',   icon: 'receipt',      roles: ['admin'] },
-        { label: 'Insurance', route: '/insurance', icon: 'shield-check', roles: ['admin', 'receptionist'] },
+        { label: 'Billing',   route: '/billing',   icon: 'receipt',      roles: ['admin'], module: 'billing' },
+        { label: 'Insurance', route: '/insurance', icon: 'shield-check', roles: ['admin', 'receptionist'], module: 'insurance' },
       ],
     },
     {
       title: 'Operations',
       items: [
-        { label: 'Inventory', route: '/inventory', icon: 'package',    roles: ['admin'] },
-        { label: 'Schedules', route: '/schedules', icon: 'clock',      roles: ['admin'] },
-        { label: 'Staff',     route: '/staff',     icon: 'user-check', roles: ['admin'] },
-        { label: 'Branches',  route: '/branches',  icon: 'building-2', roles: ['admin'] },
-        { label: 'Reports',   route: '/reports',   icon: 'chart-bar',  roles: ['admin'] },
+        { label: 'Inventory', route: '/inventory', icon: 'package',    roles: ['admin'], module: 'inventory' },
+        { label: 'Schedules', route: '/schedules', icon: 'clock',      roles: ['admin'], module: 'schedules' },
+        { label: 'Staff',     route: '/staff',     icon: 'user-check', roles: ['admin'], module: 'staff' },
+        { label: 'Branches',  route: '/branches',  icon: 'building-2', roles: ['admin'], module: 'settings' },
+        { label: 'Reports',   route: '/reports',   icon: 'chart-bar',  roles: ['admin'], module: 'reports' },
       ],
     },
     {
       title: 'System',
       items: [
-        { label: 'Notifications', route: '/notifications', icon: 'bell',     roles: ['admin', 'doctor'] },
-        { label: 'Settings',      route: '/settings',      icon: 'settings', roles: ['admin', 'doctor'] },
+        { label: 'Notifications', route: '/notifications', icon: 'bell',     roles: ['admin', 'doctor'], module: 'notifications' },
+        { label: 'Settings',      route: '/settings',      icon: 'settings', roles: ['admin', 'doctor'], module: 'settings' },
+        { label: 'Super Admin',   route: '/super-admin',   icon: 'shield-check', roles: ['super_admin'] },
       ],
     },
   ];
 
   readonly visibleSections = computed(() => {
     const role = this.auth.role();
+    // Read the permissions signal so this computed reactively re-runs when
+    // /app-meta is refreshed (e.g. after Super Admin updates the matrix).
+    const perms = this.appMeta.permissions();
+    const isSuper = role === 'super_admin';
     return this.sections
       .map(s => ({
         ...s,
-        items: s.items.filter(i => !i.roles || (role && i.roles.includes(role))),
+        items: s.items.filter(i => {
+          // Role gate
+          if (i.roles && !(role && i.roles.includes(role))) return false;
+          // Permission gate — skip for super_admin (bypass) and items without a module key
+          if (!i.module || isSuper) return true;
+          return perms[i.module]?.canView === true;
+        }),
       }))
       .filter(s => s.items.length > 0);
   });

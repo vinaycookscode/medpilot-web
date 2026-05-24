@@ -1,0 +1,199 @@
+<div class="md-layout">
+
+  <!-- Left: Type Sidebar -->
+  <aside class="md-sidebar">
+    <div class="md-sidebar__head">
+      <lucide-icon name="database" [size]="14" />
+      Master Data Types
+    </div>
+
+    @for (type of typeKeys; track type) {
+      <button
+        class="md-type-btn"
+        [class.md-type-btn--active]="activeType() === type"
+        (click)="selectType(type)">
+        <span class="md-type-btn__label">{{ typeLabels[type] }}</span>
+        <span class="md-type-btn__count">{{ typeItemCount(type) }}</span>
+      </button>
+    }
+  </aside>
+
+  <!-- Right: Items Table -->
+  <div class="md-content">
+    <div class="md-content__header">
+      <div class="md-content__title">
+        <lucide-icon name="tag" [size]="16" />
+        <span>{{ typeLabels[activeType()] }}</span>
+        <span class="md-count-badge">{{ filteredItems().length }}</span>
+      </div>
+      <button class="btn-primary" (click)="openAdd()">
+        <lucide-icon name="plus" [size]="14" />
+        Add Item
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="md-loading">
+        <lucide-icon name="loader-2" [size]="20" class="spin" />
+        Loading…
+      </div>
+    } @else if (filteredItems().length === 0) {
+      <div class="md-empty">
+        <lucide-icon name="tag" [size]="32" class="md-empty__icon" />
+        <p>No items for this type yet.</p>
+        <button class="btn-primary" (click)="openAdd()">
+          <lucide-icon name="plus" [size]="14" />
+          Add First Item
+        </button>
+      </div>
+    } @else {
+      <div class="md-table-wrap">
+        <table class="md-table">
+          <thead>
+            <tr>
+              <th class="col-order">Order</th>
+              <th>Value</th>
+              <th>Label</th>
+              <th>Color</th>
+              <th>Status</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of filteredItems(); track item.id; let first = $first; let last = $last) {
+              <tr [class.md-row--inactive]="!item.isActive">
+                <td class="col-order">
+                  <div class="md-order-btns">
+                    <button class="md-order-btn" [disabled]="first" (click)="moveUp(item)" title="Move up">
+                      <lucide-icon name="chevron-up" [size]="12" />
+                    </button>
+                    <span class="md-order-num">{{ item.displayOrder }}</span>
+                    <button class="md-order-btn" [disabled]="last" (click)="moveDown(item)" title="Move down">
+                      <lucide-icon name="chevron-right" [size]="12" style="transform:rotate(90deg)" />
+                    </button>
+                  </div>
+                </td>
+                <td><code class="md-value-code">{{ item.value }}</code></td>
+                <td class="fw-500">{{ item.label }}</td>
+                <td>
+                  @if (item.color) {
+                    <span class="md-color-chip" [attr.data-color]="item.color">
+                      <span class="md-color-dot"></span>
+                      {{ item.color }}
+                    </span>
+                  } @else {
+                    <span class="md-dash">—</span>
+                  }
+                </td>
+                <td>
+                  <span class="badge" [class.badge--green]="item.isActive" [class.badge--gray]="!item.isActive">
+                    {{ item.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="col-actions">
+                  <div class="md-actions">
+                    <button class="icon-btn" (click)="openEdit(item)" title="Edit">
+                      <lucide-icon name="pencil" [size]="14" />
+                    </button>
+                    <button class="icon-btn icon-btn--danger" (click)="confirmDelete(item)" title="Delete">
+                      <lucide-icon name="trash-2" [size]="14" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal__title">{{ editItem() ? 'Edit Item' : 'Add Item' }}</h3>
+        <button class="icon-btn" (click)="closeModal()">
+          <lucide-icon name="x" [size]="16" />
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form" (ngSubmit)="save()" class="md-form">
+          <div class="md-form__type-badge">
+            <lucide-icon name="tag" [size]="12" />
+            {{ typeLabels[activeType()] }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Value <span class="required">*</span></label>
+            <input class="form-control" formControlName="value" placeholder="e.g. new_patient" />
+            <small class="form-hint">Used internally — no spaces, use underscores</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Label <span class="required">*</span></label>
+            <input class="form-control" formControlName="label" placeholder="e.g. New Patient" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <select class="form-control" formControlName="color">
+              <option value="">— None —</option>
+              @for (c of colorOptions; track c.value) {
+                <option [value]="c.value">{{ c.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="md-form__row">
+            <div class="form-group">
+              <label class="form-label">Display Order</label>
+              <input class="form-control" type="number" formControlName="displayOrder" min="0" />
+            </div>
+            <div class="form-group md-form__toggle">
+              <label class="form-label">Active</label>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="isActive" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-ghost" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="form.invalid">
+              <lucide-icon name="save" [size]="14" />
+              {{ editItem() ? 'Update' : 'Add Item' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirm Modal -->
+@if (deleteTarget()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-box modal-box--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal__title">Delete Item</h3>
+        <button class="icon-btn" (click)="closeModal()">
+          <lucide-icon name="x" [size]="16" />
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Delete <strong>{{ deleteTarget()!.label }}</strong>? This cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn-danger" (click)="doDelete()">
+          <lucide-icon name="trash-2" [size]="14" />
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

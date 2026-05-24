@@ -31,7 +31,11 @@ export class LoginComponent {
     this.loading.set(true);
 
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => {
+        this.loading.set(false);
+        const role = this.auth.role();
+        this.router.navigate([role === 'super_admin' ? '/super-admin' : '/dashboard']);
+      },
       error: (err) => {
         this.loading.set(false);
         this.errorMessage.set(err?.error?.message ?? 'Invalid email or password');

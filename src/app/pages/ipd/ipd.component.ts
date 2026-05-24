@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,6 +8,7 @@ import { PatientsService } from '../../core/services/patients.service';
 import { StaffService } from '../../core/services/staff.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import {
   IpdAdmission, IpdStats, Ward, Bed, WardOccupancy,
   AdmissionStatus, CreateAdmissionDto,
@@ -30,7 +31,11 @@ export class IpdComponent implements OnInit {
   private staffSvc   = inject(StaffService);
   private toast      = inject(ToastService);
   readonly auth      = inject(AuthService);
+  private appMeta    = inject(AppMetaService);
   private fb         = inject(FormBuilder);
+
+  readonly canCreate = computed(() => this.appMeta.canDo('ipd', 'canCreate'));
+  readonly canEdit   = computed(() => this.appMeta.canDo('ipd', 'canEdit'));
 
   readonly tab          = signal<TabMode>('admissions');
   readonly loading      = signal(true);
