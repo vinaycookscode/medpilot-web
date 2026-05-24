@@ -19,6 +19,7 @@ const TYPE_LABELS: Record<string, string> = {
   dosage_frequency:  'Dosage Frequency',
   medicine_route:    'Medicine Route',
   bed_category:      'Bed Category',
+  leave_type:        'Leave Type',
 };
 
 const COLOR_OPTIONS = [

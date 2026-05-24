@@ -237,7 +237,12 @@
               <div class="form-grid">
                 <div class="field">
                   <label class="field__label">Specialization</label>
-                  <input class="input" formControlName="specialization" placeholder="e.g. Cardiologist" />
+                  <select class="select" formControlName="specialization">
+                    <option value="">— Select specialization —</option>
+                    @for (s of specializations(); track s.value) {
+                      <option [value]="s.value">{{ s.label }}</option>
+                    }
+                  </select>
                 </div>
                 <div class="field">
                   <label class="field__label">Qualification</label>
@@ -285,12 +290,9 @@
             <label class="field__label">Leave Type <span style="color: var(--color-danger);">*</span></label>
             <select class="select" formControlName="leaveType">
               <option value="">Select type</option>
-              <option value="sick">Sick Leave</option>
-              <option value="casual">Casual Leave</option>
-              <option value="annual">Annual Leave</option>
-              <option value="emergency">Emergency Leave</option>
-              <option value="maternity">Maternity Leave</option>
-              <option value="paternity">Paternity Leave</option>
+              @for (lt of leaveTypes(); track lt.value) {
+                <option [value]="lt.value">{{ lt.label }}</option>
+              }
             </select>
           </div>
 

@@ -29,6 +29,9 @@ export class PatientsComponent implements OnInit {
   readonly canCreate  = computed(() => this.appMeta.canDo('patients', 'canCreate'));
   readonly canEdit    = computed(() => this.appMeta.canDo('patients', 'canEdit'));
 
+  readonly genders     = this.appMeta.genders;
+  readonly bloodGroups = this.appMeta.bloodGroups;
+
   readonly patients    = signal<Patient[]>([]);
   readonly total       = signal(0);
   readonly loading     = signal(true);

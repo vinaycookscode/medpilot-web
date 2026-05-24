@@ -50,6 +50,7 @@ export class AppMetaService implements OnDestroy {
   readonly dosageFrequencies= computed(() => this._meta()?.meta['dosage_frequency'] ?? []);
   readonly medicineRoutes   = computed(() => this._meta()?.meta['medicine_route']   ?? []);
   readonly bedCategories    = computed(() => this._meta()?.meta['bed_category']     ?? []);
+  readonly leaveTypes       = computed(() => this._meta()?.meta['leave_type']       ?? []);
 
   readonly clinic      = computed(() => this._meta()?.clinic ?? null);
   readonly departments = computed(() => this._meta()?.departments ?? []);

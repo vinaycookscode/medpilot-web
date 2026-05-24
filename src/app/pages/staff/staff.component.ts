@@ -6,6 +6,7 @@ import { IconsModule } from '../../shared/icons';
 import { StaffService, Staff, StaffLeave } from '../../core/services/staff.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 
 @Component({
   selector: 'app-staff',
@@ -19,6 +20,10 @@ export class StaffComponent implements OnInit {
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
+  private appMeta = inject(AppMetaService);
+
+  readonly specializations = this.appMeta.specializations;
+  readonly leaveTypes      = this.appMeta.leaveTypes;
 
   readonly staff = signal<Staff[]>([]);
   readonly leaves = signal<StaffLeave[]>([]);

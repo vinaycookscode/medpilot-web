@@ -412,9 +412,9 @@
             <div class="field">
               <label class="field__label">Gender *</label>
               <select class="select" formControlName="gender">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                @for (g of genders(); track g.value) {
+                  <option [value]="g.value">{{ g.label }}</option>
+                }
               </select>
             </div>
             <div class="field">
@@ -425,7 +425,9 @@
               <label class="field__label">Blood Group</label>
               <select class="select" formControlName="bloodGroup">
                 <option value="">Select</option>
-                <option *ngFor="let bg of ['A+','A-','B+','B-','AB+','AB-','O+','O-']" [value]="bg">{{ bg }}</option>
+                @for (bg of bloodGroups(); track bg.value) {
+                  <option [value]="bg.value">{{ bg.label }}</option>
+                }
               </select>
             </div>
             <div class="field">

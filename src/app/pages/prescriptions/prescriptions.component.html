@@ -355,7 +355,12 @@
                     }
                   </div>
                   <input class="input" formControlName="dosage" placeholder="Dosage (e.g. 1 tab)" />
-                  <input class="input" formControlName="frequency" placeholder="Frequency (e.g. Twice daily)" />
+                  <select class="select" formControlName="frequency">
+                    <option value="">— Frequency —</option>
+                    @for (f of dosageFrequencies(); track f.value) {
+                      <option [value]="f.value">{{ f.label }}</option>
+                    }
+                  </select>
                   <input class="input" formControlName="duration" placeholder="Duration (e.g. 5 days)" />
                   <input class="input" formControlName="timing" placeholder="Timing (optional)" />
                 </div>

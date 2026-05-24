@@ -28,6 +28,10 @@ export class PrescriptionsComponent implements OnInit {
 
   readonly canCreate  = computed(() => this.appMeta.canDo('prescriptions', 'canCreate'));
 
+  readonly dosageFrequencies = this.appMeta.dosageFrequencies;
+  readonly medicineUnits     = this.appMeta.medicineUnits;
+  readonly medicineRoutes    = this.appMeta.medicineRoutes;
+
   readonly prescriptions = signal<Prescription[]>([]);
   readonly total         = signal(0);
   readonly loading       = signal(true);

@@ -289,7 +289,7 @@
           <div class="form-group">
             <label class="form-label">Admission Type</label>
             <select class="form-control" formControlName="admissionType">
-              @for (t of admissionTypes; track t.value) {
+              @for (t of admissionTypes(); track t.value) {
                 <option [value]="t.value">{{ t.label }}</option>
               }
             </select>

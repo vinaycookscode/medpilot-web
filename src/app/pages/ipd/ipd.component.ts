@@ -72,12 +72,7 @@ export class IpdComponent implements OnInit {
     notes:             [''],
   });
 
-  readonly admissionTypes = [
-    { value: 'elective',  label: 'Elective' },
-    { value: 'emergency', label: 'Emergency' },
-    { value: 'referral',  label: 'Referral' },
-    { value: 'transfer',  label: 'Transfer' },
-  ];
+  readonly admissionTypes = this.appMeta.admissionTypes;
 
   readonly filterOptions: { value: string; label: string }[] = [
     { value: '',            label: 'All' },
