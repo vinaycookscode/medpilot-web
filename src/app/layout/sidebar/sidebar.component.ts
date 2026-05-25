@@ -117,11 +117,12 @@ export class SidebarComponent {
     {
       title: 'Operations',
       items: [
-        { label: 'Inventory', route: '/inventory', icon: 'package',    roles: ['admin'], module: 'inventory' },
-        { label: 'Schedules', route: '/schedules', icon: 'clock',      roles: ['admin'], module: 'schedules' },
-        { label: 'Staff',     route: '/staff',     icon: 'user-check', roles: ['admin'], module: 'staff' },
-        { label: 'Branches',  route: '/branches',  icon: 'building-2', roles: ['admin'], module: 'settings' },
-        { label: 'Reports',   route: '/reports',   icon: 'chart-bar',  roles: ['admin'], module: 'reports' },
+        { label: 'Inventory',       route: '/inventory',       icon: 'package',      roles: ['admin'], module: 'inventory' },
+        { label: 'Schedules',       route: '/schedules',       icon: 'clock',        roles: ['admin'], module: 'schedules' },
+        { label: 'Staff',           route: '/staff',           icon: 'user-check',   roles: ['admin'], module: 'staff' },
+        { label: 'Security Entry',  route: '/security/entry',  icon: 'shield-check', roles: ['admin', 'super_admin', 'security', 'receptionist'], module: 'attendance' },
+        { label: 'Branches',        route: '/branches',        icon: 'building-2',   roles: ['admin'], module: 'settings' },
+        { label: 'Reports',         route: '/reports',         icon: 'chart-bar',    roles: ['admin'], module: 'reports' },
       ],
     },
     {

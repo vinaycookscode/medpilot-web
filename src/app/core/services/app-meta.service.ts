@@ -152,6 +152,36 @@ export class AppMetaService implements OnDestroy {
     return this._meta()?.permissions?.[module]?.[action] ?? false;
   }
 
+  /**
+   * Returns the route the current user should land on after login. Walks a
+   * priority-ordered list of (module, route) pairs and picks the first one
+   * the user has canView on. Falls back to /no-access if they have nothing.
+   */
+  firstAccessibleRoute(): string {
+    const candidates: Array<[string, string]> = [
+      ['dashboard',     '/dashboard'],
+      ['attendance',    '/security/entry'],
+      ['patients',      '/patients'],
+      ['appointments',  '/appointments'],
+      ['opd',           '/opd'],
+      ['ipd',           '/ipd'],
+      ['prescriptions', '/prescriptions'],
+      ['labs',          '/labs'],
+      ['billing',       '/billing'],
+      ['insurance',     '/insurance'],
+      ['inventory',     '/inventory'],
+      ['staff',         '/staff'],
+      ['schedules',     '/schedules'],
+      ['reports',       '/reports'],
+      ['notifications', '/notifications'],
+      ['settings',      '/settings'],
+    ];
+    for (const [mod, path] of candidates) {
+      if (this.canDo(mod, 'canView')) return path;
+    }
+    return '/no-access';
+  }
+
   private loadFromStorage(): AppMeta | null {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);

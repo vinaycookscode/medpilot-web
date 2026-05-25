@@ -136,6 +136,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/super-admin/super-admin.component').then(m => m.SuperAdminComponent),
       },
       {
+        path: 'security/entry',
+        canActivate: [permissionGuard],
+        data: { module: 'attendance' },
+        loadComponent: () => import('./pages/security-entry/security-entry.component').then(m => m.SecurityEntryComponent),
+      },
+      {
         path: 'no-access',
         canActivate: [noAccessGuard],
         loadComponent: () => import('./pages/no-access/no-access.component').then(m => m.NoAccessComponent),

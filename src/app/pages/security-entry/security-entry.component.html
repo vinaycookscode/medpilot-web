@@ -1,0 +1,262 @@
+<div class="page sec">
+
+  <!-- ── Header ─────────────────────────────────────── -->
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">Security Entry</h2>
+      <p class="page__subtitle">Gate-level staff entry, bag-check, and NABH compliance</p>
+    </div>
+  </div>
+
+  <!-- ── Stats row ─────────────────────────────────── -->
+  <div class="sec-stats">
+    <div class="sec-stat sec-stat--blue">
+      <div class="sec-stat__icon"><lucide-icon name="log-in" [size]="18" /></div>
+      <div class="sec-stat__body">
+        <div class="sec-stat__value">{{ stats().today }}</div>
+        <div class="sec-stat__label">Entries today</div>
+      </div>
+    </div>
+
+    <div class="sec-stat sec-stat--cyan">
+      <div class="sec-stat__icon"><lucide-icon name="users" [size]="18" /></div>
+      <div class="sec-stat__body">
+        <div class="sec-stat__value">{{ stats().inside }}</div>
+        <div class="sec-stat__label">Currently inside</div>
+      </div>
+    </div>
+
+    <div class="sec-stat"
+         [class.sec-stat--green]="stats().pct === 100"
+         [class.sec-stat--orange]="stats().pct >= 80 && stats().pct < 100"
+         [class.sec-stat--red]="stats().pct < 80 && stats().today > 0"
+         [class.sec-stat--neutral]="stats().today === 0">
+      <div class="sec-stat__icon"><lucide-icon name="shield-check" [size]="18" /></div>
+      <div class="sec-stat__body">
+        <div class="sec-stat__value">{{ stats().pct }}<span class="sec-stat__suffix">%</span></div>
+        <div class="sec-stat__label">Bag-check compliance</div>
+      </div>
+    </div>
+
+    <div class="sec-stat" [class.sec-stat--red]="stats().missed > 0" [class.sec-stat--neutral]="stats().missed === 0">
+      <div class="sec-stat__icon"><lucide-icon name="alert-triangle" [size]="18" /></div>
+      <div class="sec-stat__body">
+        <div class="sec-stat__value">{{ stats().missed }}</div>
+        <div class="sec-stat__label">Bag-checks missed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Entry capture (collapsed when no selection, expands on pick) ── -->
+  <section class="sec-card sec-card--entry">
+    @if (!selected()) {
+      <div class="sec-entry-compact">
+        <div class="sec-entry-compact__icon"><lucide-icon name="log-in" [size]="18" /></div>
+        <div class="sec-entry-compact__search">
+          <div class="input-group">
+            <span class="input-icon"><lucide-icon name="search" [size]="15" /></span>
+            <input
+              class="input"
+              type="search"
+              placeholder="Search staff to record entry…"
+              [value]="query()"
+              (input)="onSearch($any($event.target).value)" />
+          </div>
+          @if (results().length > 0) {
+            <ul class="sec__results">
+              @for (s of results(); track s.id) {
+                <li class="sec__result" (click)="pick(s)">
+                  <div class="avatar avatar--sm" [style.background]="'hsl(' + roleHue(s.role) + ' 60% 88%)'" [style.color]="'hsl(' + roleHue(s.role) + ' 60% 35%)'">{{ initials(s) }}</div>
+                  <div class="sec__result-info">
+                    <div class="sec__result-name">{{ s.firstName }} {{ s.lastName }}</div>
+                    <div class="sec__result-meta">
+                      {{ roleLabel(s.role) }}@if (s.specialization) { · {{ s.specialization }} }
+                    </div>
+                  </div>
+                  <lucide-icon class="sec__result-arrow" name="arrow-right" [size]="14" />
+                </li>
+              }
+            </ul>
+          }
+          @if (searching()) { <div class="sec__hint">Searching…</div> }
+          @if (!searching() && query().length >= 2 && results().length === 0) {
+            <div class="sec__hint sec__hint--empty"><lucide-icon name="user-x" [size]="13" /> No matches</div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="sec-entry-expanded">
+        <div class="sec__picked">
+          <div class="avatar avatar--lg" [style.background]="'hsl(' + roleHue(selected()!.role) + ' 60% 88%)'" [style.color]="'hsl(' + roleHue(selected()!.role) + ' 60% 35%)'">
+            {{ initials(selected()) }}
+          </div>
+          <div class="sec__picked-info">
+            <div class="sec__picked-name">{{ selected()!.firstName }} {{ selected()!.lastName }}</div>
+            <div class="sec__picked-meta">
+              <span class="badge badge--neutral">{{ roleLabel(selected()!.role) }}</span>
+              @if (selected()!.specialization) { <span class="text-muted text-sm">{{ selected()!.specialization }}</span> }
+            </div>
+          </div>
+          <button class="btn btn--ghost btn--icon" (click)="clearSelection()" title="Change">
+            <lucide-icon name="x" [size]="16" />
+          </button>
+        </div>
+
+        <label class="sec__bag" [class.sec__bag--warn]="bagWarning()">
+          <input type="checkbox" [checked]="bagChecked()" (change)="bagChecked.set($any($event.target).checked)" />
+          <span class="sec__bag-track"></span>
+          <div class="sec__bag-text">
+            <span class="sec__bag-label">Bag checked at entry</span>
+            <span class="sec__bag-sub">
+              @if (bagWarning()) {
+                <lucide-icon name="alert-triangle" [size]="13" /> NABH requires bag-check for this role
+              } @else {
+                NABH compliance — required for nursing, RMO, consultant
+              }
+            </span>
+          </div>
+        </label>
+
+        <div class="sec__notes-row">
+          <input
+            class="input"
+            [value]="notes()"
+            (input)="notes.set($any($event.target).value)"
+            placeholder="Notes (optional) — e.g. carrying lab samples" />
+          <button class="btn btn--ghost" (click)="clearSelection()">Cancel</button>
+          <button class="btn btn--primary" [disabled]="saving()" (click)="recordEntry()">
+            <lucide-icon name="log-in" [size]="15" /> Record Entry
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- ── Two-column dashboard ──────────────────────────────────── -->
+  <div class="sec-grid">
+
+    <!-- Compliance card -->
+    <section class="sec-card">
+      <header class="sec-card__head">
+        <h3 class="sec-card__title">Bag-Check Compliance — Today</h3>
+        <span class="sec-card__sub">By role</span>
+      </header>
+      <div class="sec-card__body">
+        @if (visibleCompliance().length === 0) {
+          <div class="sec-empty"><lucide-icon name="info" [size]="14" /> No entries recorded today.</div>
+        }
+        @for (r of visibleCompliance(); track r.role) {
+          <div class="sec-comp-row">
+            <div class="sec-comp-row__head">
+              <span class="sec-comp-row__role">{{ roleLabel(r.role) }}</span>
+              <span class="sec-comp-row__stat">{{ r.checked }} / {{ r.total }}</span>
+            </div>
+            <div class="sec-comp-row__bar">
+              <div class="sec-comp-row__fill"
+                   [style.width.%]="r.percent"
+                   [class.sec-comp-row__fill--low]="r.percent < 80"
+                   [class.sec-comp-row__fill--mid]="r.percent >= 80 && r.percent < 100"
+                   [class.sec-comp-row__fill--full]="r.percent === 100"></div>
+            </div>
+            <div class="sec-comp-row__pct">{{ r.percent }}%</div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Currently Inside card -->
+    <section class="sec-card">
+      <header class="sec-card__head">
+        <h3 class="sec-card__title">
+          Currently Inside <span class="sec-card__count">{{ filteredInside().length }}</span>
+        </h3>
+        @if (insideRoles().length > 0) {
+          <div class="sec-pills">
+            <button type="button"
+                    class="sec-pill"
+                    [ngClass]="{ 'is-active': !insideFilter() }"
+                    (click)="setInsideFilter('')">
+              All · {{ insideNow().length }}
+            </button>
+            @for (r of insideRoles(); track r.role) {
+              <button type="button"
+                      class="sec-pill"
+                      [ngClass]="{ 'is-active': insideFilter() === r.role }"
+                      (click)="setInsideFilter(r.role)">
+                {{ roleLabel(r.role) }} · {{ r.count }}
+              </button>
+            }
+          </div>
+        }
+      </header>
+      <div class="sec-card__body sec-card__body--scroll">
+        @if (filteredInside().length === 0) {
+          <div class="sec-empty"><lucide-icon name="info" [size]="14" /> No one inside right now.</div>
+        }
+        <ul class="sec-list">
+          @for (e of filteredInside(); track e.id) {
+            <li class="sec-list__item" [class.sec-list__item--warn]="!e.bagChecked">
+              <div class="avatar avatar--sm" [style.background]="'hsl(' + roleHue(e.user?.role) + ' 60% 88%)'" [style.color]="'hsl(' + roleHue(e.user?.role) + ' 60% 35%)'">
+                {{ initials(e.user) }}
+              </div>
+              <div class="sec-list__info">
+                <div class="sec-list__name">
+                  {{ e.user?.firstName }} {{ e.user?.lastName }}
+                  @if (!e.bagChecked) {
+                    <span class="badge badge--danger badge--sm" title="Bag was not checked at entry">
+                      <lucide-icon name="alert-triangle" [size]="10" /> Bag
+                    </span>
+                  }
+                </div>
+                <div class="sec-list__meta">
+                  {{ roleLabel(e.user?.role) }} · in {{ e.entryAt | date:'shortTime' }}
+                </div>
+              </div>
+              <button type="button" class="sec-list__action" (click)="markExit(e)" title="Mark exit for this staff member">
+                <lucide-icon name="log-out" [size]="13" /> Exit
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Today's entries chronological feed -->
+    <section class="sec-card sec-card--feed">
+      <header class="sec-card__head">
+        <h3 class="sec-card__title">Today's Activity <span class="sec-card__count">{{ todaysEntries().length }}</span></h3>
+        <span class="sec-card__sub">Most recent first</span>
+      </header>
+      <div class="sec-card__body sec-card__body--scroll">
+        @if (todaysEntries().length === 0) {
+          <div class="sec-empty"><lucide-icon name="info" [size]="14" /> No activity today.</div>
+        }
+        <ul class="sec-list sec-list--dense">
+          @for (e of todaysEntries(); track e.id) {
+            <li class="sec-list__item">
+              <div class="avatar avatar--sm" [style.background]="'hsl(' + roleHue(e.user?.role) + ' 60% 88%)'" [style.color]="'hsl(' + roleHue(e.user?.role) + ' 60% 35%)'">
+                {{ initials(e.user) }}
+              </div>
+              <div class="sec-list__info">
+                <div class="sec-list__name">
+                  {{ e.user?.firstName }} {{ e.user?.lastName }}
+                  @if (e.bagChecked) {
+                    <lucide-icon class="sec-list__bag sec-list__bag--ok" name="check-circle" [size]="12" />
+                  } @else {
+                    <lucide-icon class="sec-list__bag sec-list__bag--miss" name="alert-triangle" [size]="12" />
+                  }
+                </div>
+                <div class="sec-list__meta">
+                  {{ roleLabel(e.user?.role) }} · entered {{ e.entryAt | date:'shortTime' }}
+                  @if (e.exitAt) { · exited {{ e.exitAt | date:'shortTime' }} }
+                  @else { · <span class="text-success-soft">inside</span> }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</div>

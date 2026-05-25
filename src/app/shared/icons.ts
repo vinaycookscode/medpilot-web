@@ -34,6 +34,8 @@ import {
   HeartPulse, Gauge, Thermometer, Zap, Play,
   // Master Data / HMS Config
   Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
+  // Empty-state screens
+  Compass,
 } from 'lucide-angular';
 
 @NgModule({
@@ -60,6 +62,8 @@ import {
       Activity, Bed, ClipboardList, ClipboardCheck, Check, LayoutGrid, Pencil,
       HeartPulse, Gauge, Thermometer, Zap, Play,
       Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
+  // Empty-state screens
+  Compass,
     }),
   ],
   exports: [LucideAngularModule],
