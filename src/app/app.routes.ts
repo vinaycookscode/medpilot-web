@@ -142,6 +142,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/security-entry/security-entry.component').then(m => m.SecurityEntryComponent),
       },
       {
+        path: 'nursing/handover',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
+        loadComponent: () => import('./pages/nursing-handover/nursing-handover.component').then(m => m.NursingHandoverComponent),
+      },
+      {
         path: 'no-access',
         canActivate: [noAccessGuard],
         loadComponent: () => import('./pages/no-access/no-access.component').then(m => m.NoAccessComponent),

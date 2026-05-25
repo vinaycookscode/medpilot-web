@@ -97,6 +97,7 @@ export class SidebarComponent {
         { label: 'Appointments',  route: '/appointments',  icon: 'calendar',       module: 'appointments' },
         { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'], module: 'opd' },
         { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'], module: 'ipd' },
+        { label: 'Nursing Handover', route: '/nursing/handover', icon: 'log-out',    roles: ['admin', 'super_admin', 'doctor', 'nursing'], module: 'ipd' },
         { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'], module: 'appointments' },
       ],
     },

@@ -1,0 +1,903 @@
+.nh {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  // ── Tabs ─────────────────────────────────────────────────
+  &-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,0.04);
+    border-radius: 10px;
+    align-self: flex-start;
+  }
+
+  &-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary, #5b5b62);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 140ms;
+    position: relative;
+
+    &:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+    &.is-active {
+      background: var(--surface-card);
+      color: var(--color-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      margin-left: 2px;
+      border-radius: 999px;
+      background: #FF3B30;
+      color: white;
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1;
+    }
+  }
+
+  // ── Card shell ───────────────────────────────────────────
+  &-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // ── Controls row (incoming nurse + selection summary) ────
+  &-controls {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 16px;
+    align-items: end;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    &--summary {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      @media (max-width: 720px) { justify-content: flex-start; }
+    }
+  }
+
+  &-summary {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--color-primary-subtle);
+    border-radius: 999px;
+    color: var(--color-primary);
+    font-weight: 600;
+
+    &__count { font-size: 16px; font-weight: 700; }
+    &__label { font-size: 12px; }
+  }
+
+  // ── Pills (ward filter, history filter) ──────────────────
+  &-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    &__total {
+      margin-left: auto;
+      font-size: 11.5px;
+      color: var(--text-tertiary, #8e8e93);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  &-pill {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.05);
+    color: var(--text-secondary, #5b5b62);
+    border: 1px solid rgba(0,0,0,0.04);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 140ms;
+    user-select: none;
+    font-family: inherit;
+
+    &:hover {
+      background: rgba(0,0,0,0.09);
+      border-color: rgba(0,0,0,0.08);
+    }
+    &:active { transform: scale(0.96); }
+
+    &.is-active {
+      background: #007AFF;
+      color: white;
+      border-color: #007AFF;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+  }
+
+  // ── Pending tab header ───────────────────────────────────
+  &-pending-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0 4px;
+    flex-wrap: wrap;
+
+    &__info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary, #5b5b62);
+
+      strong { color: var(--color-primary); font-weight: 600; }
+    }
+  }
+
+  // ── Empty state ──────────────────────────────────────────
+  &-empty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 24px 4px;
+    color: var(--text-tertiary, #8e8e93);
+    font-size: 13.5px;
+    justify-content: center;
+  }
+
+  // ── Patient list ─────────────────────────────────────────
+  &-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &-item {
+    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+    border-radius: 10px;
+    background: var(--surface-card);
+    transition: border-color 160ms, background 160ms, box-shadow 160ms;
+    overflow: hidden;
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    &--on {
+      border-color: var(--color-primary);
+      background: var(--color-primary-subtle);
+      box-shadow: 0 2px 8px rgba(0,122,255,0.08);
+    }
+
+    &--pending {
+      border-left: 3px solid #FF9500;
+    }
+
+    &__info { flex: 1; min-width: 0; }
+
+    &__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    &__age { font-size: 12px; color: var(--text-tertiary, #8e8e93); font-weight: 500; }
+    &__gender {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary, #8e8e93);
+      font-weight: 500;
+    }
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-secondary, #5b5b62);
+      flex-wrap: wrap;
+    }
+    &__dx {
+      max-width: 380px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__note {
+      padding: 4px 14px 14px;
+      animation: nh-expand 220ms ease;
+    }
+
+    &__detail {
+      padding: 4px 16px 16px;
+      animation: nh-expand 220ms ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+
+  // Custom checkbox
+  &-check {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid rgba(0,0,0,0.2);
+    background: white;
+    position: relative;
+    transition: all 140ms;
+  }
+  &-item__head input[type="checkbox"]:checked + &-check {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 4px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  &-chevron {
+    color: var(--text-tertiary, #8e8e93);
+    flex-shrink: 0;
+    transition: transform 200ms;
+  }
+
+  // ── Textarea ─────────────────────────────────────────────
+  &-textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 70px;
+    font-family: inherit;
+    font-size: 13.5px;
+    line-height: 1.5;
+    padding: 10px 12px;
+  }
+
+  &-detail-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: var(--text-tertiary, #8e8e93);
+    margin-top: 4px;
+  }
+  &-detail-body {
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    color: var(--text-primary);
+  }
+  &-detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  // ── Sticky submit bar ────────────────────────────────────
+  &-submitbar {
+    position: sticky;
+    bottom: 8px;
+    margin-top: 4px;
+    padding: 14px 18px;
+    background: var(--surface-card);
+    border: 1px solid var(--color-primary-light, rgba(0,122,255,0.18));
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    &__info {
+      font-size: 13.5px;
+      color: var(--text-primary);
+
+      strong { color: var(--color-primary); }
+    }
+  }
+
+  // ── Patient-grouped history (one card per patient with timeline) ────
+  &-patients {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &-patient {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 160ms, box-shadow 160ms;
+
+    &:hover { border-color: rgba(0, 122, 255, 0.18); }
+    &--open {
+      border-color: rgba(0, 122, 255, 0.35);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    &__head {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.4fr) minmax(240px, 1.6fr) 24px;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background 120ms;
+
+      &:hover { background: rgba(0, 122, 255, 0.025); }
+
+      @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    &__id {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    &__name-block { min-width: 0; }
+    &__name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    &__sub {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-secondary, #5b5b62);
+    }
+
+    &__stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      @media (max-width: 900px) { justify-content: flex-start; }
+    }
+
+    &__stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+
+      &-value {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+      }
+      &-label {
+        font-size: 11px;
+        color: var(--text-tertiary, #8e8e93);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 500;
+      }
+
+      &--pending {
+        padding: 3px 10px;
+        background: rgba(255, 149, 0, 0.1);
+        border-radius: 999px;
+
+        .nh-patient__stat-value { color: #C76A00; font-size: 14px; }
+        .nh-patient__stat-label { color: #C76A00; font-size: 10.5px; }
+      }
+    }
+
+    &__latest {
+      font-size: 11.5px;
+      color: var(--text-tertiary, #8e8e93);
+      white-space: nowrap;
+    }
+
+    &__chevron {
+      color: var(--text-tertiary, #8e8e93);
+      flex-shrink: 0;
+    }
+    &__head:hover &__chevron { color: var(--color-primary); }
+  }
+
+  // ── Scrollable zigzag timeline within each patient card ────────────
+  &-timeline {
+    position: relative;
+    padding: 20px 24px 24px;
+    background: linear-gradient(180deg, rgba(0,122,255,0.03), rgba(0,122,255,0.01));
+    border-top: 1px solid rgba(0,0,0,0.05);
+    animation: nh-expand 240ms ease;
+
+    // Scroll container — keeps the page compact even with many handovers
+    max-height: 520px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+
+    // Central vertical rail (the spine of the zigzag)
+    &::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(0,122,255,0.25), rgba(0,122,255,0.08));
+      transform: translateX(-50%);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+
+    // Each event sits to one side of the rail; CSS-counter zigzags them.
+    &__event {
+      position: relative;
+      width: calc(50% - 26px);
+      padding: 6px 0;
+
+      // Even-indexed → right side of rail
+      &:nth-child(odd) {
+        margin-left: auto;
+        padding-left: 26px;
+
+        .nh-timeline__rail { left: -26px; }
+        .nh-timeline__content { text-align: left; }
+        .nh-timeline__transfer { justify-content: flex-start; }
+      }
+      // Odd-indexed → left side of rail
+      &:nth-child(even) {
+        margin-right: auto;
+        padding-right: 26px;
+
+        .nh-timeline__rail { right: -26px; left: auto; }
+        .nh-timeline__content { text-align: left; }
+        .nh-timeline__transfer { justify-content: flex-start; }
+      }
+
+      @media (max-width: 760px) {
+        width: calc(100% - 26px);
+        margin-left: 26px !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+
+        .nh-timeline__rail { left: -22px !important; right: auto !important; }
+      }
+    }
+
+    // The rail-anchored dot for this event
+    &__rail {
+      position: absolute;
+      top: 14px;
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.15);
+      border: 3px solid var(--surface-card);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+
+      &--ack     { background: #34C759; box-shadow: 0 0 0 2px rgba(52,199,89,0.35),  0 1px 3px rgba(0,0,0,0.15); }
+      &--pending { background: #FF9500; box-shadow: 0 0 0 2px rgba(255,149,0,0.35), 0 1px 3px rgba(0,0,0,0.15); }
+    }
+
+    // Card on either side of the rail
+    &__content {
+      background: var(--surface-card);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      position: relative;
+
+      // A small "tail" pointing toward the rail
+      &::before {
+        content: '';
+        position: absolute;
+        top: 14px;
+        width: 10px;
+        height: 10px;
+        background: var(--surface-card);
+        border: 1px solid rgba(0,0,0,0.06);
+        transform: rotate(45deg);
+      }
+    }
+
+    &__event:nth-child(odd) &__content::before {
+      left: -6px;
+      border-right: none;
+      border-top: none;
+    }
+    &__event:nth-child(even) &__content::before {
+      right: -6px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    // Hide the tail on mobile (single column)
+    @media (max-width: 760px) {
+      &__content::before { display: none !important; }
+    }
+
+    &__transfer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary, #5b5b62);
+      flex-wrap: wrap;
+
+      lucide-icon { color: var(--color-primary); flex-shrink: 0; }
+    }
+
+    &__when {
+      font-size: 11.5px;
+      color: var(--text-tertiary, #8e8e93);
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    // Hide the connecting `line` element since we now use the rail pseudo
+    &__line { display: none; }
+
+    // Inside zigzag cards, neutralise the in/out left-right alternation —
+    // the zigzag at the event level is the visual hierarchy. Inner bubbles
+    // stack vertically and align left for legibility in a half-width card.
+    .nh-msg {
+      flex-direction: row;
+      align-items: flex-start;
+
+      &__body {
+        max-width: 100%;
+        align-items: flex-start;
+      }
+      &__head { justify-content: flex-start; }
+      &__bubble {
+        max-width: 100%;
+
+        &--in {
+          background: rgba(0, 122, 255, 0.10);
+          color: var(--text-primary);
+          border: 1px solid rgba(0, 122, 255, 0.18);
+          border-top-left-radius: 4px;
+          border-top-right-radius: 12px;
+        }
+        &--out {
+          background: rgba(0, 0, 0, 0.025);
+          border: 1px solid rgba(0,0,0,0.08);
+          border-top-left-radius: 4px;
+        }
+      }
+    }
+  }
+
+  // Pending role badge (used in timeline + thread)
+  &-msg__role--pending {
+    background: rgba(255, 149, 0, 0.12) !important;
+    color: #C76A00 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  // ── History (legacy collapsible cards — kept for reference) ────────
+  &-history {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__row {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 160ms, box-shadow 160ms, transform 160ms;
+
+      &:hover { border-color: rgba(0, 122, 255, 0.25); }
+      &--pending { border-left: 3px solid #FF9500; }
+      &--open {
+        border-color: rgba(0, 122, 255, 0.35);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    &__head {
+      display: grid;
+      grid-template-columns: minmax(200px, 1.4fr) minmax(180px, 1.2fr) minmax(120px, auto) 20px;
+      gap: 16px;
+      align-items: center;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: background 120ms;
+
+      &:hover { background: rgba(0, 122, 255, 0.025); }
+
+      @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    &__patient {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    &__name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    &__sub { font-size: 11.5px; color: var(--text-tertiary, #8e8e93); margin-top: 2px; }
+
+    &__transfer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary, #5b5b62);
+      flex-wrap: wrap;
+
+      lucide-icon { color: var(--color-primary); flex-shrink: 0; }
+    }
+
+    &__pill {
+      padding: 3px 8px;
+      background: rgba(0,0,0,0.04);
+      border-radius: 6px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    &__when {
+      text-align: right;
+      min-width: 130px;
+
+      @media (max-width: 900px) { text-align: left; }
+    }
+    &__time { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+    &__ack {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #1F8E3D;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    &__pending {
+      font-size: 11px;
+      color: #C76A00;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    &__chevron {
+      color: var(--text-tertiary, #8e8e93);
+      flex-shrink: 0;
+      transition: color 140ms;
+    }
+    &__row:hover &__chevron { color: var(--color-primary); }
+  }
+
+  // ── Conversation thread (expanded view) ────────────────────────────
+  &-thread {
+    padding: 8px 14px 18px;
+    background: rgba(0, 122, 255, 0.02);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: nh-expand 220ms ease;
+
+    &__waiting {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(255, 149, 0, 0.08);
+      border: 1px dashed rgba(255, 149, 0, 0.4);
+      border-radius: 8px;
+      color: #C76A00;
+      font-size: 12.5px;
+      font-weight: 500;
+      align-self: flex-start;
+
+      strong { font-weight: 600; }
+    }
+  }
+
+  &-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+
+    &--in {
+      flex-direction: row-reverse;
+
+      .nh-msg__head { justify-content: flex-end; }
+      .nh-msg__body { align-items: flex-end; }
+    }
+
+    &__avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-width: 78%;
+      min-width: 0;
+    }
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary, #5b5b62);
+      flex-wrap: wrap;
+
+      strong { color: var(--text-primary); font-weight: 600; }
+    }
+
+    &__role {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.05);
+      color: var(--text-tertiary, #8e8e93);
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &--ack {
+        background: rgba(52, 199, 89, 0.12);
+        color: #1F8E3D;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+      }
+    }
+
+    &__time {
+      font-size: 11px;
+      color: var(--text-tertiary, #8e8e93);
+    }
+
+    &__bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+
+      &--out {
+        background: var(--surface-card);
+        border: 1px solid rgba(0,0,0,0.08);
+        color: var(--text-primary);
+        border-top-left-radius: 4px;
+      }
+
+      &--in {
+        background: var(--color-primary);
+        color: white;
+        border-top-right-radius: 4px;
+      }
+    }
+
+    &__no-reply {
+      font-size: 12.5px;
+      font-style: italic;
+      color: var(--text-tertiary, #8e8e93);
+      padding: 4px 0;
+    }
+  }
+
+  // ── Misc ─────────────────────────────────────────────────
+  .spin { animation: nh-spin 0.9s linear infinite; }
+  .text-warning { color: #C76A00; font-weight: 600; }
+  .text-danger { color: #C0271E; }
+}
+
+@keyframes nh-expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nh-spin {
+  to { transform: rotate(360deg); }
+}
