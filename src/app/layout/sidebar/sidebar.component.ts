@@ -97,6 +97,10 @@ export class SidebarComponent {
         { label: 'Appointments',  route: '/appointments',  icon: 'calendar',       module: 'appointments' },
         { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'], module: 'opd' },
         { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'], module: 'ipd' },
+        { label: 'Nursing Handover', route: '/nursing/handover', icon: 'log-out',    roles: ['admin', 'super_admin', 'doctor', 'nursing'], module: 'ipd' },
+        { label: 'RMO Handover',     route: '/rmo/handover',     icon: 'clipboard-check', roles: ['admin', 'super_admin', 'doctor', 'rmo', 'consultant'], module: 'ipd' },
+        { label: 'Consultant Rounds',route: '/consultant/rounds',icon: 'stethoscope', roles: ['admin', 'super_admin', 'doctor', 'consultant'], module: 'ipd' },
+        { label: 'My Tasks',         route: '/attendant/tasks',  icon: 'clipboard-list', roles: ['admin', 'super_admin', 'attendant'], module: 'ipd' },
         { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'], module: 'appointments' },
       ],
     },
@@ -117,11 +121,12 @@ export class SidebarComponent {
     {
       title: 'Operations',
       items: [
-        { label: 'Inventory', route: '/inventory', icon: 'package',    roles: ['admin'], module: 'inventory' },
-        { label: 'Schedules', route: '/schedules', icon: 'clock',      roles: ['admin'], module: 'schedules' },
-        { label: 'Staff',     route: '/staff',     icon: 'user-check', roles: ['admin'], module: 'staff' },
-        { label: 'Branches',  route: '/branches',  icon: 'building-2', roles: ['admin'], module: 'settings' },
-        { label: 'Reports',   route: '/reports',   icon: 'chart-bar',  roles: ['admin'], module: 'reports' },
+        { label: 'Inventory',       route: '/inventory',       icon: 'package',      roles: ['admin'], module: 'inventory' },
+        { label: 'Schedules',       route: '/schedules',       icon: 'clock',        roles: ['admin'], module: 'schedules' },
+        { label: 'Staff',           route: '/staff',           icon: 'user-check',   roles: ['admin'], module: 'staff' },
+        { label: 'Security Entry',  route: '/security/entry',  icon: 'shield-check', roles: ['admin', 'super_admin', 'security', 'receptionist'], module: 'attendance' },
+        { label: 'Branches',        route: '/branches',        icon: 'building-2',   roles: ['admin'], module: 'settings' },
+        { label: 'Reports',         route: '/reports',         icon: 'chart-bar',    roles: ['admin'], module: 'reports' },
       ],
     },
     {

@@ -41,6 +41,7 @@ export class PermissionsComponent implements OnInit {
     insurance: 'Insurance', inventory: 'Inventory', schedules: 'Schedules', staff: 'Staff',
     reports: 'Reports', notifications: 'Notifications', settings: 'Settings',
     charge_master: 'Charge Master', permissions: 'Permissions', nabh: 'NABH',
+    attendance: 'Security Entry',
   };
 
   private appMeta = inject(AppMetaService);

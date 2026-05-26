@@ -136,6 +136,36 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/super-admin/super-admin.component').then(m => m.SuperAdminComponent),
       },
       {
+        path: 'security/entry',
+        canActivate: [permissionGuard],
+        data: { module: 'attendance' },
+        loadComponent: () => import('./pages/security-entry/security-entry.component').then(m => m.SecurityEntryComponent),
+      },
+      {
+        path: 'nursing/handover',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
+        loadComponent: () => import('./pages/nursing-handover/nursing-handover.component').then(m => m.NursingHandoverComponent),
+      },
+      {
+        path: 'rmo/handover',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
+        loadComponent: () => import('./pages/rmo-handover/rmo-handover.component').then(m => m.RmoHandoverComponent),
+      },
+      {
+        path: 'consultant/rounds',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
+        loadComponent: () => import('./pages/consultant-rounds/consultant-rounds.component').then(m => m.ConsultantRoundsComponent),
+      },
+      {
+        path: 'attendant/tasks',
+        canActivate: [permissionGuard],
+        data: { module: 'ipd' },
+        loadComponent: () => import('./pages/attendant-tasks/attendant-tasks.component').then(m => m.AttendantTasksComponent),
+      },
+      {
         path: 'no-access',
         canActivate: [noAccessGuard],
         loadComponent: () => import('./pages/no-access/no-access.component').then(m => m.NoAccessComponent),

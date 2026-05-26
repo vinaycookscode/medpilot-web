@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +13,10 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  private auth   = inject(AuthService);
-  private router = inject(Router);
-  private fb     = inject(FormBuilder);
+  private auth    = inject(AuthService);
+  private appMeta = inject(AppMetaService);
+  private router  = inject(Router);
+  private fb      = inject(FormBuilder);
 
   readonly form = this.fb.nonNullable.group({
     email:    ['', [Validators.required, Validators.email]],
@@ -34,7 +36,13 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         const role = this.auth.role();
-        this.router.navigate([role === 'super_admin' ? '/super-admin' : '/dashboard']);
+        if (role === 'super_admin') {
+          this.router.navigate(['/super-admin']);
+        } else {
+          // Send each role to the first page they actually have access to,
+          // instead of /dashboard which roles like 'security' can't view.
+          this.router.navigate([this.appMeta.firstAccessibleRoute()]);
+        }
       },
       error: (err) => {
         this.loading.set(false);
@@ -45,11 +53,12 @@ export class LoginComponent {
 
   togglePassword() { this.showPassword.update(v => !v); }
 
-  fillDemo(role: 'admin' | 'doctor' | 'receptionist') {
+  fillDemo(role: 'admin' | 'doctor' | 'receptionist' | 'security') {
     const creds = {
       admin:        { email: 'admin@democlinic.com',     password: 'Admin@123' },
       doctor:       { email: 'doctor@democlinic.com',    password: 'Admin@123' },
       receptionist: { email: 'reception@democlinic.com', password: 'Admin@123' },
+      security:     { email: 'security@democlinic.com',  password: 'Admin@123' },
     };
     this.form.patchValue(creds[role]);
   }
