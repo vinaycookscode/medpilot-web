@@ -1,0 +1,174 @@
+// Reuses the shared .nh-* class taxonomy from nursing-handover.component.scss
+// (those styles are unencapsulated thanks to ViewEncapsulation.None on the
+// nursing component, so they cascade here once that page has been visited
+// in-session). We still define a self-contained copy below so the RMO page
+// works standalone on the first visit.
+@import '../nursing-handover/nursing-handover.component.scss';
+
+// RMO-specific additions: consultant-instruction pill + inline panel
+.rh-inst-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 149, 0, 0.12);
+  color: #C76A00;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.rh-instructions {
+  margin: 4px 14px 12px;
+  padding: 10px 12px;
+  background: rgba(255, 149, 0, 0.05);
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  border-radius: 8px;
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #C76A00;
+    margin-bottom: 8px;
+  }
+}
+
+.rh-inst {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 0;
+
+  &:not(:last-child) { border-bottom: 1px solid rgba(255, 149, 0, 0.15); }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+  &__text {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+  &__meta {
+    font-size: 11.5px;
+    color: var(--text-tertiary, #8e8e93);
+    margin-top: 3px;
+  }
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  &__forward {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(0, 122, 255, 0.08);
+    color: var(--color-primary);
+    border: 1px solid rgba(0, 122, 255, 0.25);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 140ms;
+
+    &:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    &:active { transform: scale(0.96); }
+  }
+  &__done {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(52, 199, 89, 0.1);
+    color: #1F8E3D;
+    border: 1px solid rgba(52, 199, 89, 0.25);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 140ms;
+
+    &:hover { background: #34C759; color: white; border-color: #34C759; }
+    &:active { transform: scale(0.96); }
+  }
+}
+
+.rh-send-trigger {
+  margin: 8px 14px 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px dashed rgba(0, 122, 255, 0.35);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 140ms;
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.06);
+    border-color: var(--color-primary);
+  }
+}
+
+.rh-compose {
+  margin: 8px 14px 12px;
+  padding: 12px 14px;
+  background: rgba(0, 122, 255, 0.04);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: rh-compose-in 200ms ease;
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+  }
+  &__chain {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-tertiary, #8e8e93);
+    font-weight: 500;
+  }
+  &__text {
+    width: 100%;
+    resize: vertical;
+    min-height: 50px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 8px 10px;
+  }
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+@keyframes rh-compose-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

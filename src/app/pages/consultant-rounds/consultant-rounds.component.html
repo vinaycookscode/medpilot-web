@@ -1,0 +1,202 @@
+<div class="page cr">
+
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">Consultant Rounds</h2>
+      <p class="page__subtitle">Your admitted patients, round notes, and RMO instructions</p>
+    </div>
+    @if (canShowAll()) {
+      <label class="cr-toggle">
+        <input type="checkbox" [checked]="showAll()" (change)="toggleShowAll()" />
+        Show all consultants' admissions
+      </label>
+    }
+  </div>
+
+  <div class="cr-grid">
+
+    <!-- ── Left: patient list ───────────────────────────── -->
+    <aside class="cr-list-pane">
+      <header class="cr-list-pane__head">
+        <h3 class="cr-list-pane__title">
+          My Patients <span class="cr-list-pane__count">{{ admissions().length }}</span>
+        </h3>
+      </header>
+
+      @if (loading()) {
+        <div class="cr-empty"><lucide-icon name="loader-2" [size]="14" class="spin" /> Loading…</div>
+      } @else if (admissions().length === 0) {
+        <div class="cr-empty">
+          <lucide-icon name="info" [size]="14" />
+          No admissions assigned to you.
+        </div>
+      } @else {
+        <ul class="cr-patient-list">
+          @for (a of admissions(); track a.id) {
+            <li class="cr-patient" [class.cr-patient--active]="selectedId() === a.id" (click)="pick(a.id)">
+              <div class="avatar avatar--sm"
+                   [style.background]="'hsl(' + patientHue(a.patient?.id) + ' 55% 88%)'"
+                   [style.color]="'hsl(' + patientHue(a.patient?.id) + ' 55% 32%)'">
+                {{ initials(a.patient) }}
+              </div>
+              <div class="cr-patient__info">
+                <div class="cr-patient__name">
+                  {{ a.patient?.firstName }} {{ a.patient?.lastName }}
+                  @if (a.patient?.age !== null) { <span class="cr-patient__age">· {{ a.patient?.age }}y</span> }
+                </div>
+                <div class="cr-patient__sub">
+                  @if (a.bed?.ward?.name) { {{ a.bed?.ward?.name }} }
+                  @if (a.bed?.bedNumber) { · Bed {{ a.bed?.bedNumber }} }
+                </div>
+                @if (a.lastVisitedAt) {
+                  <div class="cr-patient__last">Last seen: {{ a.lastVisitedAt | date:'shortTime' }} · {{ a.lastVisitedAt | date:'mediumDate' }}</div>
+                } @else {
+                  <div class="cr-patient__last cr-patient__last--never">Not visited yet</div>
+                }
+              </div>
+              @if (a.openInstructions > 0) {
+                <span class="cr-patient__open" title="Open instructions for the RMO">{{ a.openInstructions }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+
+    <!-- ── Right: round timeline + add round ─────────────── -->
+    <section class="cr-detail-pane">
+      @if (!selected()) {
+        <div class="cr-empty cr-empty--large">
+          <lucide-icon name="users" [size]="20" />
+          <div>Select a patient from the left to view their round history.</div>
+        </div>
+      } @else {
+        <!-- Patient summary -->
+        <div class="cr-summary">
+          <div class="avatar avatar--lg"
+               [style.background]="'hsl(' + patientHue(selected()!.patient?.id) + ' 55% 88%)'"
+               [style.color]="'hsl(' + patientHue(selected()!.patient?.id) + ' 55% 32%)'">
+            {{ initials(selected()!.patient) }}
+          </div>
+          <div class="cr-summary__info">
+            <h2 class="cr-summary__name">
+              {{ selected()!.patient?.firstName }} {{ selected()!.patient?.lastName }}
+              @if (selected()!.patient?.age !== null) { <span class="cr-summary__age">{{ selected()!.patient?.age }}y</span> }
+              @if (selected()!.patient?.gender) { <span class="cr-summary__gender">{{ selected()!.patient?.gender }}</span> }
+            </h2>
+            <div class="cr-summary__sub">
+              @if (selected()!.bed?.ward?.name) { <span class="badge badge--neutral badge--sm">{{ selected()!.bed?.ward?.name }}</span> }
+              @if (selected()!.bed?.bedNumber) { <span class="text-muted">· Bed {{ selected()!.bed?.bedNumber }}</span> }
+              @if (selected()!.admissionDate) { <span class="text-muted">· Admitted {{ selected()!.admissionDate | date:'mediumDate' }}</span> }
+            </div>
+            @if (selected()!.admissionDiagnosis) {
+              <div class="cr-summary__dx">
+                <span class="cr-summary__dx-label">Admission diagnosis:</span> {{ selected()!.admissionDiagnosis }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- New round form -->
+        <div class="cr-new-round">
+          <h3 class="cr-section-title">
+            <lucide-icon name="plus" [size]="14" /> Log Round
+          </h3>
+          <label class="field__label">Round notes <span class="text-danger">*</span></label>
+          <textarea
+            class="input cr-textarea"
+            rows="3"
+            placeholder="Patient status, observations, plan…"
+            [value]="noteDraft()"
+            (input)="noteDraft.set($any($event.target).value)"></textarea>
+
+          <label class="field__label cr-instr-label">
+            <lucide-icon name="message-square" [size]="13" />
+            Instruction for RMO (optional)
+          </label>
+          <textarea
+            class="input cr-textarea cr-textarea--instr"
+            rows="2"
+            placeholder="e.g. Start IV fluids at 100ml/hr, repeat labs in 6 hours…"
+            [value]="instrDraft()"
+            (input)="instrDraft.set($any($event.target).value)"></textarea>
+
+          <div class="cr-actions">
+            <button type="button" class="btn btn--primary" [disabled]="!noteDraft().trim() || saving()" (click)="submitRound()">
+              <lucide-icon name="check-circle" [size]="15" />
+              {{ instrDraft().trim() ? 'Log Round + Send Instruction' : 'Log Round' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="cr-history">
+          <h3 class="cr-section-title">
+            <lucide-icon name="clock" [size]="14" /> Round History
+            <span class="cr-section-title__count">{{ rounds().length }}</span>
+          </h3>
+
+          @if (roundsLoading()) {
+            <div class="cr-empty"><lucide-icon name="loader-2" [size]="14" class="spin" /> Loading rounds…</div>
+          } @else if (rounds().length === 0) {
+            <div class="cr-empty"><lucide-icon name="info" [size]="14" /> No rounds yet — log the first one above.</div>
+          } @else {
+            <ul class="cr-timeline">
+              @for (r of rounds(); track r.id; let i = $index) {
+                <li class="cr-round">
+                  <div class="cr-round__rail">
+                    <div class="cr-round__dot"
+                         [class.cr-round__dot--open]="r.instructionStatus === 'open'"
+                         [class.cr-round__dot--done]="r.instructionStatus === 'done'"
+                         [class.cr-round__dot--cancelled]="r.instructionStatus === 'cancelled'"></div>
+                    @if (i < rounds().length - 1) { <div class="cr-round__line"></div> }
+                  </div>
+                  <div class="cr-round__content">
+                    <div class="cr-round__head">
+                      <strong>{{ r.consultant?.firstName }} {{ r.consultant?.lastName }}</strong>
+                      @if (r.consultant?.specialization) { <span class="text-muted">{{ r.consultant?.specialization }}</span> }
+                      <span class="cr-round__time">{{ r.visitedAt | date:'mediumDate' }} · {{ r.visitedAt | date:'shortTime' }}</span>
+                    </div>
+                    <div class="cr-round__notes">{{ r.roundNotes }}</div>
+
+                    @if (r.instructionsForRmo) {
+                      <div class="cr-instr" [class.cr-instr--done]="r.instructionStatus === 'done'" [class.cr-instr--cancelled]="r.instructionStatus === 'cancelled'">
+                        <div class="cr-instr__head">
+                          <lucide-icon name="message-square" [size]="12" />
+                          <span class="cr-instr__label">RMO instruction</span>
+                          @if (r.instructionStatus === 'open') {
+                            <span class="cr-instr__status cr-instr__status--open">Open</span>
+                          } @else if (r.instructionStatus === 'done') {
+                            <span class="cr-instr__status cr-instr__status--done">
+                              <lucide-icon name="check-circle" [size]="11" /> Actioned
+                            </span>
+                          } @else {
+                            <span class="cr-instr__status cr-instr__status--cancelled">Cancelled</span>
+                          }
+                          @if (r.instructionStatus === 'open' && r.consultant?.id === auth.user()?.id) {
+                            <button type="button" class="cr-instr__cancel" (click)="cancelInstruction(r)">
+                              <lucide-icon name="x" [size]="11" /> Cancel
+                            </button>
+                          }
+                        </div>
+                        <div class="cr-instr__text">{{ r.instructionsForRmo }}</div>
+                        @if (r.instructionStatus === 'done' && r.instructionCompletedAt) {
+                          <div class="cr-instr__done-meta">
+                            <lucide-icon name="check-circle" [size]="11" />
+                            Actioned {{ r.instructionCompletedAt | date:'short' }}
+                            @if (r.instructionCompletedNotes) { · "{{ r.instructionCompletedNotes }}" }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </section>
+
+  </div>
+</div>

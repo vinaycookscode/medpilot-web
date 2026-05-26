@@ -3,12 +3,14 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import {
-  NursingService, ActiveAdmission, NurseLite, Handover,
+  NursingService, ActiveAdmission, NurseLite, Handover, RmoOrderForNursing,
+  NursingTask, AttendantLite,
 } from '../../core/services/nursing.service';
+import { AppMetaService } from '../../core/services/app-meta.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 
-type Tab = 'handover' | 'pending' | 'history';
+type Tab = 'handover' | 'pending' | 'orders' | 'tasks' | 'history';
 
 @Component({
   selector: 'app-nursing-handover',
@@ -19,9 +21,10 @@ type Tab = 'handover' | 'pending' | 'history';
   encapsulation: ViewEncapsulation.None,
 })
 export class NursingHandoverComponent implements OnInit, OnDestroy {
-  private svc   = inject(NursingService);
-  private toast = inject(ToastService);
-  readonly auth = inject(AuthService);
+  private svc     = inject(NursingService);
+  private toast   = inject(ToastService);
+  readonly auth   = inject(AuthService);
+  private appMeta = inject(AppMetaService);
 
   private visibilityHandler: (() => void) | null = null;
 
@@ -41,6 +44,26 @@ export class NursingHandoverComponent implements OnInit, OnDestroy {
   readonly pending          = signal<Handover[]>([]);
   readonly pendingExpanded  = signal<string | null>(null);
   readonly ackNote          = signal<string>('');
+
+  // ── Doctor Orders tab state (RMO → nursing) ──────────────
+  readonly rmoOrders        = signal<RmoOrderForNursing[]>([]);
+  readonly orderDoneNote    = signal<string>('');
+  readonly orderActioning   = signal<string | null>(null);
+
+  // ── Tasks tab state (nursing → attendant) ────────────────
+  readonly tasks         = signal<NursingTask[]>([]);
+  readonly attendants    = signal<AttendantLite[]>([]);
+  readonly composeFor    = signal<string | null>(null);  // admissionId
+  readonly draftCategory = signal<string>('');
+  readonly draftTitle    = signal<string>('');
+  readonly draftDesc     = signal<string>('');
+  readonly draftDue      = signal<string>('');
+  readonly draftDest     = signal<string>('');
+  readonly draftAtt      = signal<string>('');
+  readonly taskSaving    = signal(false);
+
+  readonly taskCategories = computed(() => this.appMeta.meta()?.meta['attendant_task_category'] ?? []);
+  readonly taskCount      = computed(() => this.tasks().length);
 
   // ── History tab state ────────────────────────────────────
   readonly history          = signal<Handover[]>([]);
@@ -114,10 +137,12 @@ export class NursingHandoverComponent implements OnInit, OnDestroy {
   });
 
   readonly pendingCount = computed(() => this.pending().length);
+  readonly orderCount   = computed(() => this.rmoOrders().length);
 
   ngOnInit() {
     this.loadHandoverTab();
     this.loadPending();
+    this.loadOrders();
 
     // Auto-refresh pending list when this tab regains focus — handles the
     // case where another nurse submitted a handover while this window was
@@ -125,6 +150,7 @@ export class NursingHandoverComponent implements OnInit, OnDestroy {
     this.visibilityHandler = () => {
       if (document.visibilityState === 'visible') {
         this.loadPending();
+        this.loadOrders();
         if (this.tab() === 'history') this.loadHistory();
       }
     };
@@ -140,7 +166,106 @@ export class NursingHandoverComponent implements OnInit, OnDestroy {
   switchTab(t: Tab) {
     this.tab.set(t);
     if (t === 'pending') this.loadPending();
+    if (t === 'orders')  this.loadOrders();
+    if (t === 'tasks')   this.loadTasks();
     if (t === 'history') this.loadHistory();
+  }
+
+  private loadTasks() {
+    this.svc.myOpenTasks().subscribe({
+      next: r => this.tasks.set(r),
+      error: () => this.tasks.set([]),
+    });
+    if (this.attendants().length === 0) {
+      this.svc.attendants().subscribe({
+        next: r => this.attendants.set(r),
+        error: () => this.attendants.set([]),
+      });
+    }
+  }
+
+  refreshTasks() { this.loadTasks(); this.toast.success('Refreshed'); }
+
+  openTaskCompose(admissionId: string) {
+    this.composeFor.set(admissionId);
+    this.draftCategory.set(this.taskCategories()[0]?.value ?? '');
+    this.draftTitle.set('');
+    this.draftDesc.set('');
+    this.draftDue.set('');
+    this.draftDest.set('');
+    this.draftAtt.set('');
+  }
+
+  closeTaskCompose() {
+    this.composeFor.set(null);
+  }
+
+  createTask() {
+    const aid = this.composeFor();
+    if (!aid || !this.draftCategory() || !this.draftTitle().trim() || this.taskSaving()) return;
+    this.taskSaving.set(true);
+    this.svc.createTask({
+      admissionId: aid,
+      category: this.draftCategory(),
+      title: this.draftTitle().trim(),
+      description: this.draftDesc().trim() || undefined,
+      dueAt: this.draftDue() ? new Date(this.draftDue()).toISOString() : undefined,
+      destination: this.draftDest().trim() || undefined,
+      assignedAttendantId: this.draftAtt() || undefined,
+    }).subscribe({
+      next: () => {
+        this.toast.success('Task assigned');
+        this.taskSaving.set(false);
+        this.closeTaskCompose();
+        this.loadTasks();
+      },
+      error: err => {
+        this.taskSaving.set(false);
+        this.toast.error(err?.error?.message ?? 'Failed to assign task');
+      },
+    });
+  }
+
+  cancelTask(taskId: string) {
+    this.svc.cancelTask(taskId).subscribe({
+      next: () => { this.toast.success('Task cancelled'); this.loadTasks(); },
+      error: err => this.toast.error(err?.error?.message ?? 'Failed to cancel'),
+    });
+  }
+
+  taskCategoryLabel(value: string): string {
+    return this.taskCategories().find(c => c.value === value)?.label ?? value;
+  }
+
+  isTaskOverdue(t: NursingTask): boolean {
+    if (!t.dueAt) return false;
+    return new Date(t.dueAt).getTime() < Date.now();
+  }
+
+  private loadOrders() {
+    this.svc.listRmoOrders().subscribe({
+      next: r => this.rmoOrders.set(r),
+      error: () => this.rmoOrders.set([]),
+    });
+  }
+
+  refreshOrders() { this.loadOrders(); this.toast.success('Refreshed'); }
+
+  /** Nurse marks an RMO order as actioned. */
+  completeOrder(orderId: string) {
+    this.orderActioning.set(orderId);
+    this.svc.completeRmoOrder(orderId, this.orderDoneNote() || undefined).subscribe({
+      next: () => {
+        this.toast.success('Order marked as done');
+        this.orderActioning.set(null);
+        this.orderDoneNote.set('');
+        this.loadOrders();
+      },
+      error: err => {
+        this.orderActioning.set(null);
+        this.toast.error(err?.error?.message ?? 'Failed to mark done');
+      },
+    });
   }
 
   refreshPending() {

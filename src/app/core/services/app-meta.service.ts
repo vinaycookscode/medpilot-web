@@ -158,6 +158,20 @@ export class AppMetaService implements OnDestroy {
    * the user has canView on. Falls back to /no-access if they have nothing.
    */
   firstAccessibleRoute(): string {
+    const role = (() => { try { return JSON.parse(localStorage.getItem('mp_user') ?? 'null')?.role ?? null; } catch { return null; } })();
+    // Role-aware landing routes — sends each role straight to their workbench.
+    const roleLanding: Record<string, string> = {
+      security:   '/security/entry',
+      nursing:    '/nursing/handover',
+      rmo:        '/rmo/handover',
+      consultant: '/consultant/rounds',
+      attendant:  '/attendant/tasks',
+    };
+    if (role && roleLanding[role] && this.canDo('ipd' /* nursing/rmo/consultant/attendant gated here */, 'canView')) {
+      if (role === 'nursing' || role === 'rmo' || role === 'consultant' || role === 'attendant') return roleLanding[role];
+    }
+    if (role === 'security' && this.canDo('attendance', 'canView')) return roleLanding['security'];
+
     const candidates: Array<[string, string]> = [
       ['dashboard',     '/dashboard'],
       ['attendance',    '/security/entry'],

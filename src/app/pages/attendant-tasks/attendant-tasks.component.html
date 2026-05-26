@@ -1,0 +1,117 @@
+<div class="page at">
+
+  <div class="page__header">
+    <div>
+      <h2 class="page__title">My Tasks</h2>
+      <p class="page__subtitle">
+        Patient shift, transport, hygiene, and other duties assigned by nursing
+      </p>
+    </div>
+    @if (overdueCount() > 0) {
+      <div class="at-overdue-chip">
+        <lucide-icon name="alert-triangle" [size]="14" />
+        {{ overdueCount() }} overdue
+      </div>
+    }
+  </div>
+
+  <!-- Filter pills -->
+  <div class="at-filters">
+    <button type="button" class="at-pill" [ngClass]="{ 'is-active': !category() }" (click)="category.set('')">
+      All · {{ tasks().length }}
+    </button>
+    @for (c of categories(); track c.value) {
+      @if ((categoryCounts().get(c.value) ?? 0) > 0) {
+        <button type="button" class="at-pill" [ngClass]="{ 'is-active': category() === c.value }" (click)="setCategory(c.value)">
+          {{ c.label }} · {{ categoryCounts().get(c.value) }}
+        </button>
+      }
+    }
+  </div>
+
+  @if (loading() && tasks().length === 0) {
+    <div class="at-empty"><lucide-icon name="loader-2" [size]="14" class="spin" /> Loading tasks…</div>
+  } @else if (filtered().length === 0) {
+    <div class="at-empty">
+      <lucide-icon name="check-circle" [size]="14" />
+      All caught up — no open tasks.
+    </div>
+  } @else {
+    <div class="at-grid">
+      @for (t of filtered(); track t.id) {
+        <article class="at-task" [class.at-task--overdue]="isOverdue(t)">
+          <header class="at-task__head">
+            <span class="at-task__category" [attr.data-cat]="t.category">{{ categoryLabel(t.category) }}</span>
+            @if (t.dueAt) {
+              <span class="at-task__due" [class.at-task__due--overdue]="isOverdue(t)">
+                <lucide-icon [name]="isOverdue(t) ? 'alert-triangle' : 'clock'" [size]="11" />
+                {{ dueHint(t) }}
+              </span>
+            }
+          </header>
+
+          <h3 class="at-task__title">{{ t.title }}</h3>
+
+          <div class="at-task__patient">
+            <div class="avatar avatar--sm"
+                 [style.background]="'hsl(' + patientHue(t.patient?.id) + ' 55% 88%)'"
+                 [style.color]="'hsl(' + patientHue(t.patient?.id) + ' 55% 32%)'">
+              {{ initials(t.patient) }}
+            </div>
+            <div>
+              <div class="at-task__patient-name">{{ t.patient?.firstName }} {{ t.patient?.lastName }}</div>
+              <div class="at-task__patient-meta">
+                @if (t.bed?.ward?.name) { {{ t.bed?.ward?.name }} }
+                @if (t.bed?.bedNumber) { · Bed {{ t.bed?.bedNumber }} }
+              </div>
+            </div>
+          </div>
+
+          @if (t.destination) {
+            <div class="at-task__destination">
+              <lucide-icon name="map-pin" [size]="12" /> {{ t.destination }}
+            </div>
+          }
+
+          @if (t.description) {
+            <div class="at-task__description">{{ t.description }}</div>
+          }
+
+          <footer class="at-task__foot">
+            <div class="at-task__from">
+              <lucide-icon name="user" [size]="11" />
+              From {{ t.nurse?.firstName }} {{ t.nurse?.lastName }}
+              · {{ t.createdAt | date:'shortTime' }}
+            </div>
+
+            @if (noteFor() === t.id) {
+              <div class="at-task__note-form">
+                <textarea
+                  class="input at-task__note"
+                  rows="2"
+                  placeholder="Optional note on what you did…"
+                  [value]="doneNote()"
+                  (input)="doneNote.set($any($event.target).value)"></textarea>
+                <div class="at-task__note-actions">
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="closeNote()">Cancel</button>
+                  <button type="button" class="btn btn--primary btn--sm" (click)="complete(t, true)" [disabled]="actioning() === t.id">
+                    <lucide-icon name="check-circle" [size]="13" /> Done
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="at-task__actions">
+                <button type="button" class="at-task__note-btn" (click)="openNoteFor(t.id)" title="Mark done with a note">
+                  <lucide-icon name="message-square" [size]="12" /> With note
+                </button>
+                <button type="button" class="at-task__done-btn" (click)="complete(t, false)" [disabled]="actioning() === t.id">
+                  <lucide-icon name="check-circle" [size]="14" /> Mark Done
+                </button>
+              </div>
+            }
+          </footer>
+        </article>
+      }
+    </div>
+  }
+</div>

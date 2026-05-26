@@ -149,6 +149,66 @@
     }
   }
 
+  // ── Task quick-assign (compose) ──────────────────────────
+  &-task-quick {
+    padding: 12px 0 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 8px;
+
+    &__label {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary, #8e8e93);
+      margin-bottom: 6px;
+    }
+    &__patients {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    &__btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid transparent;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 140ms;
+      font-family: inherit;
+      &:hover { background: rgba(0,122,255,0.08); border-color: rgba(0,122,255,0.2); }
+      &--active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        &:hover { background: #0066D6; border-color: #0066D6; }
+      }
+    }
+  }
+
+  &-task-compose {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: var(--color-primary-subtle);
+    border: 1px solid rgba(0, 122, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: nh-expand 220ms ease;
+
+    &__row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+
+      @media (max-width: 720px) { grid-template-columns: 1fr; }
+    }
+  }
+
   // ── Pending tab header ───────────────────────────────────
   &-pending-head {
     display: flex;

@@ -17,6 +17,14 @@
       <lucide-icon name="bell" [size]="14" /> Pending
       @if (pendingCount() > 0) { <span class="nh-tab__badge">{{ pendingCount() }}</span> }
     </button>
+    <button type="button" class="nh-tab" [ngClass]="{ 'is-active': tab() === 'orders' }" (click)="switchTab('orders')">
+      <lucide-icon name="message-square" [size]="14" /> Doctor Orders
+      @if (orderCount() > 0) { <span class="nh-tab__badge">{{ orderCount() }}</span> }
+    </button>
+    <button type="button" class="nh-tab" [ngClass]="{ 'is-active': tab() === 'tasks' }" (click)="switchTab('tasks')">
+      <lucide-icon name="clipboard-list" [size]="14" /> Attendant Tasks
+      @if (taskCount() > 0) { <span class="nh-tab__badge">{{ taskCount() }}</span> }
+    </button>
     <button type="button" class="nh-tab" [ngClass]="{ 'is-active': tab() === 'history' }" (click)="switchTab('history')">
       <lucide-icon name="clock" [size]="14" /> History
     </button>
@@ -197,6 +205,206 @@
           </li>
         }
       </ul>
+    </section>
+  }
+
+  <!-- ─────────────────────────────── Doctor Orders tab ─────────────────────────────── -->
+  @if (tab() === 'orders') {
+    <section class="nh-card">
+      <div class="nh-pending-head">
+        <div class="nh-pending-head__info">
+          <lucide-icon name="message-square" [size]="14" />
+          Open RMO orders for
+          <strong>{{ auth.user()?.firstName }} {{ auth.user()?.lastName }}</strong>
+        </div>
+        <button type="button" class="nh-pill" (click)="refreshOrders()">
+          <lucide-icon name="refresh-cw" [size]="12" /> Refresh
+        </button>
+      </div>
+
+      @if (rmoOrders().length === 0) {
+        <div class="nh-empty">
+          <lucide-icon name="check-circle" [size]="14" /> No open orders.
+        </div>
+      }
+
+      <ul class="nh-list">
+        @for (o of rmoOrders(); track o.id) {
+          <li class="nh-item">
+            <div class="nh-item__head" style="cursor:default">
+              <div class="avatar avatar--sm"
+                   [style.background]="'hsl(' + patientHue(o.patient?.id) + ' 55% 88%)'"
+                   [style.color]="'hsl(' + patientHue(o.patient?.id) + ' 55% 32%)'">
+                {{ initials(o.patient) }}
+              </div>
+              <div class="nh-item__info">
+                <div class="nh-item__name">
+                  {{ o.patient?.firstName }} {{ o.patient?.lastName }}
+                  @if (o.relatedConsultantInstructionId) {
+                    <span class="badge badge--neutral badge--sm" title="Chained from a consultant instruction">
+                      <lucide-icon name="arrow-right" [size]="10" /> chained
+                    </span>
+                  }
+                </div>
+                <div class="nh-item__meta">
+                  @if (o.bed?.ward?.name) { <span class="badge badge--neutral badge--sm">{{ o.bed?.ward?.name }}</span> }
+                  @if (o.bed?.bedNumber) { <span class="text-muted">· Bed {{ o.bed?.bedNumber }}</span> }
+                  · from <strong>Dr. {{ o.rmo?.firstName }} {{ o.rmo?.lastName }}</strong>
+                  · {{ o.createdAt | date:'shortTime' }}
+                </div>
+              </div>
+            </div>
+            <div class="nh-item__detail">
+              <div class="nh-detail-label">Instruction</div>
+              <div class="nh-detail-body">{{ o.instruction }}</div>
+              <div class="nh-detail-actions">
+                <button type="button" class="btn btn--primary" (click)="completeOrder(o.id)" [disabled]="orderActioning() === o.id">
+                  <lucide-icon name="check-circle" [size]="15" /> Mark Done
+                </button>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <!-- ─────────────────────────────── Attendant Tasks tab ─────────────────────────────── -->
+  @if (tab() === 'tasks') {
+    <section class="nh-card">
+      <div class="nh-pending-head">
+        <div class="nh-pending-head__info">
+          <lucide-icon name="clipboard-list" [size]="14" />
+          Open tasks assigned by
+          <strong>{{ auth.user()?.firstName }} {{ auth.user()?.lastName }}</strong>
+        </div>
+        <button type="button" class="nh-pill" (click)="refreshTasks()">
+          <lucide-icon name="refresh-cw" [size]="12" /> Refresh
+        </button>
+      </div>
+
+      <!-- Quick compose: pick a patient first -->
+      <div class="nh-task-quick">
+        <div class="nh-task-quick__label">Assign a new task — pick patient:</div>
+        <div class="nh-task-quick__patients">
+          @for (a of admissions(); track a.id) {
+            <button type="button" class="nh-task-quick__btn"
+                    [class.nh-task-quick__btn--active]="composeFor() === a.id"
+                    (click)="openTaskCompose(a.id)">
+              {{ a.patient?.firstName }} {{ a.patient?.lastName }}
+              @if (a.bed?.bedNumber) { <span class="text-muted">· {{ a.bed?.bedNumber }}</span> }
+            </button>
+          }
+        </div>
+
+        @if (composeFor(); as cfId) {
+          <div class="nh-task-compose">
+            <div class="nh-task-compose__row">
+              <div class="field">
+                <label class="field__label">Category <span class="text-danger">*</span></label>
+                <select class="select" [value]="draftCategory()" (change)="draftCategory.set($any($event.target).value)">
+                  @for (c of taskCategories(); track c.value) {
+                    <option [value]="c.value">{{ c.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label">Assign to (optional)</label>
+                <select class="select" [value]="draftAtt()" (change)="draftAtt.set($any($event.target).value)">
+                  <option value="">Any attendant on duty</option>
+                  @for (a of attendants(); track a.id) {
+                    <option [value]="a.id">{{ a.firstName }} {{ a.lastName }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label">Due by (optional)</label>
+                <input type="datetime-local" class="input"
+                       [value]="draftDue()"
+                       (input)="draftDue.set($any($event.target).value)" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label">Task title <span class="text-danger">*</span></label>
+              <input class="input" [value]="draftTitle()" (input)="draftTitle.set($any($event.target).value)"
+                     placeholder="e.g. Shift to MRI for brain scan" />
+            </div>
+            <div class="nh-task-compose__row">
+              <div class="field" style="flex:1">
+                <label class="field__label">Destination (for transport tasks)</label>
+                <input class="input" [value]="draftDest()" (input)="draftDest.set($any($event.target).value)"
+                       placeholder="e.g. Radiology · MRI Room 2" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label">Notes</label>
+              <textarea class="input nh-textarea" rows="2"
+                        [value]="draftDesc()" (input)="draftDesc.set($any($event.target).value)"
+                        placeholder="Anything the attendant should know — wheelchair, oxygen support, etc."></textarea>
+            </div>
+            <div class="nh-detail-actions">
+              <button type="button" class="btn btn--ghost btn--sm" (click)="closeTaskCompose()">Cancel</button>
+              <button type="button" class="btn btn--primary"
+                      [disabled]="!draftTitle().trim() || !draftCategory() || taskSaving()"
+                      (click)="createTask()">
+                <lucide-icon name="check-circle" [size]="15" /> Assign Task
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Open task list -->
+      @if (tasks().length === 0) {
+        <div class="nh-empty">
+          <lucide-icon name="check-circle" [size]="14" /> No open attendant tasks.
+        </div>
+      } @else {
+        <ul class="nh-list">
+          @for (t of tasks(); track t.id) {
+            <li class="nh-item" [class.nh-item--pending]="isTaskOverdue(t)">
+              <div class="nh-item__head" style="cursor:default">
+                <div class="avatar avatar--sm"
+                     [style.background]="'hsl(' + patientHue(t.patient?.id) + ' 55% 88%)'"
+                     [style.color]="'hsl(' + patientHue(t.patient?.id) + ' 55% 32%)'">
+                  {{ initials(t.patient) }}
+                </div>
+                <div class="nh-item__info">
+                  <div class="nh-item__name">
+                    {{ t.title }}
+                    <span class="badge badge--neutral badge--sm">{{ taskCategoryLabel(t.category) }}</span>
+                    @if (isTaskOverdue(t)) {
+                      <span class="badge badge--danger badge--sm">
+                        <lucide-icon name="alert-triangle" [size]="10" /> Overdue
+                      </span>
+                    }
+                  </div>
+                  <div class="nh-item__meta">
+                    {{ t.patient?.firstName }} {{ t.patient?.lastName }}
+                    @if (t.bed?.bedNumber) { <span class="text-muted">· Bed {{ t.bed?.bedNumber }}</span> }
+                    @if (t.assignedAttendant) {
+                      <span class="text-muted">· assigned to {{ t.assignedAttendant?.firstName }} {{ t.assignedAttendant?.lastName }}</span>
+                    } @else {
+                      <span class="text-muted">· any attendant</span>
+                    }
+                    @if (t.dueAt) {
+                      <span class="text-muted">· due {{ t.dueAt | date:'short' }}</span>
+                    }
+                  </div>
+                </div>
+                <button type="button" class="rh-inst__forward" (click)="cancelTask(t.id)" title="Cancel this task">
+                  <lucide-icon name="x" [size]="13" /> Cancel
+                </button>
+              </div>
+              @if (t.description) {
+                <div class="nh-item__detail">
+                  <div class="nh-detail-body">{{ t.description }}</div>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
     </section>
   }
 
