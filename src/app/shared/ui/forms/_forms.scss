@@ -1,0 +1,63 @@
+// Shared mixins + base styles for gw-* form controls.
+// Imported by each control's SCSS to keep visuals consistent.
+
+@mixin gw-control-surface {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--t-fast) ease,
+              box-shadow var(--t-fast) ease,
+              background-color var(--t-fast) ease;
+
+  &::placeholder { color: var(--text-tertiary); }
+
+  &:hover:not(:disabled):not(:focus):not(:focus-within) {
+    border-color: var(--border-strong);
+  }
+
+  &:focus,
+  &:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    color: var(--text-disabled);
+    background: var(--surface-input);
+    cursor: not-allowed;
+  }
+}
+
+@mixin gw-control-error {
+  border-color: var(--color-danger);
+  &:focus,
+  &:focus-within {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 4px var(--color-danger-subtle);
+  }
+}
+
+@mixin gw-size-sm { min-height: 32px; padding: 0 10px; font-size: 13px; }
+@mixin gw-size-md { min-height: 40px; padding: 0 12px; font-size: 14px; }
+@mixin gw-size-lg { min-height: 48px; padding: 0 14px; font-size: 15px; }
+
+@mixin gw-visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

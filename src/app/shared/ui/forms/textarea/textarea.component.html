@@ -1,0 +1,14 @@
+<textarea
+  #area
+  class="gw-textarea"
+  [class.gw-textarea--invalid]="invalid"
+  [id]="inputId"
+  [rows]="rows"
+  [placeholder]="placeholder"
+  [value]="value()"
+  [disabled]="disabled()"
+  [attr.maxlength]="maxLength"
+  [attr.aria-invalid]="invalid || null"
+  (input)="handleInput($event)"
+  (blur)="handleBlur()"
+></textarea>

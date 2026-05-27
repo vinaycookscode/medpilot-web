@@ -1,0 +1,24 @@
+<div class="gw-select"
+     [class.gw-select--sm]="size === 'sm'"
+     [class.gw-select--lg]="size === 'lg'"
+     [class.gw-select--invalid]="invalid"
+     [class.gw-select--disabled]="disabled()"
+     [class.gw-select--empty]="value() === null">
+  <select
+    class="gw-select__el"
+    [id]="inputId"
+    [disabled]="disabled()"
+    [attr.aria-invalid]="invalid || null"
+    (change)="handleChange($event)"
+    (blur)="handleBlur()">
+    <option [value]="''" [selected]="value() === null" disabled hidden>{{ placeholder }}</option>
+    @for (opt of options; track opt.value) {
+      <option [value]="opt.value" [disabled]="opt.disabled" [selected]="isSelected(opt)">
+        {{ opt.label }}
+      </option>
+    }
+  </select>
+  <span class="gw-select__caret" aria-hidden="true">
+    <svg viewBox="0 0 12 8" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+  </span>
+</div>

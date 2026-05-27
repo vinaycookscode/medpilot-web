@@ -1,0 +1,53 @@
+@use '../forms' as f;
+
+:host { display: block; width: 100%; }
+
+.gw-search {
+  @include f.gw-control-surface;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+
+  &__icon {
+    width: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+  }
+
+  &__el {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    padding: 0 4px 0 0;
+    height: 100%;
+    min-height: inherit;
+    font: inherit;
+    color: inherit;
+
+    &::placeholder { color: var(--text-tertiary); }
+    &::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+  }
+
+  &__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    margin-right: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--text-tertiary);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    &:hover { background: var(--surface-input); color: var(--text-primary); }
+  }
+
+  &--sm { @include f.gw-size-sm; .gw-search__icon { width: 30px; } }
+  &--lg { @include f.gw-size-lg; .gw-search__icon { width: 40px; } }
+  &--invalid { @include f.gw-control-error; }
+}

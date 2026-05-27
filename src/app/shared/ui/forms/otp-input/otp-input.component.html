@@ -1,0 +1,21 @@
+<div class="gw-otp"
+     [class.gw-otp--invalid]="invalid"
+     [class.gw-otp--disabled]="disabled()"
+     (paste)="handlePaste($event)">
+  @for (i of slotIndices; track i) {
+    <input
+      #slot
+      class="gw-otp__slot"
+      [class.is-filled]="slots()[i]"
+      type="text"
+      [attr.inputmode]="digitsOnly ? 'numeric' : 'text'"
+      [attr.maxlength]="1"
+      [attr.autocomplete]="i === 0 ? 'one-time-code' : 'off'"
+      [value]="slots()[i]"
+      [disabled]="disabled()"
+      (input)="handleInput(i, $event)"
+      (keydown)="handleKeydown(i, $event)"
+      (blur)="handleBlur()"
+    />
+  }
+</div>

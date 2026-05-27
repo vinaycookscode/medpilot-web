@@ -1,0 +1,19 @@
+<label class="gw-toggle"
+       [class.gw-toggle--checked]="checked()"
+       [class.gw-toggle--disabled]="disabled()"
+       [class.gw-toggle--sm]="size === 'sm'">
+  <input
+    class="gw-toggle__input"
+    type="checkbox"
+    role="switch"
+    [id]="inputId"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    [attr.aria-checked]="checked()"
+    (change)="handleChange($event)"
+  />
+  <span class="gw-toggle__track" aria-hidden="true">
+    <span class="gw-toggle__thumb"></span>
+  </span>
+  @if (label) { <span class="gw-toggle__label">{{ label }}</span> }
+</label>

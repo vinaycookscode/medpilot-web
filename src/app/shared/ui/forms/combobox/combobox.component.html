@@ -1,0 +1,73 @@
+<div class="gw-cb"
+     [class.gw-cb--sm]="size === 'sm'"
+     [class.gw-cb--lg]="size === 'lg'"
+     [class.gw-cb--open]="open()"
+     [class.gw-cb--invalid]="invalid"
+     [class.gw-cb--disabled]="disabled()">
+  <button type="button" class="gw-cb__trigger"
+          [id]="inputId"
+          [disabled]="disabled()"
+          [attr.aria-haspopup]="'listbox'"
+          [attr.aria-expanded]="open()"
+          [attr.aria-invalid]="invalid || null"
+          (click)="toggle()">
+    @if (selected()) {
+      <span class="gw-cb__value">{{ selected()!.label }}</span>
+    } @else {
+      <span class="gw-cb__placeholder">{{ placeholder }}</span>
+    }
+    @if (clearable && selected() && !disabled()) {
+      <span class="gw-cb__clear" role="button" aria-label="Clear" (click)="clear($event)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </span>
+    }
+    <span class="gw-cb__caret" aria-hidden="true">
+      <svg viewBox="0 0 12 8" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </span>
+  </button>
+
+  @if (open()) {
+    <div class="gw-cb__panel" role="listbox">
+      <div class="gw-cb__search">
+        <svg class="gw-cb__search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <input #search
+               class="gw-cb__search-el"
+               type="text"
+               [placeholder]="searchPlaceholder"
+               [value]="query()"
+               (input)="onSearch($event)"
+               (keydown)="onSearchKeydown($event)" />
+      </div>
+      @if (filtered().length === 0) {
+        <div class="gw-cb__empty">{{ emptyText }}</div>
+      } @else {
+        <ul class="gw-cb__list">
+          @for (opt of filtered(); track opt.value; let i = $index) {
+            <li class="gw-cb__option"
+                role="option"
+                [class.is-active]="i === activeIndex()"
+                [class.is-selected]="isSelected(opt)"
+                [class.is-disabled]="opt.disabled"
+                [attr.aria-selected]="isSelected(opt)"
+                (mouseenter)="activeIndex.set(i)"
+                (mousedown)="pick(opt); $event.preventDefault()">
+              <div class="gw-cb__opt-main">
+                <span class="gw-cb__opt-label">{{ opt.label }}</span>
+                @if (opt.hint) { <span class="gw-cb__opt-hint">{{ opt.hint }}</span> }
+              </div>
+              @if (isSelected(opt)) {
+                <svg viewBox="0 0 14 14" width="14" height="14" class="gw-cb__check">
+                  <path d="M3 7.5l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

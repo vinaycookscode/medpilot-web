@@ -1,0 +1,11 @@
+@if (loading) {
+  <span class="gw-button__spinner" aria-hidden="true"></span>
+} @else if (leadingIcon) {
+  <i class="gw-button__icon gw-button__icon--leading" [attr.data-lucide]="leadingIcon" aria-hidden="true"></i>
+}
+
+<span class="gw-button__label"><ng-content></ng-content></span>
+
+@if (trailingIcon && !loading) {
+  <i class="gw-button__icon gw-button__icon--trailing" [attr.data-lucide]="trailingIcon" aria-hidden="true"></i>
+}

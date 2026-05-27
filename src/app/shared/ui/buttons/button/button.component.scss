@@ -1,0 +1,87 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--t-fast) ease,
+              border-color var(--t-fast) ease,
+              color var(--t-fast) ease,
+              box-shadow var(--t-fast) ease,
+              transform var(--t-fast) ease;
+
+  &:focus-visible { box-shadow: var(--shadow-focus); outline: none; }
+  &:active:not([disabled]) { transform: translateY(0.5px); }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+:host(.gw-button-host--sm) { height: 32px; padding: 0 12px; font-size: 13px; }
+:host(.gw-button-host--lg) { height: 48px; padding: 0 20px; font-size: 15px; }
+:host(.gw-button-host--block) { display: flex; width: 100%; }
+
+:host(.gw-button-host--primary) {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  &:hover:not([disabled]) { background: var(--color-primary-hover); }
+  &:active:not([disabled]) { background: var(--color-primary-active); }
+}
+
+:host(.gw-button-host--secondary) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border);
+  &:hover:not([disabled]) { background: var(--surface-input); border-color: var(--border-strong); }
+}
+
+:host(.gw-button-host--ghost) {
+  background: transparent;
+  color: var(--text-secondary);
+  &:hover:not([disabled]) { background: var(--surface-input); color: var(--text-primary); }
+}
+
+:host(.gw-button-host--subtle) {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  &:hover:not([disabled]) { background: var(--color-primary-light); }
+}
+
+:host(.gw-button-host--danger) {
+  background: var(--color-danger);
+  color: var(--text-inverse);
+  &:hover:not([disabled]) { background: #d63027; }
+}
+
+.gw-button__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.gw-button__spinner {
+  width: 14px; height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: gw-button-spin 0.7s linear infinite;
+}
+
+:host(.gw-button-host--loading) .gw-button__label { opacity: 0.6; }
+
+@keyframes gw-button-spin {
+  to { transform: rotate(360deg); }
+}

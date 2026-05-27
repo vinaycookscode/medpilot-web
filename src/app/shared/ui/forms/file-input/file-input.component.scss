@@ -1,0 +1,95 @@
+:host { display: block; width: 100%; }
+
+.gw-file {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--t-fast) ease, background-color var(--t-fast) ease;
+
+  &:hover:not(.gw-file--disabled) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-subtle);
+  }
+
+  &--hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-subtle);
+  }
+
+  &--has-files {
+    padding: 12px;
+    text-align: left;
+    border-style: solid;
+    cursor: default;
+  }
+
+  &--invalid { border-color: var(--color-danger); }
+  &--disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &__native {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0; pointer-events: none;
+  }
+
+  &__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__icon {
+    color: var(--text-secondary);
+    width: 32px; height: 32px;
+  }
+
+  &__hint { margin: 0; font-size: 14px; color: var(--text-primary); }
+  &__meta { margin: 0; font-size: 12px; color: var(--text-tertiary); }
+
+  &__list {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+  }
+
+  &__row-icon { color: var(--text-secondary); flex-shrink: 0; width: 16px; height: 16px; }
+  &__row-name { flex: 1; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__row-size { color: var(--text-tertiary); font-size: 12px; flex-shrink: 0; }
+  &__row-x {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px;
+    border: 0; background: transparent;
+    color: var(--text-tertiary);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    &:hover { background: var(--color-danger-subtle); color: var(--color-danger); }
+  }
+
+  &__add {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px;
+    color: var(--color-primary);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    &:hover { background: var(--color-primary-subtle); }
+    i { width: 14px; height: 14px; }
+  }
+}

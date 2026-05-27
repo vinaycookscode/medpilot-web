@@ -1,0 +1,55 @@
+@use '../forms' as f;
+
+:host { display: block; width: 100%; }
+
+.gw-num {
+  @include f.gw-control-surface;
+  padding: 0;
+
+  &__el {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    text-align: center;
+    height: 100%;
+    min-height: inherit;
+    padding: 0 8px;
+    font: inherit;
+    color: inherit;
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    &::placeholder { color: var(--text-tertiary); }
+  }
+
+  &__step {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 100%;
+    min-height: inherit;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: var(--surface-input); color: var(--text-primary); }
+    &:disabled { color: var(--text-disabled); cursor: not-allowed; }
+
+    &--minus { border-right: 1px solid var(--border); }
+    &--plus  { border-left:  1px solid var(--border); }
+  }
+
+  &--sm {
+    @include f.gw-size-sm;
+    .gw-num__step { width: 32px; font-size: 16px; }
+  }
+  &--lg {
+    @include f.gw-size-lg;
+    .gw-num__step { width: 48px; font-size: 20px; }
+  }
+  &--invalid { @include f.gw-control-error; }
+}

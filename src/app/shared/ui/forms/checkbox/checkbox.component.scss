@@ -1,0 +1,54 @@
+@use '../forms' as f;
+
+:host { display: inline-block; }
+
+.gw-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+
+  &__input { @include f.gw-visually-hidden; }
+
+  &__box {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    background: var(--bg-input);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: background-color var(--t-fast) ease,
+                border-color var(--t-fast) ease,
+                box-shadow var(--t-fast) ease;
+  }
+
+  &__label { line-height: 1.4; }
+
+  &:hover .gw-checkbox__box { border-color: var(--color-primary); }
+
+  &__input:focus-visible + .gw-checkbox__box {
+    box-shadow: var(--shadow-focus);
+    border-color: var(--border-focus);
+  }
+
+  &--checked .gw-checkbox__box,
+  &--indeterminate .gw-checkbox__box {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  &--invalid .gw-checkbox__box { border-color: var(--color-danger); }
+
+  &--disabled {
+    cursor: not-allowed;
+    color: var(--text-disabled);
+    .gw-checkbox__box { background: var(--surface-input); border-color: var(--border); }
+  }
+}

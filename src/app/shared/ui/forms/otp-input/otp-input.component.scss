@@ -1,0 +1,29 @@
+:host { display: block; }
+
+.gw-otp {
+  display: inline-flex;
+  gap: 8px;
+
+  &__slot {
+    width: 44px;
+    height: 52px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    outline: 0;
+    transition: border-color var(--t-fast) ease, box-shadow var(--t-fast) ease;
+
+    &:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+    &:disabled { background: var(--surface-input); cursor: not-allowed; }
+    &.is-filled { border-color: var(--color-primary); }
+  }
+
+  &--invalid .gw-otp__slot { border-color: var(--color-danger); }
+  &--invalid .gw-otp__slot:focus { box-shadow: 0 0 0 4px var(--color-danger-subtle); }
+  &--disabled .gw-otp__slot { opacity: 0.7; }
+}

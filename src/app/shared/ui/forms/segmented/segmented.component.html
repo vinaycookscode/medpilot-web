@@ -1,0 +1,22 @@
+<div class="gw-seg"
+     role="tablist"
+     [class.gw-seg--sm]="size === 'sm'"
+     [class.gw-seg--lg]="size === 'lg'"
+     [class.gw-seg--block]="block"
+     [class.gw-seg--invalid]="invalid"
+     [class.gw-seg--disabled]="disabled()">
+  @for (opt of options; track opt.value) {
+    <button type="button"
+            class="gw-seg__item"
+            role="tab"
+            [class.is-active]="isActive(opt)"
+            [attr.aria-selected]="isActive(opt)"
+            [disabled]="disabled() || opt.disabled || false"
+            (click)="pick(opt)">
+      @if (opt.icon) {
+        <i class="gw-seg__icon" [attr.data-lucide]="opt.icon" aria-hidden="true"></i>
+      }
+      <span>{{ opt.label }}</span>
+    </button>
+  }
+</div>

@@ -1,0 +1,29 @@
+<div class="gw-search"
+     [class.gw-search--sm]="size === 'sm'"
+     [class.gw-search--lg]="size === 'lg'"
+     [class.gw-search--invalid]="invalid"
+     [class.gw-search--disabled]="disabled()">
+  <span class="gw-search__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+    </svg>
+  </span>
+  <input
+    class="gw-search__el"
+    type="search"
+    [id]="inputId"
+    [placeholder]="placeholder"
+    [value]="value()"
+    [disabled]="disabled()"
+    [attr.aria-invalid]="invalid || null"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+  />
+  @if (value()) {
+    <button type="button" class="gw-search__clear" aria-label="Clear" (click)="clear()">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+  }
+</div>

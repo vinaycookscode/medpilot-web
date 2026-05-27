@@ -1,0 +1,32 @@
+<div class="gw-input"
+     [class.gw-input--sm]="size === 'sm'"
+     [class.gw-input--lg]="size === 'lg'"
+     [class.gw-input--invalid]="invalid"
+     [class.gw-input--disabled]="disabled()">
+
+  @if (leadingIcon) {
+    <span class="gw-input__icon gw-input__icon--leading" aria-hidden="true">
+      <i [attr.data-lucide]="leadingIcon"></i>
+    </span>
+  }
+
+  <input
+    #input
+    class="gw-input__el"
+    [id]="inputId"
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value()"
+    [disabled]="disabled()"
+    [attr.autocomplete]="autocomplete"
+    [attr.aria-invalid]="invalid || null"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+  />
+
+  @if (trailingIcon) {
+    <span class="gw-input__icon gw-input__icon--trailing" aria-hidden="true">
+      <i [attr.data-lucide]="trailingIcon"></i>
+    </span>
+  }
+</div>
