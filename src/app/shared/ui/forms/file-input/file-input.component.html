@@ -1,0 +1,53 @@
+<div class="gw-file"
+     [class.gw-file--hover]="hovering()"
+     [class.gw-file--invalid]="invalid"
+     [class.gw-file--disabled]="disabled()"
+     [class.gw-file--has-files]="files().length > 0"
+     (click)="trigger()">
+  <input #fileInput
+         type="file"
+         class="gw-file__native"
+         [id]="inputId"
+         [multiple]="multiple"
+         [attr.accept]="accept"
+         [disabled]="disabled()"
+         (change)="onSelected($event)" />
+
+  @if (files().length === 0) {
+    <div class="gw-file__placeholder">
+      <i class="gw-file__icon" [attr.data-lucide]="icon" aria-hidden="true"></i>
+      <p class="gw-file__hint">{{ hint }}</p>
+      @if (accept || maxMb !== null) {
+        <p class="gw-file__meta">
+          @if (accept) { <span>{{ accept }}</span> }
+          @if (accept && maxMb !== null) { <span> · </span> }
+          @if (maxMb !== null) { <span>up to {{ maxMb }} MB</span> }
+        </p>
+      }
+    </div>
+  } @else {
+    <ul class="gw-file__list" (click)="$event.stopPropagation()">
+      @for (file of files(); track file.name + file.size; let i = $index) {
+        <li class="gw-file__row">
+          <i class="gw-file__row-icon" [attr.data-lucide]="'file'" aria-hidden="true"></i>
+          <span class="gw-file__row-name">{{ file.name }}</span>
+          <span class="gw-file__row-size">{{ formatSize(file.size) }}</span>
+          @if (!disabled()) {
+            <button type="button" class="gw-file__row-x" aria-label="Remove file"
+                    (click)="remove(i, $event)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <path d="M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </button>
+          }
+        </li>
+      }
+      @if (multiple) {
+        <li class="gw-file__add" (click)="trigger()">
+          <i [attr.data-lucide]="'plus'" aria-hidden="true"></i>
+          <span>Add more</span>
+        </li>
+      }
+    </ul>
+  }
+</div>

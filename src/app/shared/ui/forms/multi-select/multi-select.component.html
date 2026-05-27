@@ -1,0 +1,83 @@
+<div class="gw-ms"
+     [class.gw-ms--open]="open()"
+     [class.gw-ms--invalid]="invalid"
+     [class.gw-ms--disabled]="disabled()">
+  <button type="button" class="gw-ms__trigger"
+          [id]="inputId"
+          [disabled]="disabled()"
+          [attr.aria-haspopup]="'listbox'"
+          [attr.aria-expanded]="open()"
+          (click)="toggle()">
+    @if (chips().length === 0) {
+      <span class="gw-ms__placeholder">{{ placeholder }}</span>
+    } @else {
+      <span class="gw-ms__chips">
+        @for (chip of visibleChips(); track chip.value) {
+          <span class="gw-ms__chip">
+            {{ chip.label }}
+            @if (!disabled()) {
+              <button type="button" class="gw-ms__chip-x" aria-label="Remove"
+                      (click)="remove(chip, $event)">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                  <path d="M6 6l12 12M18 6L6 18"/>
+                </svg>
+              </button>
+            }
+          </span>
+        }
+        @if (overflowCount() > 0) {
+          <span class="gw-ms__chip gw-ms__chip--more">+{{ overflowCount() }}</span>
+        }
+      </span>
+    }
+    @if (chips().length > 0 && !disabled()) {
+      <span class="gw-ms__clear" role="button" aria-label="Clear all" (click)="clearAll($event)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </span>
+    }
+    <span class="gw-ms__caret" aria-hidden="true">
+      <svg viewBox="0 0 12 8" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </span>
+  </button>
+
+  @if (open()) {
+    <div class="gw-ms__panel">
+      <div class="gw-ms__search">
+        <svg class="gw-ms__search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <input #search type="text" class="gw-ms__search-el"
+               [placeholder]="searchPlaceholder"
+               [value]="query()"
+               (input)="onSearch($event)"
+               (keydown)="onSearchKeydown($event)" />
+      </div>
+      @if (filtered().length === 0) {
+        <div class="gw-ms__empty">{{ emptyText }}</div>
+      } @else {
+        <ul class="gw-ms__list" role="listbox" [attr.aria-multiselectable]="true">
+          @for (opt of filtered(); track opt.value; let i = $index) {
+            <li class="gw-ms__option"
+                role="option"
+                [class.is-active]="i === activeIndex()"
+                [class.is-selected]="isSelected(opt)"
+                [class.is-disabled]="opt.disabled"
+                [attr.aria-selected]="isSelected(opt)"
+                (mouseenter)="activeIndex.set(i)"
+                (mousedown)="toggleOpt(opt); $event.preventDefault()">
+              <span class="gw-ms__opt-check" [class.is-on]="isSelected(opt)">
+                @if (isSelected(opt)) {
+                  <svg viewBox="0 0 14 14" width="12" height="12"><path d="M3 7.5l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                }
+              </span>
+              <span class="gw-ms__opt-label">{{ opt.label }}</span>
+              @if (opt.hint) { <span class="gw-ms__opt-hint">{{ opt.hint }}</span> }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

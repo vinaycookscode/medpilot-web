@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "storybook": "ng run medpilot-web:storybook",
+    "build-storybook": "ng run medpilot-web:build-storybook"
   },
   "private": true,
   "packageManager": "npm@11.6.2",
@@ -26,6 +28,16 @@
     "@angular/cli": "^21.2.10",
     "@angular/compiler-cli": "^21.2.0",
     "prettier": "^3.8.1",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "storybook": "^10.4.1",
+    "@storybook/angular": "^10.4.1",
+    "@storybook/addon-a11y": "^10.4.1",
+    "@storybook/addon-docs": "^10.4.1",
+    "@storybook/addon-onboarding": "^10.4.1",
+    "@angular-devkit/build-angular": "^21.2.0",
+    "@angular-devkit/architect": "^0.2102.0",
+    "@angular-devkit/core": "^21.2.0",
+    "@angular/platform-browser-dynamic": "^21.2.0",
+    "@compodoc/compodoc": "^1.2.1"
   }
 }

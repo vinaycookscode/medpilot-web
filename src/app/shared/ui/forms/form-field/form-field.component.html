@@ -1,0 +1,16 @@
+@if (label) {
+  <label class="gw-field__label" [attr.for]="fieldId()">
+    {{ label }}
+    @if (required) { <span class="gw-field__required" aria-hidden="true">*</span> }
+  </label>
+}
+
+<div class="gw-field__control">
+  <ng-content></ng-content>
+</div>
+
+@if (error) {
+  <p class="gw-field__error" [id]="fieldId() + '-error'" role="alert">{{ error }}</p>
+} @else if (hint) {
+  <p class="gw-field__hint" [id]="fieldId() + '-hint'">{{ hint }}</p>
+}

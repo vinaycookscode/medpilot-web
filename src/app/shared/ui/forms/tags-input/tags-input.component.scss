@@ -1,0 +1,54 @@
+@use '../forms' as f;
+
+:host { display: block; width: 100%; }
+
+.gw-tags {
+  @include f.gw-control-surface;
+  padding: 6px 8px;
+  min-height: 40px;
+  flex-wrap: wrap;
+  gap: 4px;
+  cursor: text;
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  &__x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px; height: 14px;
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+    &:hover { opacity: 1; }
+  }
+
+  &__el {
+    flex: 1;
+    min-width: 80px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    height: 26px;
+    font: inherit;
+    color: inherit;
+
+    &::placeholder { color: var(--text-tertiary); }
+  }
+
+  &--invalid { @include f.gw-control-error; }
+}

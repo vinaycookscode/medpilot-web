@@ -1,0 +1,15 @@
+@use '../forms' as f;
+
+:host { display: block; width: 100%; }
+
+.gw-textarea {
+  @include f.gw-control-surface;
+  min-height: 92px;
+  padding: 10px 12px;
+  align-items: flex-start;
+  resize: vertical;
+  line-height: 1.5;
+  display: block;
+
+  &--invalid { @include f.gw-control-error; }
+}

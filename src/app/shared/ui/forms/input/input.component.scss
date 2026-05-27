@@ -1,0 +1,42 @@
+@use '../forms' as f;
+
+:host { display: block; width: 100%; }
+
+.gw-input {
+  @include f.gw-control-surface;
+  position: relative;
+  padding: 0;          // padding is on the inner <input>
+
+  &__el {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    padding: 0 12px;
+    height: 100%;
+    min-height: inherit;
+    font: inherit;
+    color: inherit;
+
+    &::placeholder { color: var(--text-tertiary); }
+
+    &:disabled { cursor: not-allowed; }
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+
+    & + .gw-input__el { padding-left: 0; }
+    &--trailing       { margin-left: -36px; }
+  }
+
+  &--sm { @include f.gw-size-sm; }
+  &--lg { @include f.gw-size-lg; }
+
+  &--invalid { @include f.gw-control-error; }
+}

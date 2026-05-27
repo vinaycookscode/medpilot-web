@@ -1,0 +1,20 @@
+<div class="gw-phone"
+     [class.gw-phone--sm]="size === 'sm'"
+     [class.gw-phone--lg]="size === 'lg'"
+     [class.gw-phone--invalid]="invalid"
+     [class.gw-phone--disabled]="disabled()">
+  <span class="gw-phone__cc" aria-hidden="true">{{ countryCode }}</span>
+  <input
+    class="gw-phone__el"
+    type="tel"
+    inputmode="tel"
+    autocomplete="tel"
+    [id]="inputId"
+    [placeholder]="placeholder"
+    [value]="local()"
+    [disabled]="disabled()"
+    [attr.aria-invalid]="invalid || null"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+  />
+</div>

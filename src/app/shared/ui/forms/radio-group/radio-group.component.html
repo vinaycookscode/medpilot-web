@@ -1,0 +1,24 @@
+<div class="gw-radio-group"
+     [class.gw-radio-group--horizontal]="orientation === 'horizontal'"
+     [class.gw-radio-group--invalid]="invalid"
+     role="radiogroup">
+  @for (opt of options; track opt.value) {
+    <label class="gw-radio"
+           [class.gw-radio--checked]="isChecked(opt)"
+           [class.gw-radio--disabled]="disabled() || opt.disabled">
+      <input
+        class="gw-radio__input"
+        type="radio"
+        [name]="name"
+        [checked]="isChecked(opt)"
+        [disabled]="disabled() || opt.disabled || false"
+        (change)="pick(opt)"
+      />
+      <span class="gw-radio__dot" aria-hidden="true"></span>
+      <span class="gw-radio__body">
+        <span class="gw-radio__label">{{ opt.label }}</span>
+        @if (opt.hint) { <span class="gw-radio__hint">{{ opt.hint }}</span> }
+      </span>
+    </label>
+  }
+</div>

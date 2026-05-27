@@ -1,0 +1,22 @@
+<section class="gw-section" [class.gw-section--collapsed]="isCollapsed()">
+  @if (title || description) {
+    <header class="gw-section__header"
+            [class.is-clickable]="collapsible"
+            (click)="toggle()">
+      <div class="gw-section__heading">
+        @if (title) { <h3 class="gw-section__title">{{ title }}</h3> }
+        @if (description) { <p class="gw-section__desc">{{ description }}</p> }
+      </div>
+      @if (collapsible) {
+        <button type="button" class="gw-section__toggle" aria-label="Toggle section">
+          <svg viewBox="0 0 12 8" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+      }
+    </header>
+  }
+  @if (!isCollapsed()) {
+    <div class="gw-section__body">
+      <ng-content></ng-content>
+    </div>
+  }
+</section>

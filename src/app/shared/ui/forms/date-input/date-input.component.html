@@ -1,0 +1,23 @@
+<div class="gw-datelike"
+     [class.gw-datelike--sm]="size === 'sm'"
+     [class.gw-datelike--lg]="size === 'lg'"
+     [class.gw-datelike--invalid]="invalid"
+     [class.gw-datelike--disabled]="disabled()">
+  <input
+    class="gw-datelike__el"
+    type="date"
+    [id]="inputId"
+    [value]="value()"
+    [attr.min]="min"
+    [attr.max]="max"
+    [disabled]="disabled()"
+    [attr.aria-invalid]="invalid || null"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+  />
+  <span class="gw-datelike__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+    </svg>
+  </span>
+</div>

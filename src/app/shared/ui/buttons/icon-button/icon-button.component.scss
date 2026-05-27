@@ -1,0 +1,52 @@
+:host { display: inline-flex; }
+
+.gw-icon-button {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--t-fast) ease,
+              border-color var(--t-fast) ease,
+              color var(--t-fast) ease,
+              box-shadow var(--t-fast) ease;
+
+  &:hover:not(:disabled) { background: var(--surface-input); color: var(--text-primary); }
+  &:focus-visible        { outline: none; box-shadow: var(--shadow-focus); }
+  &:disabled             { cursor: not-allowed; opacity: 0.55; }
+
+  i { display: inline-flex; width: 18px; height: 18px; }
+}
+
+:host(.gw-icon-button-host--sm) .gw-icon-button { width: 32px; height: 32px; i { width: 16px; height: 16px; } }
+:host(.gw-icon-button-host--lg) .gw-icon-button { width: 48px; height: 48px; i { width: 20px; height: 20px; } }
+
+:host(.gw-icon-button-host--primary) .gw-icon-button {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  &:hover:not(:disabled) { background: var(--color-primary-hover); color: var(--text-inverse); }
+}
+
+:host(.gw-icon-button-host--secondary) .gw-icon-button {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border);
+  &:hover:not(:disabled) { background: var(--surface-input); }
+}
+
+:host(.gw-icon-button-host--subtle) .gw-icon-button {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  &:hover:not(:disabled) { background: var(--color-primary-light); color: var(--color-primary); }
+}
+
+:host(.gw-icon-button-host--danger) .gw-icon-button {
+  background: var(--color-danger-subtle);
+  color: var(--color-danger);
+  &:hover:not(:disabled) { background: var(--color-danger); color: var(--text-inverse); }
+}

@@ -1,0 +1,22 @@
+<div class="gw-cur"
+     [class.gw-cur--sm]="size === 'sm'"
+     [class.gw-cur--lg]="size === 'lg'"
+     [class.gw-cur--invalid]="invalid"
+     [class.gw-cur--disabled]="disabled()">
+  <span class="gw-cur__symbol" aria-hidden="true">{{ symbol }}</span>
+  <input
+    class="gw-cur__el"
+    type="number"
+    inputmode="decimal"
+    [id]="inputId"
+    [placeholder]="placeholder"
+    [value]="value() ?? ''"
+    [attr.min]="min"
+    [attr.max]="max"
+    [step]="step"
+    [disabled]="disabled()"
+    [attr.aria-invalid]="invalid || null"
+    (input)="handleInput($event)"
+    (blur)="handleBlur($event)"
+  />
+</div>

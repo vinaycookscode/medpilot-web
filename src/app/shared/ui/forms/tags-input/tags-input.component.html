@@ -1,0 +1,28 @@
+<div class="gw-tags"
+     [class.gw-tags--invalid]="invalid"
+     [class.gw-tags--disabled]="disabled()">
+  @for (tag of tags(); track tag; let i = $index) {
+    <span class="gw-tags__chip">
+      {{ tag }}
+      @if (!disabled()) {
+        <button type="button" class="gw-tags__x" aria-label="Remove"
+                (click)="remove(i, $event)">
+          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+      }
+    </span>
+  }
+  <input
+    class="gw-tags__el"
+    type="text"
+    [id]="inputId"
+    [placeholder]="tags().length ? '' : placeholder"
+    [value]="draft()"
+    [disabled]="disabled()"
+    (input)="handleInput($event)"
+    (keydown)="handleKeydown($event)"
+    (blur)="handleBlur()"
+  />
+</div>
