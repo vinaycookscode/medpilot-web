@@ -1,0 +1,59 @@
+<div class="gw-fb">
+  @if (rulesSig().length === 0) {
+    <div class="gw-fb__empty">
+      <p>No filters applied.</p>
+      <button type="button" class="gw-fb__btn gw-fb__btn--primary" (click)="addRule()">+ Add filter</button>
+    </div>
+  } @else {
+    <div class="gw-fb__rules">
+      @for (rule of rulesSig(); track rule.id; let i = $index) {
+        @if (i > 0) {
+          <button type="button" class="gw-fb__combinator" (click)="toggleCombinator()">{{ combinator }}</button>
+        }
+        <div class="gw-fb__rule">
+          <select class="gw-fb__select"
+                  [value]="rule.field"
+                  (change)="updateRule(rule.id, { field: $any($event.target).value })">
+            @for (f of fields; track f.key) {
+              <option [value]="f.key">{{ f.label }}</option>
+            }
+          </select>
+
+          <select class="gw-fb__select"
+                  [value]="rule.operator"
+                  (change)="updateRule(rule.id, { operator: $any($event.target).value })">
+            @for (op of operatorsFor(fieldFor(rule.field)); track op.value) {
+              <option [value]="op.value">{{ op.label }}</option>
+            }
+          </select>
+
+          @if (fieldFor(rule.field)?.type === 'select') {
+            <select class="gw-fb__select gw-fb__select--value"
+                    [value]="rule.value ?? ''"
+                    (change)="updateRule(rule.id, { value: $any($event.target).value })">
+              <option [value]="''" disabled hidden>Choose…</option>
+              @for (opt of fieldFor(rule.field)?.options || []; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          } @else {
+            <input class="gw-fb__input"
+                   [type]="fieldFor(rule.field)?.type || 'text'"
+                   [value]="rule.value ?? ''"
+                   placeholder="Value"
+                   (input)="updateRule(rule.id, { value: $any($event.target).value })" />
+          }
+
+          <button type="button" class="gw-fb__x" aria-label="Remove" (click)="removeRule(rule.id)">
+            <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="gw-fb__footer">
+      <button type="button" class="gw-fb__btn gw-fb__btn--ghost" (click)="addRule()">+ Add filter</button>
+      <button type="button" class="gw-fb__btn gw-fb__btn--ghost" (click)="clear()">Clear all</button>
+    </div>
+  }
+</div>

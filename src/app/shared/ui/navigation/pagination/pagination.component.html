@@ -1,0 +1,48 @@
+<nav class="gw-pg" aria-label="Pagination">
+  @if (showTotal) {
+    <p class="gw-pg__summary">
+      Showing <strong>{{ fromRow }}</strong>–<strong>{{ toRow }}</strong> of <strong>{{ total }}</strong>
+    </p>
+  }
+
+  <div class="gw-pg__controls">
+    @if (showPageSize) {
+      <label class="gw-pg__size">
+        <span>Rows</span>
+        <select class="gw-pg__size-select" [value]="pageSize" (change)="changeSize($event)">
+          @for (s of pageSizes; track s) { <option [value]="s">{{ s }}</option> }
+        </select>
+      </label>
+    }
+
+    <button type="button" class="gw-pg__nav"
+            aria-label="Previous page"
+            [disabled]="page <= 1"
+            (click)="go(page - 1)">
+      <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 3l-3 3 3 3"/></svg>
+    </button>
+
+    <ul class="gw-pg__pages">
+      @for (p of pages; track $index) {
+        @if (asNumber(p); as n) {
+          <li>
+            <button type="button"
+                    class="gw-pg__page"
+                    [class.is-active]="n === page"
+                    [attr.aria-current]="n === page ? 'page' : null"
+                    (click)="go(n)">{{ n }}</button>
+          </li>
+        } @else {
+          <li class="gw-pg__ellipsis" aria-hidden="true">…</li>
+        }
+      }
+    </ul>
+
+    <button type="button" class="gw-pg__nav"
+            aria-label="Next page"
+            [disabled]="page >= totalPages"
+            (click)="go(page + 1)">
+      <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>
+    </button>
+  </div>
+</nav>

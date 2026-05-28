@@ -1,0 +1,47 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Spacing" />
+
+# Spacing
+
+A **4px-base scale**. Every margin, padding, and gap in the library is
+a token — no magic numbers in component code.
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 520 }}>
+  {[
+    ['--sp-1',  4],
+    ['--sp-2',  8],
+    ['--sp-3',  12],
+    ['--sp-4',  16],
+    ['--sp-5',  20],
+    ['--sp-6',  24],
+    ['--sp-8',  32],
+    ['--sp-10', 40],
+    ['--sp-12', 48],
+    ['--sp-16', 64],
+    ['--sp-20', 80],
+  ].map(([tok, px]) => (
+    <div key={tok} style={{ display: 'grid', gridTemplateColumns: '90px 60px 1fr', gap: 12, alignItems: 'center' }}>
+      <code style={{ fontSize: 11, color: '#52525B', fontFamily: 'JetBrains Mono, monospace' }}>{tok}</code>
+      <span style={{ fontSize: 12, color: '#52525B', fontVariantNumeric: 'tabular-nums' }}>{px}px</span>
+      <div style={{ width: px, height: 14, background: '#2563EB', borderRadius: 3 }} />
+    </div>
+  ))}
+</div>
+
+## Layout grid
+
+| Token | Value | Use |
+|---|---|---|
+| `--sidebar-width` | 248px | App sidebar |
+| `--topbar-height` | 56px  | App topbar |
+
+## Density philosophy
+
+- **Compact controls** — 28px height, for table toolbars and dense layouts
+- **Default controls** — 36px height, for forms and standard pages
+- **Spacious controls** — 44px height, for auth screens and CTAs
+
+These map onto `--gw-control-surface` in
+[`shared/ui/forms/_forms.scss`](?path=/story/forms-input--basic) and
+propagate to every input + button.

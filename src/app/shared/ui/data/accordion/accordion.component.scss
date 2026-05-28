@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  width: 100%;
+  font-family: var(--font-family);
+}
+
+:host(.gw-accordion--bordered) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+:host(.gw-accordion--separated) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+
+  ::ng-deep .gw-acc-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+}

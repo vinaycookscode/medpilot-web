@@ -1,0 +1,43 @@
+<ul class="gw-tree" role="tree">
+  @for (node of nodes; track node.key) {
+    <ng-container *ngTemplateOutlet="row; context: { $implicit: node, depth: 0 }"></ng-container>
+  }
+</ul>
+
+<ng-template #row let-node let-depth="depth">
+  <li class="gw-tree__item" role="treeitem"
+      [attr.aria-expanded]="node.children?.length ? isExpanded(node) : null"
+      [attr.aria-selected]="isSelected(node)">
+    <button type="button"
+            class="gw-tree__node"
+            [class.is-selected]="isSelected(node)"
+            [class.is-disabled]="node.disabled"
+            [disabled]="node.disabled"
+            [style.padding-left.px]="8 + depth * 16"
+            (click)="toggle(node); select(node)">
+      <span class="gw-tree__chev"
+            [class.is-empty]="!node.children?.length"
+            [class.is-open]="isExpanded(node)"
+            aria-hidden="true">
+        @if (node.children?.length) {
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3l3 3-3 3"/></svg>
+        }
+      </span>
+      @if (node.icon) {
+        <i class="gw-tree__icon" [attr.data-lucide]="node.icon" aria-hidden="true"></i>
+      }
+      <span class="gw-tree__label">{{ node.label }}</span>
+      @if (node.meta !== undefined) {
+        <span class="gw-tree__meta">{{ node.meta }}</span>
+      }
+    </button>
+
+    @if (node.children?.length && isExpanded(node)) {
+      <ul class="gw-tree__group" role="group">
+        @for (child of node.children; track child.key) {
+          <ng-container *ngTemplateOutlet="row; context: { $implicit: child, depth: depth + 1 }"></ng-container>
+        }
+      </ul>
+    }
+  </li>
+</ng-template>

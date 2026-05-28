@@ -1,0 +1,37 @@
+<aside class="gw-sb">
+  <div class="gw-sb__brand"><ng-content select="[gw-sidebar-brand]"></ng-content></div>
+
+  <nav class="gw-sb__nav" aria-label="Primary">
+    @for (section of sections; track section.label || $index) {
+      <div class="gw-sb__section">
+        @if (section.label && !collapsed) {
+          <p class="gw-sb__section-label">{{ section.label }}</p>
+        }
+        <ul class="gw-sb__list">
+          @for (item of section.items; track item.key) {
+            <li>
+              <a class="gw-sb__item"
+                 [class.is-active]="isActive(item)"
+                 [class.is-disabled]="item.disabled"
+                 [href]="item.link || '#'"
+                 [attr.aria-current]="isActive(item) ? 'page' : null"
+                 [attr.title]="collapsed ? item.label : null">
+                @if (item.icon) {
+                  <i class="gw-sb__icon" [attr.data-lucide]="item.icon" aria-hidden="true"></i>
+                }
+                @if (!collapsed) {
+                  <span class="gw-sb__label">{{ item.label }}</span>
+                  @if (item.badge !== undefined) {
+                    <span class="gw-sb__badge">{{ item.badge }}</span>
+                  }
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+
+  <div class="gw-sb__footer"><ng-content select="[gw-sidebar-footer]"></ng-content></div>
+</aside>

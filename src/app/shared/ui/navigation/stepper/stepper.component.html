@@ -1,0 +1,32 @@
+<ol class="gw-step">
+  @for (step of steps; track $index; let i = $index, isLast = $last) {
+    <li class="gw-step__item"
+        [class.is-clickable]="canClick(step, i)"
+        [attr.data-status]="status(step, i)">
+      <button type="button"
+              class="gw-step__node"
+              [disabled]="!canClick(step, i)"
+              [attr.aria-current]="status(step, i) === 'current' ? 'step' : null"
+              (click)="handleClick(step, i)">
+        <span class="gw-step__indicator" aria-hidden="true">
+          @switch (status(step, i)) {
+            @case ('complete') {
+              <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5l3 3 5-6"/></svg>
+            }
+            @case ('error') {
+              <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg>
+            }
+            @default { {{ i + 1 }} }
+          }
+        </span>
+        <span class="gw-step__body">
+          <span class="gw-step__label">{{ step.label }}</span>
+          @if (step.description) { <span class="gw-step__desc">{{ step.description }}</span> }
+        </span>
+      </button>
+      @if (!isLast) {
+        <span class="gw-step__rail" aria-hidden="true"></span>
+      }
+    </li>
+  }
+</ol>

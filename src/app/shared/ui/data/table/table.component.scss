@@ -1,0 +1,154 @@
+:host {
+  display: block;
+  width: 100%;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+
+  // Density knobs (overridden per modifier)
+  --gw-tbl-cell-py: 10px;
+  --gw-tbl-cell-px: 14px;
+  --gw-tbl-row-h: auto;
+  --gw-tbl-head-py: 8px;
+}
+
+:host(.gw-table-host--bordered) {
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+:host(.gw-table-host--compact)  { --gw-tbl-cell-py: 6px;  --gw-tbl-head-py: 6px; }
+:host(.gw-table-host--spacious) { --gw-tbl-cell-py: 14px; --gw-tbl-head-py: 12px; }
+
+.gw-table__wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.gw-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  table-layout: auto;
+}
+
+// Header --------------------------------------------------------------------
+.gw-table__head {
+  background: var(--surface-input);
+}
+
+:host(.gw-table-host--sticky-head) .gw-table__head th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.gw-table__th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  padding: var(--gw-tbl-head-py) var(--gw-tbl-cell-px);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color var(--t-fast) ease, color var(--t-fast) ease;
+
+  &--right  { text-align: right; }
+  &--center { text-align: center; }
+
+  &.is-sortable {
+    cursor: pointer;
+    &:hover { color: var(--text-primary); background: var(--bg-hover); }
+  }
+
+  &.is-sorted { color: var(--text-primary); }
+
+  &--truncate {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.gw-table__th-label { vertical-align: middle; }
+.gw-table__sort {
+  display: inline-flex;
+  margin-left: 4px;
+  color: var(--text-tertiary);
+  vertical-align: middle;
+
+  svg path { opacity: 0.4; }
+
+  &[data-dir='asc']  svg path:first-child  { opacity: 1; }
+  &[data-dir='desc'] svg path:last-child   { opacity: 1; }
+  &[data-dir='asc'],
+  &[data-dir='desc'] { color: var(--color-primary); }
+}
+
+// Body ----------------------------------------------------------------------
+.gw-table__row {
+  transition: background-color var(--t-fast) ease;
+}
+
+:host(.gw-table-host--hoverable) .gw-table__row:not(.gw-table__row--skel):not(.gw-table__row--empty):hover {
+  background: var(--bg-hover);
+}
+
+.gw-table__row[role='button'] { cursor: pointer; }
+.gw-table__row[role='button']:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+
+.gw-table__td {
+  padding: var(--gw-tbl-cell-py) var(--gw-tbl-cell-px);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--text-primary);
+
+  &--right  { text-align: right; }
+  &--center { text-align: center; }
+  &--truncate {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// Strip border on the last row when bordered host (cleaner edge)
+:host(.gw-table-host--bordered) .gw-table__body tr:last-child .gw-table__td { border-bottom: 0; }
+
+// Skeleton + empty ----------------------------------------------------------
+.gw-table__skel-bar {
+  display: inline-block;
+  height: 10px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.05) 100%);
+  background-size: 200% 100%;
+  animation: gw-table-shimmer 1.4s linear infinite;
+}
+
+.gw-table__empty-cell {
+  padding: 48px 16px !important;
+  text-align: center;
+}
+.gw-table__empty-default {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+@keyframes gw-table-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-table__skel-bar { animation: none; }
+}

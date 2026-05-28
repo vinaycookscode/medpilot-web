@@ -1,0 +1,20 @@
+<div class="gw-msg__inner">
+  @if (author || time) {
+    <div class="gw-msg__head">
+      @if (author) { <span class="gw-msg__author">{{ author }}</span> }
+      @if (time)   { <time class="gw-msg__time">{{ time }}</time> }
+    </div>
+  }
+  <div class="gw-msg__body">
+    @if (streaming) {
+      <span class="gw-msg__dot"></span>
+      <span class="gw-msg__dot"></span>
+      <span class="gw-msg__dot"></span>
+    } @else {
+      <ng-content></ng-content>
+    }
+  </div>
+  @if (role === 'assistant' && !streaming) {
+    <div class="gw-msg__actions"><ng-content select="[gw-msg-actions]"></ng-content></div>
+  }
+</div>

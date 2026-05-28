@@ -161,3 +161,70 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --z-modal:    600;
   --z-toast:    700;
 }
+
+// ── Dark theme ────────────────────────────────────────────────────────────
+// Activate by setting `data-theme="dark"` on <html> or a wrapping container.
+
+:root[data-theme='dark'],
+[data-theme='dark'] {
+  // Brand — slightly lifted for dark surface contrast
+  --color-primary:        #3B82F6;
+  --color-primary-hover:  #60A5FA;
+  --color-primary-active: #2563EB;
+  --color-primary-subtle: rgba(59, 130, 246, 0.14);
+  --color-primary-light:  rgba(59, 130, 246, 0.22);
+
+  // Semantic
+  --color-success:        #22C55E;
+  --color-success-subtle: rgba(34, 197, 94, 0.16);
+  --color-warning:        #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.16);
+  --color-danger:         #EF4444;
+  --color-danger-subtle:  rgba(239, 68, 68, 0.16);
+  --color-purple:         #A78BFA;
+  --color-purple-subtle:  rgba(167, 139, 250, 0.16);
+  --color-teal:           #38BDF8;
+  --color-teal-subtle:    rgba(56, 189, 248, 0.16);
+
+  // Surfaces
+  --surface-page:    #09090B;
+  --surface-card:    #18181B;
+  --surface-sidebar: rgba(24, 24, 27, 0.92);
+  --surface-topbar:  rgba(24, 24, 27, 0.92);
+  --surface-input:   #1F1F23;
+  --surface-overlay: rgba(0, 0, 0, 0.66);
+  --bg-card:         var(--surface-card);
+  --bg-page:         var(--surface-page);
+  --bg-hover:        rgba(255, 255, 255, 0.05);
+  --bg-input:        #18181B;
+
+  // Text
+  --text-primary:    #FAFAFA;
+  --text-secondary:  #A1A1AA;
+  --text-tertiary:   #71717A;
+  --text-disabled:   #52525B;
+  --text-inverse:    #09090B;
+
+  // Border
+  --border:        #27272A;
+  --border-strong: #3F3F46;
+  --border-focus:  var(--color-primary);
+
+  // Shadows — dark needs heavier opacity to register
+  --shadow-xs: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.04),
+               0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 2px 4px rgba(0, 0, 0, 0.32),
+               0 4px 8px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 4px 8px rgba(0, 0, 0, 0.34),
+               0 12px 24px rgba(0, 0, 0, 0.36);
+  --shadow-xl: 0 0 0 1px rgba(255, 255, 255, 0.06),
+               0 8px 16px rgba(0, 0, 0, 0.40),
+               0 24px 48px rgba(0, 0, 0, 0.50);
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.26);
+  --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                      0 4px 12px rgba(0, 0, 0, 0.36),
+                      0 12px 32px rgba(0, 0, 0, 0.38);
+}

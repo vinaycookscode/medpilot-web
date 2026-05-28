@@ -1,0 +1,77 @@
+:host {
+  display: block;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+}
+
+:host(.gw-dl-host--bordered) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.gw-dl {
+  margin: 0;
+  display: grid;
+  gap: 0;
+}
+
+.gw-dl__row {
+  display: contents;
+}
+
+// Inline (default) — two-column label / value, items stacked vertically
+:host(.gw-dl-host--inline) .gw-dl { grid-template-columns: minmax(120px, max-content) 1fr; }
+:host(.gw-dl-host--inline) .gw-dl__row {
+  display: contents;
+
+  > .gw-dl__label,
+  > .gw-dl__value { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+}
+:host(.gw-dl-host--inline) .gw-dl__row:last-child > * { border-bottom: 0; }
+
+:host(:not(.gw-dl-host--bordered).gw-dl-host--inline) .gw-dl__row > * { padding-left: 0; padding-right: 16px; }
+
+// Stacked — label on top of value, each pair a block
+:host(:not(.gw-dl-host--inline):not(.gw-dl-host--grid)) {
+  .gw-dl { gap: 14px; }
+  .gw-dl__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+// Grid — N columns of stacked pairs
+:host(.gw-dl-host--grid) {
+  .gw-dl { gap: 16px; }
+  .gw-dl__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.gw-dl__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: -0.005em;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.gw-dl__hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.gw-dl__value {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  word-break: break-word;
+}

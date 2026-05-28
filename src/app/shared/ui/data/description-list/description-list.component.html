@@ -1,0 +1,15 @@
+<dl class="gw-dl" [style.grid-template-columns]="layout === 'grid' ? 'repeat(' + columns + ', minmax(0, 1fr))' : null">
+  @if (items.length) {
+    @for (item of items; track item.label) {
+      <div class="gw-dl__row">
+        <dt class="gw-dl__label">
+          {{ item.label }}
+          @if (item.hint) { <span class="gw-dl__hint">{{ item.hint }}</span> }
+        </dt>
+        <dd class="gw-dl__value">{{ item.value !== null && item.value !== undefined && item.value !== '' ? item.value : emptyValue }}</dd>
+      </div>
+    }
+  } @else {
+    <ng-content></ng-content>
+  }
+</dl>

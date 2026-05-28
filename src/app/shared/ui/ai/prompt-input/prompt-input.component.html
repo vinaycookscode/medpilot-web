@@ -1,0 +1,41 @@
+<div class="gw-prompt"
+     [class.is-disabled]="disabled()"
+     [class.is-busy]="busy">
+  <textarea #area
+            class="gw-prompt__area"
+            [rows]="minRows"
+            [placeholder]="placeholder"
+            [value]="value()"
+            [attr.maxlength]="maxLength"
+            [disabled]="disabled()"
+            (input)="handleInput($event)"
+            (keydown)="handleKeydown($event)"></textarea>
+
+  <div class="gw-prompt__toolbar">
+    <div class="gw-prompt__hint">
+      @if (busy) {
+        Generating…
+      } @else {
+        <span><kbd>Enter</kbd> to send · <kbd>Shift</kbd> + <kbd>Enter</kbd> for newline</span>
+      }
+    </div>
+    <div class="gw-prompt__actions">
+      @if (busy) {
+        <button type="button" class="gw-prompt__stop" (click)="stop.emit()">
+          <span class="gw-prompt__stop-icon" aria-hidden="true"></span>
+          Stop
+        </button>
+      } @else {
+        <button type="button"
+                class="gw-prompt__send"
+                [disabled]="disabled() || !value().trim()"
+                (click)="send()">
+          {{ submitLabel }}
+          <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 7h10M8 3l4 4-4 4"/>
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+</div>
