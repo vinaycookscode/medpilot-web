@@ -12,51 +12,27 @@
 
     <!-- Form -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="sal-form">
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <div class="sal-input-wrap">
-          <lucide-icon name="mail" [size]="15" class="sal-input-icon" />
-          <input
-            class="form-control sal-input"
-            type="email"
-            formControlName="email"
-            placeholder="super@super.com"
-            autocomplete="username" />
-        </div>
-      </div>
+      <gw-form-field label="Email address" [required]="true">
+        <gw-input formControlName="email" type="email" autocomplete="username"
+                  placeholder="super@super.com" />
+      </gw-form-field>
 
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <div class="sal-input-wrap">
-          <lucide-icon name="lock" [size]="15" class="sal-input-icon" />
-          <input
-            class="form-control sal-input"
-            [type]="showPassword() ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Enter password"
-            autocomplete="current-password" />
-          <button type="button" class="sal-eye-btn" (click)="togglePassword()">
-            <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="15" />
-          </button>
-        </div>
-      </div>
+      <gw-form-field label="Password" [required]="true">
+        <gw-password-input formControlName="password" autocomplete="current-password"
+                           placeholder="Enter password" />
+      </gw-form-field>
 
       @if (errorMessage()) {
-        <div class="sal-error">
-          <lucide-icon name="alert-circle" [size]="14" />
+        <gw-alert variant="danger" [dismissible]="true" (dismiss)="errorMessage.set('')">
           {{ errorMessage() }}
-        </div>
+        </gw-alert>
       }
 
-      <button type="submit" class="sal-submit" [disabled]="loading()">
-        @if (loading()) {
-          <lucide-icon name="loader-2" [size]="16" class="sal-spin" />
-          Authenticating…
-        } @else {
-          <lucide-icon name="shield-check" [size]="16" />
-          Sign in to Portal
-        }
-      </button>
+      <gw-button variant="primary" size="lg" type="submit"
+                 [block]="true" [loading]="loading()"
+                 [disabled]="form.invalid">
+        Sign in to Portal
+      </gw-button>
     </form>
 
     <div class="sal-footer">

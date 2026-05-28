@@ -11,9 +11,9 @@
 }
 
 :host(.gw-card--flat) { box-shadow: none; }
-:host(.gw-card--sm)   { box-shadow: var(--shadow-xs); }
-:host(.gw-card--md)   { box-shadow: var(--shadow-md); }
-:host(.gw-card--lg)   { box-shadow: var(--shadow-lg); border-color: transparent; }
+:host(.gw-card--sm)   { box-shadow: var(--shadow-md); }
+:host(.gw-card--md)   { box-shadow: var(--shadow-lg); }
+:host(.gw-card--lg)   { box-shadow: var(--shadow-xl); border-color: transparent; }
 
 :host(.gw-card--hoverable) {
   cursor: pointer;

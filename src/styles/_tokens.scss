@@ -39,9 +39,11 @@ $sp-1:  4px;   $sp-2:  8px;   $sp-3:  12px;  $sp-4:  16px;
 $sp-5:  20px;  $sp-6:  24px;  $sp-8:  32px;  $sp-10: 40px;
 $sp-12: 48px;  $sp-16: 64px;  $sp-20: 80px;
 
-// Radius — sharpened
-$radius-xs: 4px;   $radius-sm: 6px;   $radius-md: 8px;
-$radius-lg: 12px;  $radius-xl: 16px;  $radius-2xl: 24px;
+// Radius — collapsed onto --radius-xs (4px). Everything tiles to 4px,
+// container surfaces (lg / xl) ease up only slightly. This is the
+// sharpest enterprise look we can ship and still keep round avatars.
+$radius-xs: 4px;   $radius-sm: 4px;   $radius-md: 4px;
+$radius-lg: 6px;   $radius-xl: 8px;   $radius-2xl: 12px;
 $radius-full: 9999px;
 
 // Typography — Inter, tighter base
@@ -122,23 +124,24 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --radius-xl:   #{$radius-xl};  --radius-2xl: #{$radius-2xl};
   --radius-full: #{$radius-full};
 
-  // Shadows — Linear-style "ring + soft glow"
-  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.04);
-  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.04),
-               0 1px 2px rgba(9, 9, 11, 0.04);
-  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.05),
-               0 2px 4px rgba(9, 9, 11, 0.04),
-               0 4px 8px rgba(9, 9, 11, 0.04);
-  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.05),
+  // Shadows — bumped up one stop: deeper rings + heavier drop shadows.
+  // Cards default to --shadow-md, dialogs/drawers to --shadow-xl.
+  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.06);
+  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.06),
+               0 2px 4px rgba(9, 9, 11, 0.05);
+  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.07),
                0 4px 8px rgba(9, 9, 11, 0.06),
-               0 12px 24px rgba(9, 9, 11, 0.06);
-  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.06),
+               0 8px 16px rgba(9, 9, 11, 0.06);
+  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.07),
                0 8px 16px rgba(9, 9, 11, 0.08),
-               0 24px 48px rgba(9, 9, 11, 0.10);
-  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.16);
-  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.06),
-                      0 4px 12px rgba(9, 9, 11, 0.08),
-                      0 12px 32px rgba(9, 9, 11, 0.08);
+               0 20px 40px rgba(9, 9, 11, 0.08);
+  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.08),
+               0 12px 24px rgba(9, 9, 11, 0.10),
+               0 32px 64px rgba(9, 9, 11, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.08),
+                      0 8px 20px rgba(9, 9, 11, 0.10),
+                      0 24px 48px rgba(9, 9, 11, 0.10);
 
   // Typography
   --font-family: #{$font-family};
