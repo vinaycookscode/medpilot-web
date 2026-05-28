@@ -1,15 +1,15 @@
 :host { display: inline-flex; }
 
 .gw-icon-button {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color var(--t-fast) ease,
               border-color var(--t-fast) ease,
@@ -23,8 +23,8 @@
   i { display: inline-flex; width: 18px; height: 18px; }
 }
 
-:host(.gw-icon-button-host--sm) .gw-icon-button { width: 32px; height: 32px; i { width: 16px; height: 16px; } }
-:host(.gw-icon-button-host--lg) .gw-icon-button { width: 48px; height: 48px; i { width: 20px; height: 20px; } }
+:host(.gw-icon-button-host--sm) .gw-icon-button { width: 28px; height: 28px; i { width: 14px; height: 14px; } }
+:host(.gw-icon-button-host--lg) .gw-icon-button { width: 44px; height: 44px; i { width: 18px; height: 18px; } }
 
 :host(.gw-icon-button-host--primary) .gw-icon-button {
   background: var(--color-primary);

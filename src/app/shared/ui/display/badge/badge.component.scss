@@ -1,0 +1,74 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  border: 1px solid transparent;
+
+  // Per-variant runtime knobs
+  --gw-badge-fg: var(--text-secondary);
+  --gw-badge-bg: var(--surface-input);
+  --gw-badge-border: transparent;
+  --gw-badge-dot: var(--text-secondary);
+
+  color: var(--gw-badge-fg);
+  background: var(--gw-badge-bg);
+  border-color: var(--gw-badge-border);
+}
+
+.gw-badge__dot {
+  width: 6px; height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--gw-badge-dot);
+  flex-shrink: 0;
+}
+
+:host(.gw-badge--sm) { padding: 1px 6px; font-size: 11px; }
+:host(.gw-badge--lg) { padding: 4px 10px; font-size: 13px; }
+
+// Variant ⨯ tone matrix --------------------------------------------------------
+
+:host([data-variant='primary'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-primary); --gw-badge-bg: var(--color-primary-subtle); --gw-badge-dot: var(--color-primary);
+}
+:host([data-variant='success'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-success); --gw-badge-bg: var(--color-success-subtle); --gw-badge-dot: var(--color-success);
+}
+:host([data-variant='warning'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-warning); --gw-badge-bg: var(--color-warning-subtle); --gw-badge-dot: var(--color-warning);
+}
+:host([data-variant='danger'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-danger); --gw-badge-bg: var(--color-danger-subtle); --gw-badge-dot: var(--color-danger);
+}
+:host([data-variant='info'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-teal); --gw-badge-bg: var(--color-teal-subtle); --gw-badge-dot: var(--color-teal);
+}
+:host([data-variant='purple'].gw-badge--soft) {
+  --gw-badge-fg: var(--color-purple); --gw-badge-bg: var(--color-purple-subtle); --gw-badge-dot: var(--color-purple);
+}
+
+// Solid tone
+:host(.gw-badge--solid) { color: #fff; }
+:host([data-variant='primary'].gw-badge--solid) { --gw-badge-bg: var(--color-primary); --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='success'].gw-badge--solid) { --gw-badge-bg: var(--color-success); --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='warning'].gw-badge--solid) { --gw-badge-bg: var(--color-warning); --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='danger'].gw-badge--solid)  { --gw-badge-bg: var(--color-danger);  --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='info'].gw-badge--solid)    { --gw-badge-bg: var(--color-teal);    --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='purple'].gw-badge--solid)  { --gw-badge-bg: var(--color-purple);  --gw-badge-dot: rgba(255,255,255,0.85); }
+:host([data-variant='neutral'].gw-badge--solid) { --gw-badge-bg: var(--text-primary);  --gw-badge-dot: rgba(255,255,255,0.85); color: #fff; }
+
+// Outline tone
+:host(.gw-badge--outline) { --gw-badge-bg: transparent; }
+:host([data-variant='primary'].gw-badge--outline) { --gw-badge-fg: var(--color-primary); --gw-badge-border: var(--color-primary); --gw-badge-dot: var(--color-primary); }
+:host([data-variant='success'].gw-badge--outline) { --gw-badge-fg: var(--color-success); --gw-badge-border: var(--color-success); --gw-badge-dot: var(--color-success); }
+:host([data-variant='warning'].gw-badge--outline) { --gw-badge-fg: var(--color-warning); --gw-badge-border: var(--color-warning); --gw-badge-dot: var(--color-warning); }
+:host([data-variant='danger'].gw-badge--outline)  { --gw-badge-fg: var(--color-danger);  --gw-badge-border: var(--color-danger);  --gw-badge-dot: var(--color-danger); }
+:host([data-variant='info'].gw-badge--outline)    { --gw-badge-fg: var(--color-teal);    --gw-badge-border: var(--color-teal);    --gw-badge-dot: var(--color-teal); }
+:host([data-variant='purple'].gw-badge--outline)  { --gw-badge-fg: var(--color-purple);  --gw-badge-border: var(--color-purple);  --gw-badge-dot: var(--color-purple); }
+:host([data-variant='neutral'].gw-badge--outline) { --gw-badge-fg: var(--text-secondary); --gw-badge-border: var(--border-strong); --gw-badge-dot: var(--text-secondary); }

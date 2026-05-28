@@ -1,0 +1,32 @@
+@if (mode === 'linear') {
+  <div class="gw-prog__track" [attr.data-variant]="variant">
+    <div class="gw-prog__fill"
+         [class.is-indeterminate]="indeterminate"
+         [style.width.%]="indeterminate ? null : pct"></div>
+  </div>
+  @if (showLabel && !indeterminate) {
+    <p class="gw-prog__label">{{ pct | number:'1.0-0' }}%</p>
+  }
+} @else {
+  <svg class="gw-prog__ring"
+       [class.is-indeterminate]="indeterminate"
+       [attr.width]="size"
+       [attr.height]="size"
+       [attr.viewBox]="'0 0 ' + size + ' ' + size"
+       [attr.data-variant]="variant">
+    <circle [attr.cx]="size/2" [attr.cy]="size/2" [attr.r]="radius"
+            fill="none" class="gw-prog__ring-track"
+            [attr.stroke-width]="stroke" />
+    <circle [attr.cx]="size/2" [attr.cy]="size/2" [attr.r]="radius"
+            fill="none" class="gw-prog__ring-fill"
+            stroke-linecap="round"
+            [attr.stroke-width]="stroke"
+            [attr.stroke-dasharray]="circumference"
+            [attr.stroke-dashoffset]="indeterminate ? null : dashOffset"
+            [attr.transform]="'rotate(-90 ' + (size/2) + ' ' + (size/2) + ')'" />
+    @if (showLabel && !indeterminate) {
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+            class="gw-prog__ring-label">{{ pct | number:'1.0-0' }}%</text>
+    }
+  </svg>
+}

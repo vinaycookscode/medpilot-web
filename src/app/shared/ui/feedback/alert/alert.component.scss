@@ -47,26 +47,26 @@
 }
 
 :host(.gw-alert-host--info) {
-  --gw-alert-bg: rgba(0, 122, 255, 0.06);
-  --gw-alert-border: rgba(0, 122, 255, 0.18);
+  --gw-alert-bg: rgba(37, 99, 235, 0.06);
+  --gw-alert-border: rgba(37, 99, 235, 0.18);
   --gw-alert-icon: var(--color-primary);
 }
 
 :host(.gw-alert-host--success) {
   --gw-alert-bg: var(--color-success-subtle);
-  --gw-alert-border: rgba(52, 199, 89, 0.30);
+  --gw-alert-border: rgba(22, 163, 74, 0.25);
   --gw-alert-icon: var(--color-success);
 }
 
 :host(.gw-alert-host--warning) {
   --gw-alert-bg: var(--color-warning-subtle);
-  --gw-alert-border: rgba(255, 159, 10, 0.30);
+  --gw-alert-border: rgba(217, 119, 6, 0.25);
   --gw-alert-icon: var(--color-warning);
 }
 
 :host(.gw-alert-host--danger) {
   --gw-alert-bg: var(--color-danger-subtle);
-  --gw-alert-border: rgba(255, 59, 48, 0.30);
+  --gw-alert-border: rgba(220, 38, 38, 0.25);
   --gw-alert-icon: var(--color-danger);
 }
 

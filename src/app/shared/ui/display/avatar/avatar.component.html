@@ -1,0 +1,14 @@
+@if (src && !imgFailed()) {
+  <img class="gw-avatar__img"
+       [src]="src"
+       [alt]="alt ?? name"
+       (error)="handleImgError()" />
+} @else {
+  <span class="gw-avatar__initials"
+        [style.background]="'hsl(' + hue() + ', 60%, 92%)'"
+        [style.color]="'hsl(' + hue() + ', 40%, 35%)'"
+        [attr.aria-label]="alt ?? name">
+    {{ initials() || '?' }}
+  </span>
+}
+@if (status) { <span class="gw-avatar__status" [attr.data-status]="status" aria-hidden="true"></span> }

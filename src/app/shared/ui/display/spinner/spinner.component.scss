@@ -1,0 +1,26 @@
+:host {
+  display: inline-block;
+  --gw-spin-size: 18px;
+  --gw-spin-stroke: 2px;
+  color: currentColor;
+}
+
+:host(.gw-spin--xs) { --gw-spin-size: 12px; --gw-spin-stroke: 1.5px; }
+:host(.gw-spin--sm) { --gw-spin-size: 14px; --gw-spin-stroke: 2px; }
+:host(.gw-spin--lg) { --gw-spin-size: 24px; --gw-spin-stroke: 2.5px; }
+
+.gw-spin__dot {
+  display: inline-block;
+  width: var(--gw-spin-size);
+  height: var(--gw-spin-size);
+  border: var(--gw-spin-stroke) solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: gw-spin-rotate 0.7s linear infinite;
+}
+
+@keyframes gw-spin-rotate { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-spin__dot { animation: none; }
+}
