@@ -49,12 +49,12 @@
             <span class="nh-summary__count">{{ selectedCount() }}</span>
             <span class="nh-summary__label">patient{{ selectedCount() === 1 ? '' : 's' }} selected</span>
           </div>
-          <button type="button" class="btn btn--ghost btn--sm" (click)="selectAllVisible()" [disabled]="visibleAdmissions().length === 0">
+          <gw-button variant="ghost" size="sm" [disabled]="visibleAdmissions().length === 0" (click)="selectAllVisible()">
             Select all visible
-          </button>
-          <button type="button" class="btn btn--ghost btn--sm" (click)="clearSelection()" [disabled]="selectedCount() === 0">
+          </gw-button>
+          <gw-button variant="ghost" size="sm" [disabled]="selectedCount() === 0" (click)="clearSelection()">
             Clear
-          </button>
+          </gw-button>
         </div>
       </div>
 
@@ -126,10 +126,9 @@
             Ready to hand over <strong>{{ selectedCount() }}</strong> patient{{ selectedCount() === 1 ? '' : 's' }}
             @if (!incomingNurseId()) { <span class="text-warning">· select incoming nurse</span> }
           </div>
-          <button type="button" class="btn btn--primary" [disabled]="!canSubmit()" (click)="submitHandover()">
-            <lucide-icon name="check-circle" [size]="15" />
+          <gw-button variant="primary" leadingIcon="check-circle" [disabled]="!canSubmit()" (click)="submitHandover()">
             Submit Handover
-          </button>
+          </gw-button>
         </div>
       }
     </section>
@@ -195,10 +194,8 @@
                   (input)="ackNote.set($any($event.target).value)"></textarea>
 
                 <div class="nh-detail-actions">
-                  <button type="button" class="btn btn--ghost btn--sm" (click)="togglePending(h.id)">Cancel</button>
-                  <button type="button" class="btn btn--primary" (click)="acknowledge(h)">
-                    <lucide-icon name="check-circle" [size]="15" /> Acknowledge & Sign-off
-                  </button>
+                  <gw-button variant="ghost" size="sm" (click)="togglePending(h.id)">Cancel</gw-button>
+                  <gw-button variant="primary" leadingIcon="check-circle" (click)="acknowledge(h)">Acknowledge & Sign-off</gw-button>
                 </div>
               </div>
             }
@@ -258,9 +255,7 @@
               <div class="nh-detail-label">Instruction</div>
               <div class="nh-detail-body">{{ o.instruction }}</div>
               <div class="nh-detail-actions">
-                <button type="button" class="btn btn--primary" (click)="completeOrder(o.id)" [disabled]="orderActioning() === o.id">
-                  <lucide-icon name="check-circle" [size]="15" /> Mark Done
-                </button>
+                <gw-button variant="primary" leadingIcon="check-circle" [disabled]="orderActioning() === o.id" (click)="completeOrder(o.id)">Mark Done</gw-button>
               </div>
             </div>
           </li>
@@ -343,12 +338,11 @@
                         placeholder="Anything the attendant should know — wheelchair, oxygen support, etc."></textarea>
             </div>
             <div class="nh-detail-actions">
-              <button type="button" class="btn btn--ghost btn--sm" (click)="closeTaskCompose()">Cancel</button>
-              <button type="button" class="btn btn--primary"
-                      [disabled]="!draftTitle().trim() || !draftCategory() || taskSaving()"
-                      (click)="createTask()">
-                <lucide-icon name="check-circle" [size]="15" /> Assign Task
-              </button>
+              <gw-button variant="ghost" size="sm" (click)="closeTaskCompose()">Cancel</gw-button>
+              <gw-button variant="primary" leadingIcon="check-circle"
+                         [loading]="taskSaving()"
+                         [disabled]="!draftTitle().trim() || !draftCategory()"
+                         (click)="createTask()">Assign Task</gw-button>
             </div>
           </div>
         }

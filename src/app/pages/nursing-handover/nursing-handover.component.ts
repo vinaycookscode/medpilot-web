@@ -9,13 +9,15 @@ import {
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 
 type Tab = 'handover' | 'pending' | 'orders' | 'tasks' | 'history';
 
 @Component({
   selector: 'app-nursing-handover',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent, GwBadgeComponent],
   templateUrl: './nursing-handover.component.html',
   styleUrl: './nursing-handover.component.scss',
   encapsulation: ViewEncapsulation.None,

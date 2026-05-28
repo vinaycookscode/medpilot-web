@@ -6,11 +6,13 @@ import { NursingService, NursingTask } from '../../core/services/nursing.service
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
 
 @Component({
   selector: 'app-attendant-tasks',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent, GwTextareaComponent],
   templateUrl: './attendant-tasks.component.html',
   styleUrl: './attendant-tasks.component.scss',
   encapsulation: ViewEncapsulation.None,
