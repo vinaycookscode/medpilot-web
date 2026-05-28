@@ -6,13 +6,9 @@
     </div>
     <div class="d-flex gap-2">
       @if (auth.isAdmin()) {
-        <button class="btn btn--primary" (click)="openStaffModal()">
-          <lucide-icon name="user-plus" [size]="16" /> Add Staff
-        </button>
+        <gw-button variant="primary" leadingIcon="user-plus" (click)="openStaffModal()">Add Staff</gw-button>
       }
-      <button class="btn btn--secondary" (click)="openLeaveModal()">
-        <lucide-icon name="calendar-plus" [size]="16" /> Request Leave
-      </button>
+      <gw-button variant="secondary" leadingIcon="calendar-plus" (click)="openLeaveModal()">Request Leave</gw-button>
     </div>
   </div>
 

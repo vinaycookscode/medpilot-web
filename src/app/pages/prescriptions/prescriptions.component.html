@@ -5,10 +5,7 @@
       <p class="page__subtitle">{{ total() }} total</p>
     </div>
     @if (isDoctor() && canCreate()) {
-      <button class="btn btn--primary" (click)="openCreate()">
-        <lucide-icon name="plus" [size]="16" />
-        New Prescription
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openCreate()">New Prescription</gw-button>
     }
   </div>
 

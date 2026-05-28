@@ -6,17 +6,13 @@
       <p class="page-sub">Manage insurance providers and patient claim submissions.</p>
     </div>
     @if (activeTab() === 'claims') {
-      <button class="btn btn--primary" (click)="openClaimModal()">
-        <lucide-icon name="plus" [size]="16" /> New Claim
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openClaimModal()">New Claim</gw-button>
     } @else if (auth.isAdmin()) {
-      <button class="btn btn--primary" (click)="openProviderModal()">
-        <lucide-icon name="plus" [size]="16" /> Add Provider
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openProviderModal()">Add Provider</gw-button>
     }
   </div>
 
-  <!-- Stats pills -->
+  <!-- Stats pills (page-specific design — kept) -->
   <div class="stats-pills">
     <div class="stats-pill">
       <span class="stats-pill__count">{{ stats()?.total ?? claims().length }}</span>
@@ -40,33 +36,27 @@
     </div>
   </div>
 
-  <!-- Tab bar -->
+  <!-- Tabs -->
   <div class="insurance-tabs-row">
-    <div class="tab-bar">
-      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='claims'" (click)="activeTab.set('claims')">
-        <lucide-icon name="file-text" [size]="14" /> Claims
-      </button>
-      <button class="tab-btn" [class.tab-btn--active]="activeTab()==='providers'" (click)="activeTab.set('providers')">
-        <lucide-icon name="shield-check" [size]="14" /> Providers
-      </button>
-    </div>
+    <gw-tabs variant="segmented" [activeKey]="activeTab()" (activeKeyChange)="setTab($event)">
+      <gw-tab key="claims"    label="Claims"    icon="file-text"></gw-tab>
+      <gw-tab key="providers" label="Providers" icon="shield-check"></gw-tab>
+    </gw-tabs>
   </div>
 
   <!-- Loading -->
   @if (loading()) {
-    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+    <div style="display:flex; justify-content:center; padding: 64px 0;"><gw-spinner size="lg" /></div>
   }
 
   <!-- Claims table -->
   @if (!loading() && activeTab() === 'claims') {
     @if (!claims().length) {
-      <div class="empty-state">
-        <div class="empty-state__icon"><lucide-icon name="shield-check" [size]="28" /></div>
-        <p class="empty-state__title">No claims yet</p>
-        <p class="empty-state__subtitle">Click "New Claim" to submit the first claim.</p>
-      </div>
+      <gw-empty-state icon="shield-check"
+                      title="No claims yet"
+                      description='Click "New Claim" to submit the first claim.'></gw-empty-state>
     } @else {
-      <div class="card card--flush">
+      <gw-card padding="none">
         <div class="table-wrap">
           <table class="table">
             <thead>
@@ -106,22 +96,14 @@
                   <td>
                     <div class="row-actions">
                       @if (claim.status === 'draft') {
-                        <button class="btn btn--ghost btn--sm" title="Submit" (click)="updateClaimStatus(claim.id, 'submitted')">
-                          Submit
-                        </button>
+                        <gw-button variant="ghost" size="sm" (click)="updateClaimStatus(claim.id, 'submitted')">Submit</gw-button>
                       }
                       @if (claim.status === 'submitted' || claim.status === 'under_review') {
-                        <button class="btn btn--ghost btn--icon btn--sm" title="Mark Approved" (click)="updateClaimStatus(claim.id, 'approved')">
-                          <lucide-icon name="check-circle-2" [size]="15" />
-                        </button>
-                        <button class="btn btn--ghost btn--icon btn--sm text-danger" title="Reject" (click)="updateClaimStatus(claim.id, 'rejected')">
-                          <lucide-icon name="x" [size]="15" />
-                        </button>
+                        <gw-icon-button icon="check-circle-2" size="sm" ariaLabel="Approve" (click)="updateClaimStatus(claim.id, 'approved')" />
+                        <gw-icon-button icon="x" size="sm" variant="danger" ariaLabel="Reject" (click)="updateClaimStatus(claim.id, 'rejected')" />
                       }
                       @if (claim.status === 'approved') {
-                        <button class="btn btn--ghost btn--sm" title="Mark Paid" (click)="updateClaimStatus(claim.id, 'paid')">
-                          Paid
-                        </button>
+                        <gw-button variant="ghost" size="sm" (click)="updateClaimStatus(claim.id, 'paid')">Paid</gw-button>
                       }
                     </div>
                   </td>
@@ -130,38 +112,24 @@
             </tbody>
           </table>
         </div>
-        <div class="table-pagination">
-          <span class="table-pagination__info">{{ claimsTotal() }} claims &nbsp;·&nbsp; Page {{ claimsPage() }} of {{ claimsTotalPages || 1 }}</span>
-          <div class="table-pagination__size">
-            <label class="table-pagination__size-label">Rows</label>
-            <select class="table-pagination__size-select" [ngModel]="claimsPageSize()" (ngModelChange)="changeClaimsPageSize($event)" [ngModelOptions]="{standalone:true}">
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="20">20</option>
-              <option [ngValue]="50">50</option>
-              <option [ngValue]="100">100</option>
-            </select>
-          </div>
-          <div class="table-pagination__controls">
-            <button class="btn btn--secondary btn--sm" [disabled]="claimsPage() === 1" (click)="claimsPrevPage()">
-              <lucide-icon name="chevron-left" [size]="14" /> Prev
-            </button>
-            <button class="btn btn--secondary btn--sm" [disabled]="claimsPage() >= claimsTotalPages" (click)="claimsNextPage()">
-              Next <lucide-icon name="chevron-right" [size]="14" />
-            </button>
-          </div>
+        <div style="padding: 12px 16px; border-top: 1px solid var(--border);">
+          <gw-pagination
+            [total]="claimsTotal()"
+            [page]="claimsPage()"
+            [pageSize]="claimsPageSize()"
+            (pageChange)="claimsPage.set($event); loadClaims()"
+            (pageSizeChange)="changeClaimsPageSize($event)" />
         </div>
-      </div>
+      </gw-card>
     }
   }
 
   <!-- Providers tab -->
   @if (!loading() && activeTab() === 'providers') {
     @if (!providers().length) {
-      <div class="empty-state">
-        <div class="empty-state__icon"><lucide-icon name="shield-check" [size]="28" /></div>
-        <p class="empty-state__title">No providers yet</p>
-        <p class="empty-state__subtitle">Add an insurance provider to get started.</p>
-      </div>
+      <gw-empty-state icon="shield-check"
+                      title="No providers yet"
+                      description="Add an insurance provider to get started."></gw-empty-state>
     } @else {
       <div class="providers-grid">
         @for (p of providers(); track p.id) {
@@ -170,11 +138,9 @@
               <div class="provider-card__icon">
                 <lucide-icon name="shield-check" [size]="20" />
               </div>
-              @if (p.isActive) {
-                <span class="badge badge--success">Active</span>
-              } @else {
-                <span class="badge badge--neutral">Inactive</span>
-              }
+              <gw-badge [variant]="p.isActive ? 'success' : 'neutral'" tone="soft" size="sm">
+                {{ p.isActive ? 'Active' : 'Inactive' }}
+              </gw-badge>
             </div>
             <div class="provider-card__name">{{ p.name }}</div>
             <div class="provider-card__code">{{ p.code }}</div>
@@ -198,142 +164,95 @@
 </div>
 
 <!-- New Claim Modal -->
-@if (showClaimModal()) {
-  <div class="modal-backdrop" (click)="showClaimModal.set(false)">
-    <div class="modal modal--lg" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">New Insurance Claim</h3>
-        <button class="btn btn--ghost btn--icon" (click)="showClaimModal.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <form [formGroup]="claimForm">
-          <div class="form-grid">
-            <div class="field field--full">
-              <label class="field__label">Patient <span style="color:var(--color-danger)">*</span></label>
-              <div class="patient-search">
-                @if (selectedPatient()) {
-                  <div class="patient-selected">
-                    <div class="patient-selected__info">
-                      <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
-                      <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
-                    </div>
-                    <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
-                      <lucide-icon name="x" [size]="14" />
-                    </button>
+<gw-dialog [open]="showClaimModal()" (openChange)="showClaimModal.set($event)" size="lg"
+           title="New Insurance Claim">
+  <form [formGroup]="claimForm">
+    <div class="form-grid">
+      <gw-form-field label="Patient" [required]="true" class="field--full">
+        <!-- Patient search dropdown — page-specific, kept as-is -->
+        <div class="patient-search">
+          @if (selectedPatient()) {
+            <div class="patient-selected">
+              <div class="patient-selected__info">
+                <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
+                <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
+              </div>
+              <gw-icon-button icon="x" size="sm" ariaLabel="Clear" (click)="clearPatient()" />
+            </div>
+          } @else {
+            <div class="patient-search-wrap">
+              <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+                placeholder="Search by name or phone…" autocomplete="off" autofocus>
+              @if (patientSearching()) {
+                <span class="patient-search-spinner"><gw-spinner size="sm" /></span>
+              }
+            </div>
+            @if (patientSearching()) {
+              <div class="patient-search-status">Searching…</div>
+            } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
+              <div class="patient-search-status">No patients found</div>
+            }
+            @if (patientDropdown().length) {
+              <div class="patient-dropdown">
+                @for (p of patientDropdown(); track p.id) {
+                  <div class="patient-dropdown__item" (click)="selectPatient(p)">
+                    <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
+                    <span class="patient-dropdown__phone">{{ p.phone }}</span>
                   </div>
-                } @else {
-                  <div class="patient-search-wrap">
-                    <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
-                      placeholder="Search by name or phone…" autocomplete="off" autofocus>
-                    @if (patientSearching()) {
-                      <span class="patient-search-spinner"><span class="spinner spinner--sm"></span></span>
-                    }
-                  </div>
-                  @if (patientSearching()) {
-                    <div class="patient-search-status">Searching…</div>
-                  } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
-                    <div class="patient-search-status">No patients found</div>
-                  }
-                  @if (patientDropdown().length) {
-                    <div class="patient-dropdown">
-                      @for (p of patientDropdown(); track p.id) {
-                        <div class="patient-dropdown__item" (click)="selectPatient(p)">
-                          <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
-                          <span class="patient-dropdown__phone">{{ p.phone }}</span>
-                        </div>
-                      }
-                    </div>
-                  }
                 }
               </div>
-            </div>
-            <div class="field field--full">
-              <label class="field__label">Member / Insured Name <span style="color:var(--color-danger)">*</span></label>
-              <input class="input" formControlName="memberName" placeholder="Name on the insurance policy">
-              <span class="field__hint">Pre-filled from patient — edit if policyholder is different.</span>
-            </div>
-            <div class="field">
-              <label class="field__label">Insurance Provider <span style="color:var(--color-danger)">*</span></label>
-              <select class="select" formControlName="providerId">
-                <option value="">Select provider</option>
-                @for (p of providers(); track p.id) {
-                  <option [value]="p.id">{{ p.name }}</option>
-                }
-              </select>
-            </div>
-            <div class="field">
-              <label class="field__label">Policy Number <span style="color:var(--color-danger)">*</span></label>
-              <input class="input" formControlName="policyNumber" placeholder="Policy / member ID">
-            </div>
-            <div class="field">
-              <label class="field__label">Claim Amount (₹) <span style="color:var(--color-danger)">*</span></label>
-              <input type="number" class="input" formControlName="claimAmount" min="1" step="0.01">
-            </div>
-            <div class="field">
-              <label class="field__label">Diagnoses / ICD Codes</label>
-              <input class="input" formControlName="diagnoses" placeholder="e.g. J06.9, E11">
-            </div>
-            <div class="field field--full">
-              <label class="field__label">Notes</label>
-              <textarea class="input" formControlName="notes" placeholder="Additional information…" rows="3"></textarea>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showClaimModal.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="claimForm.invalid || saving()" (click)="submitClaim()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          Create Claim
-        </button>
-      </div>
+            }
+          }
+        </div>
+      </gw-form-field>
+      <gw-form-field label="Member / Insured Name" [required]="true" hint="Pre-filled from patient — edit if policyholder is different." class="field--full">
+        <gw-input formControlName="memberName" placeholder="Name on the insurance policy" />
+      </gw-form-field>
+      <gw-form-field label="Insurance Provider" [required]="true">
+        <gw-select formControlName="providerId" [options]="providerOptions()" placeholder="Select provider" />
+      </gw-form-field>
+      <gw-form-field label="Policy Number" [required]="true">
+        <gw-input formControlName="policyNumber" placeholder="Policy / member ID" />
+      </gw-form-field>
+      <gw-form-field label="Claim Amount (₹)" [required]="true">
+        <gw-input formControlName="claimAmount" type="number" />
+      </gw-form-field>
+      <gw-form-field label="Diagnoses / ICD Codes">
+        <gw-input formControlName="diagnoses" placeholder="e.g. J06.9, E11" />
+      </gw-form-field>
+      <gw-form-field label="Notes" class="field--full">
+        <gw-textarea formControlName="notes" placeholder="Additional information…" [rows]="3" />
+      </gw-form-field>
     </div>
-  </div>
-}
+  </form>
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showClaimModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="claimForm.invalid" [loading]="saving()" (click)="submitClaim()">Create Claim</gw-button>
+  </ng-container>
+</gw-dialog>
 
 <!-- Add Provider Modal -->
-@if (showProviderModal() && auth.isAdmin()) {
-  <div class="modal-backdrop" (click)="showProviderModal.set(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">Add Insurance Provider</h3>
-        <button class="btn btn--ghost btn--icon" (click)="showProviderModal.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <form [formGroup]="providerForm">
-          <div class="field">
-            <label class="field__label">Provider Name <span style="color:var(--color-danger)">*</span></label>
-            <input class="input" formControlName="name" placeholder="e.g. Star Health Insurance" autofocus>
-          </div>
-          <div class="field">
-            <label class="field__label">Code <span style="color:var(--color-danger)">*</span></label>
-            <input class="input" formControlName="code" placeholder="e.g. STAR">
-          </div>
-          <div class="field">
-            <label class="field__label">Contact Email</label>
-            <input type="email" class="input" formControlName="contactEmail" placeholder="claims@provider.com">
-          </div>
-          <div class="field">
-            <label class="field__label">Contact Phone</label>
-            <input class="input" formControlName="contactPhone" placeholder="Optional">
-          </div>
-          <div class="field">
-            <label class="field__label">Address</label>
-            <input class="input" formControlName="address" placeholder="Optional">
-          </div>
-        </form>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showProviderModal.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="providerForm.invalid || saving()" (click)="submitProvider()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          Add Provider
-        </button>
-      </div>
-    </div>
-  </div>
-}
+<gw-dialog [open]="showProviderModal() && auth.isAdmin()" (openChange)="showProviderModal.set($event)"
+           title="Add Insurance Provider">
+  <form [formGroup]="providerForm" style="display: flex; flex-direction: column; gap: 14px;">
+    <gw-form-field label="Provider Name" [required]="true">
+      <gw-input formControlName="name" placeholder="e.g. Star Health Insurance" />
+    </gw-form-field>
+    <gw-form-field label="Code" [required]="true">
+      <gw-input formControlName="code" placeholder="e.g. STAR" />
+    </gw-form-field>
+    <gw-form-field label="Contact Email">
+      <gw-input formControlName="contactEmail" type="email" placeholder="claims@provider.com" />
+    </gw-form-field>
+    <gw-form-field label="Contact Phone">
+      <gw-input formControlName="contactPhone" placeholder="Optional" />
+    </gw-form-field>
+    <gw-form-field label="Address">
+      <gw-input formControlName="address" placeholder="Optional" />
+    </gw-form-field>
+  </form>
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showProviderModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="providerForm.invalid" [loading]="saving()" (click)="submitProvider()">Add Provider</gw-button>
+  </ng-container>
+</gw-dialog>

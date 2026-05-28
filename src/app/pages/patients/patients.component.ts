@@ -10,11 +10,20 @@ import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
+import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-patients',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, DatePipe, FormsModule, ReactiveFormsModule, IconsModule],
+  imports: [
+    CommonModule, TitleCasePipe, DatePipe, FormsModule, ReactiveFormsModule, IconsModule,
+    GwButtonComponent, GwIconButtonComponent,
+    GwBadgeComponent, GwSpinnerComponent, GwEmptyStateComponent,
+  ],
   templateUrl: './patients.component.html',
   styleUrl: './patients.component.scss',
 })

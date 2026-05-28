@@ -10,11 +10,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-prescriptions',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, ReactiveFormsModule, IconsModule],
+  imports: [CommonModule, DatePipe, FormsModule, ReactiveFormsModule, IconsModule, GwButtonComponent],
   templateUrl: './prescriptions.component.html',
   styleUrl: './prescriptions.component.scss',
 })

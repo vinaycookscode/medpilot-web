@@ -13,11 +13,12 @@ import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { printInvoice } from '../../shared/print-invoice';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-billing',
   standalone: true,
-  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule, ReactiveFormsModule, IconsModule],
+  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule, ReactiveFormsModule, IconsModule, GwButtonComponent],
   templateUrl: './billing.component.html',
   styleUrl: './billing.component.scss',
 })

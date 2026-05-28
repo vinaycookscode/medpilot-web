@@ -7,11 +7,13 @@ import { StaffService, Staff, StaffLeave } from '../../core/services/staff.servi
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
 
 @Component({
   selector: 'app-staff',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, IconsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, IconsModule, GwButtonComponent, GwSpinnerComponent],
   templateUrl: './staff.component.html',
   styleUrl: './staff.component.scss',
 })

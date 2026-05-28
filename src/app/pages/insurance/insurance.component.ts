@@ -7,13 +7,34 @@ import { PatientsService } from '../../core/services/patients.service';
 import { Patient } from '../../core/models/patient.models';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent } from '../../shared/ui/forms/select/select.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
+import { GwCardComponent } from '../../shared/ui/display/card/card.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
+import { GwTabsComponent } from '../../shared/ui/navigation/tabs/tabs.component';
+import { GwTabComponent } from '../../shared/ui/navigation/tabs/tab.component';
+import { GwPaginationComponent } from '../../shared/ui/navigation/pagination/pagination.component';
 
 type InsuranceTab = 'claims' | 'providers';
 
 @Component({
   selector: 'app-insurance',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe],
+  imports: [
+    FormsModule, ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe,
+    GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent,
+    GwButtonComponent, GwIconButtonComponent,
+    GwBadgeComponent, GwEmptyStateComponent, GwSpinnerComponent, GwCardComponent,
+    GwDialogComponent,
+    GwTabsComponent, GwTabComponent, GwPaginationComponent,
+  ],
   templateUrl: './insurance.component.html',
   styleUrl: './insurance.component.scss',
 })
@@ -42,6 +63,12 @@ export class InsuranceComponent implements OnInit {
 
   // Server-sortable columns — others sort client-side on current page
   private readonly serverSortCols = new Set(['createdAt', 'claimAmount', 'approvedAmount', 'status', 'policyNumber']);
+
+  readonly providerOptions = computed(() =>
+    this.providers().map(p => ({ value: p.id, label: p.name })),
+  );
+
+  setTab(tab: string) { this.activeTab.set(tab as InsuranceTab); }
 
   readonly sortedClaims = computed(() => {
     const col = this.claimsSortCol();
