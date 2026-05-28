@@ -8,11 +8,12 @@ import { AppointmentsService } from '../../core/services/appointments.service';
 import { DashboardSummary, RevenueData, AppointmentStatusCount } from '../../core/models/dashboard.models';
 import { Appointment } from '../../core/models/appointment.models';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, FormsModule, RouterLink, IconsModule],
+  imports: [CommonModule, TitleCasePipe, FormsModule, RouterLink, IconsModule, GwButtonComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

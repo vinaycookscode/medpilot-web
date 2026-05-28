@@ -25,9 +25,7 @@
           }
         </select>
       </div>
-      <button class="btn btn--primary btn--sm" (click)="openAddCharge()">
-        <lucide-icon name="plus" [size]="14" /> Add Charge
-      </button>
+      <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openAddCharge()">Add Charge</gw-button>
     </div>
 
     <div class="cm-table-wrap">
@@ -88,9 +86,7 @@
       <div class="cm-toolbar__left">
         <span class="text-secondary text-sm">{{ departments().length }} departments configured</span>
       </div>
-      <button class="btn btn--primary btn--sm" (click)="openAddDept()">
-        <lucide-icon name="plus" [size]="14" /> Add Department
-      </button>
+      <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openAddDept()">Add Department</gw-button>
     </div>
     <div class="dept-grid">
       @for (d of departments(); track d.id) {

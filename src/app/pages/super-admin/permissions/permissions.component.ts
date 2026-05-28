@@ -6,11 +6,12 @@ import { IconsModule } from '../../../shared/icons';
 import { PermissionsService, PermMatrix, RolePermUpdate } from '../../../core/services/permissions.service';
 import { AppMetaService } from '../../../core/services/app-meta.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { GwButtonComponent } from '../../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-permissions',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule],
+  imports: [CommonModule, FormsModule, IconsModule, GwButtonComponent],
   templateUrl: './permissions.component.html',
   styleUrl: './permissions.component.scss',
 })

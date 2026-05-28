@@ -49,7 +49,7 @@
           @for (d of departments(); track d) { <option [value]="d">{{ d }}</option> }
         </select>
       </div>
-      <button class="btn btn--ghost btn--sm" (click)="loadDaily()"><lucide-icon name="refresh-cw" [size]="14" /> Refresh</button>
+      <gw-button variant="ghost" size="sm" leadingIcon="refresh-cw" (click)="loadDaily()">Refresh</gw-button>
     </div>
 
     @if (loading()) {
@@ -58,7 +58,7 @@
       <div class="nabh-empty">
         <lucide-icon name="clipboard-check" [size]="40" />
         <p>No checklist items configured yet.</p>
-        <button class="btn btn--primary btn--sm" (click)="setView('items')">Configure Items</button>
+        <gw-button variant="primary" size="sm" (click)="setView('items')">Configure Items</gw-button>
       </div>
     } @else {
       <div class="nabh-checklist">
@@ -93,9 +93,7 @@
   @if (view() === 'items') {
     <div class="cm-toolbar">
       <span class="text-secondary text-sm">{{ items().length }} checklist items</span>
-      <button class="btn btn--primary btn--sm" (click)="openAddItem()">
-        <lucide-icon name="plus" [size]="14" /> Add Item
-      </button>
+      <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openAddItem()">Add Item</gw-button>
     </div>
     <div class="nabh-table-wrap">
       <table class="data-table">
@@ -142,7 +140,7 @@
         @for (m of MONTHS; track $index) { <option [value]="$index + 1">{{ m }}</option> }
       </select>
       <input type="number" class="form-control" style="width:90px" [value]="reportYear()" (change)="reportYear.set(+$any($event.target).value)" />
-      <button class="btn btn--primary btn--sm" (click)="loadReport()"><lucide-icon name="chart-bar" [size]="14" /> Generate</button>
+      <gw-button variant="primary" size="sm" leadingIcon="chart-bar" (click)="loadReport()">Generate</gw-button>
     </div>
 
     @if (loading()) {

@@ -15,6 +15,12 @@ import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
 import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent } from '../../shared/ui/forms/select/select.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-patients',
@@ -23,6 +29,8 @@ import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty
     CommonModule, TitleCasePipe, DatePipe, FormsModule, ReactiveFormsModule, IconsModule,
     GwButtonComponent, GwIconButtonComponent,
     GwBadgeComponent, GwSpinnerComponent, GwEmptyStateComponent,
+    GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent, GwDateInputComponent,
+    GwDialogComponent,
   ],
   templateUrl: './patients.component.html',
   styleUrl: './patients.component.scss',

@@ -142,12 +142,8 @@
             </select>
           </div>
           <div class="table-pagination__controls">
-            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() === 1" (click)="queuePrevPage()">
-              <lucide-icon name="chevron-left" [size]="14" /> Prev
-            </button>
-            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">
-              Next <lucide-icon name="chevron-right" [size]="14" />
-            </button>
+            <gw-button variant="secondary" size="sm" leadingIcon="chevron-left" [disabled]="queuePage() === 1" (click)="queuePrevPage()">Prev</gw-button>
+            <gw-button variant="secondary" size="sm" trailingIcon="chevron-right" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">Next</gw-button>
           </div>
         </div>
       </div>
@@ -233,12 +229,8 @@
             </select>
           </div>
           <div class="table-pagination__controls">
-            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() === 1" (click)="queuePrevPage()">
-              <lucide-icon name="chevron-left" [size]="14" /> Prev
-            </button>
-            <button class="btn btn--secondary btn--sm" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">
-              Next <lucide-icon name="chevron-right" [size]="14" />
-            </button>
+            <gw-button variant="secondary" size="sm" leadingIcon="chevron-left" [disabled]="queuePage() === 1" (click)="queuePrevPage()">Prev</gw-button>
+            <gw-button variant="secondary" size="sm" trailingIcon="chevron-right" [disabled]="queuePage() >= queueTotalPages" (click)="queueNextPage()">Next</gw-button>
           </div>
         </div>
       </div>
