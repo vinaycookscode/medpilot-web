@@ -5,27 +5,20 @@ export type GwButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'su
 export type GwButtonSize = 'sm' | 'md' | 'lg';
 export type GwButtonType = 'button' | 'submit' | 'reset';
 
+/**
+ * Renders an inner real <button> so it works as a native form submit
+ * button (and is keyboard-/screen-reader-accessible by default). The
+ * <gw-button> host element is laid out as `display: contents` so it
+ * disappears from the layout tree and the inner <button> takes over.
+ */
 @Component({
-  selector: 'gw-button, button[gw-button], a[gw-button]',
+  selector: 'gw-button',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    'class': 'gw-button-host',
-    '[class.gw-button-host--primary]':   "variant === 'primary'",
-    '[class.gw-button-host--secondary]': "variant === 'secondary'",
-    '[class.gw-button-host--ghost]':     "variant === 'ghost'",
-    '[class.gw-button-host--danger]':    "variant === 'danger'",
-    '[class.gw-button-host--subtle]':    "variant === 'subtle'",
-    '[class.gw-button-host--sm]': "size === 'sm'",
-    '[class.gw-button-host--lg]': "size === 'lg'",
-    '[class.gw-button-host--block]': 'block',
-    '[class.gw-button-host--loading]': 'loading',
-    '[attr.disabled]': '(disabled || loading) ? true : null',
-    '[attr.aria-busy]': 'loading || null',
-  },
+  host: { 'class': 'gw-button-host' },
 })
 export class GwButtonComponent {
   @Input() variant: GwButtonVariant = 'primary';
