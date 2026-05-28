@@ -1,0 +1,44 @@
+// Imported once at app root (src/styles.scss) because the tooltip element
+// is appended to <body> outside any component view encapsulation.
+
+.gw-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  padding: 6px 10px;
+  background: #1c1c1e;
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &__arrow {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #1c1c1e;
+    transform: rotate(45deg);
+  }
+
+  &--top    .gw-tooltip__arrow { bottom: -3px; left: 50%; margin-left: -4px; }
+  &--bottom .gw-tooltip__arrow { top: -3px;    left: 50%; margin-left: -4px; }
+  &--left   .gw-tooltip__arrow { right: -3px;  top: 50%; margin-top: -4px; }
+  &--right  .gw-tooltip__arrow { left: -3px;   top: 50%; margin-top: -4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-tooltip { transition-duration: 0ms; }
+}

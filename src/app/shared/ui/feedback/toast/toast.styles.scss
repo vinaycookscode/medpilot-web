@@ -1,0 +1,72 @@
+// Global toast styles — declared globally so the toast cards look the same
+// whether they're rendered inside <gw-toast-outlet> in the app or inside
+// a Storybook decorator wrapper.
+
+.gw-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 360px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-family);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  animation: gw-toast-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --gw-toast-accent: var(--color-primary);
+
+  &__icon {
+    color: var(--gw-toast-accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  &__title { margin: 0; font-weight: 600; }
+  &__desc  { margin: 0; color: var(--text-secondary); font-size: 12px; }
+
+  &__action {
+    border: 0;
+    background: transparent;
+    color: var(--gw-toast-accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    align-self: center;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border: 0; background: transparent;
+    color: var(--text-tertiary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    &:hover { background: var(--surface-input); color: var(--text-primary); }
+  }
+
+  &--info    { --gw-toast-accent: var(--color-primary); }
+  &--success { --gw-toast-accent: var(--color-success); }
+  &--warning { --gw-toast-accent: var(--color-warning); }
+  &--danger  { --gw-toast-accent: var(--color-danger); }
+}
+
+@keyframes gw-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-toast { animation: none; }
+}

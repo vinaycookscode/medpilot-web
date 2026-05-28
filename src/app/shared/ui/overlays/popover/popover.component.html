@@ -1,0 +1,10 @@
+@if (open) {
+  <div #panel
+       class="gw-popover"
+       role="dialog"
+       [style.top.px]="position()?.top"
+       [style.left.px]="position()?.left"
+       [class.is-positioned]="position()">
+    <ng-content></ng-content>
+  </div>
+}

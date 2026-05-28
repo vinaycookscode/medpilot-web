@@ -1,0 +1,42 @@
+@if (resolvedIcon) {
+  <span class="gw-alert__icon" aria-hidden="true">
+    @switch (variant) {
+      @case ('success') {
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+      }
+      @case ('warning') {
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L1 21h22L12 2z"/><path d="M12 9v4"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+        </svg>
+      }
+      @case ('danger') {
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+      }
+      @default {
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+        </svg>
+      }
+    }
+  </span>
+}
+
+<div class="gw-alert__body">
+  @if (title) { <p class="gw-alert__title">{{ title }}</p> }
+  <div class="gw-alert__content"><ng-content></ng-content></div>
+  @if (false) {}
+  <div class="gw-alert__actions"><ng-content select="[gw-alert-actions]"></ng-content></div>
+</div>
+
+@if (dismissible) {
+  <button type="button" class="gw-alert__close" aria-label="Dismiss"
+          (click)="dismiss.emit()">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <path d="M6 6l12 12M18 6L6 18"/>
+    </svg>
+  </button>
+}

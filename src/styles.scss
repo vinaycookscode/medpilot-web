@@ -7,6 +7,8 @@
 @use 'styles/typography';   // Body, headings, text utility classes
 @use 'styles/animations';   // @keyframes + animation utilities
 @use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
+@use 'app/shared/ui/overlays/tooltip/tooltip.styles'; // body-appended tooltip
+@use 'app/shared/ui/feedback/toast/toast.styles';     // body-appended toast stack
 
 // ── Layout scaffold ──
 .app-shell {
