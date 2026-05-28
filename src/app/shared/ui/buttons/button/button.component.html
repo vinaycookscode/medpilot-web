@@ -15,12 +15,12 @@
   @if (loading) {
     <span class="gw-button__spinner" aria-hidden="true"></span>
   } @else if (leadingIcon) {
-    <i class="gw-button__icon gw-button__icon--leading" [attr.data-lucide]="leadingIcon" aria-hidden="true"></i>
+    <lucide-icon class="gw-button__icon gw-button__icon--leading" [name]="leadingIcon" [size]="14" />
   }
 
   <span class="gw-button__label"><ng-content></ng-content></span>
 
   @if (trailingIcon && !loading) {
-    <i class="gw-button__icon gw-button__icon--trailing" [attr.data-lucide]="trailingIcon" aria-hidden="true"></i>
+    <lucide-icon class="gw-button__icon gw-button__icon--trailing" [name]="trailingIcon" [size]="14" />
   }
 </button>

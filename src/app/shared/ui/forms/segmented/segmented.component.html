@@ -14,7 +14,7 @@
             [disabled]="disabled() || opt.disabled || false"
             (click)="pick(opt)">
       @if (opt.icon) {
-        <i class="gw-seg__icon" [attr.data-lucide]="opt.icon" aria-hidden="true"></i>
+        <lucide-icon class="gw-seg__icon" [name]="opt.icon!" [size]="14" />
       }
       <span>{{ opt.label }}</span>
     </button>

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface GwSuggestion {
   label: string;
@@ -11,12 +12,12 @@ export interface GwSuggestion {
 @Component({
   selector: 'gw-suggestion-chips',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   template: `
     <div class="gw-sg" [class.gw-sg--wrap]="wrap">
       @for (s of items; track s.label) {
         <button type="button" class="gw-sg__chip" (click)="pick.emit(s)">
-          @if (s.icon) { <i class="gw-sg__icon" [attr.data-lucide]="s.icon" aria-hidden="true"></i> }
+          @if (s.icon) { <lucide-icon class="gw-sg__icon" [name]="s.icon!" [size]="12" /> }
           <span>{{ s.label }}</span>
         </button>
       }

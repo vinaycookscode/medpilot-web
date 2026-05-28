@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export type GwIconButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle';
 export type GwIconButtonSize = 'sm' | 'md' | 'lg';
@@ -7,7 +8,7 @@ export type GwIconButtonSize = 'sm' | 'md' | 'lg';
 @Component({
   selector: 'gw-icon-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './icon-button.component.html',
   styleUrl: './icon-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,4 +30,8 @@ export class GwIconButtonComponent {
   @Input() size: GwIconButtonSize = 'md';
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() disabled = false;
+
+  get iconSize(): number {
+    return this.size === 'sm' ? 14 : this.size === 'lg' ? 20 : 18;
+  }
 }

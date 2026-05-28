@@ -8,7 +8,7 @@
         (keydown)="handleKeydown($event)">
   @if (icon) {
     <span class="gw-acc-item__icon" aria-hidden="true">
-      <i [attr.data-lucide]="icon"></i>
+      <lucide-icon [name]="icon!" [size]="16" />
     </span>
   }
   <div class="gw-acc-item__heading">

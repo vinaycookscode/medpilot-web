@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export type GwButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle';
 export type GwButtonSize = 'sm' | 'md' | 'lg';
@@ -14,7 +15,7 @@ export type GwButtonType = 'button' | 'submit' | 'reset';
 @Component({
   selector: 'gw-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

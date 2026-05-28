@@ -9,12 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'gw-file-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './file-input.component.html',
   styleUrl: './file-input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

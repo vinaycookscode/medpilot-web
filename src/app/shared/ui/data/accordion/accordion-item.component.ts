@@ -7,13 +7,14 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 let nextItemId = 0;
 
 @Component({
   selector: 'gw-accordion-item',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './accordion-item.component.html',
   styleUrl: './accordion-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

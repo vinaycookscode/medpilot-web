@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 
 export type GwInputType = 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search';
 export type GwInputSize = 'sm' | 'md' | 'lg';
@@ -16,7 +17,7 @@ export type GwInputSize = 'sm' | 'md' | 'lg';
 @Component({
   selector: 'gw-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

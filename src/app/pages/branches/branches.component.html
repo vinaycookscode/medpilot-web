@@ -4,24 +4,17 @@
       <h1 class="page-title">Branches</h1>
       <p class="page-sub">Manage multiple clinic locations under your account.</p>
     </div>
-    <button class="btn btn--primary" (click)="openAdd()">
-      <lucide-icon name="plus" [size]="16" /> Add Branch
-    </button>
+    <gw-button variant="primary" leadingIcon="plus" (click)="openAdd()">Add Branch</gw-button>
   </div>
 
   @if (loading()) {
-    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
+    <div style="display:flex; justify-content:center; padding: 64px 0;"><gw-spinner size="lg" /></div>
   } @else if (!branches().length) {
-    <div class="empty-state empty-state--lg">
-      <div class="empty-state__icon">
-        <lucide-icon name="building-2" [size]="32" />
-      </div>
-      <p class="empty-state__title">No branches yet</p>
-      <p class="empty-state__sub">Add your first location to get started with multi-branch management.</p>
-      <button class="btn btn--primary" (click)="openAdd()">
-        <lucide-icon name="plus" [size]="16" /> Add First Branch
-      </button>
-    </div>
+    <gw-empty-state icon="building-2" size="lg"
+                    title="No branches yet"
+                    description="Add your first location to get started with multi-branch management.">
+      <gw-button variant="primary" leadingIcon="plus" (click)="openAdd()">Add First Branch</gw-button>
+    </gw-empty-state>
   } @else {
     <div class="branch-grid">
       @for (b of branches(); track b.id) {
@@ -37,9 +30,9 @@
             </div>
             <div class="branch-card__meta">
               <div class="branch-card__name">{{ b.name }}</div>
-              <span class="badge" [class.badge--success]="b.isActive" [class.badge--neutral]="!b.isActive">
+              <gw-badge [variant]="b.isActive ? 'success' : 'neutral'" tone="soft" size="sm">
                 {{ b.isActive ? 'Active' : 'Inactive' }}
-              </span>
+              </gw-badge>
             </div>
           </div>
 
@@ -65,13 +58,9 @@
           </div>
 
           <div class="branch-card__footer">
-            <button class="btn btn--ghost btn--sm" (click)="openEdit(b)">
-              <lucide-icon name="file-text" [size]="14" /> Edit
-            </button>
+            <gw-button variant="ghost" size="sm" leadingIcon="file-text" (click)="openEdit(b)">Edit</gw-button>
             @if (!b.isHeadOffice) {
-              <button class="btn btn--ghost btn--sm branch-card__delete" (click)="deleteBranch(b)">
-                <lucide-icon name="trash-2" [size]="14" /> Delete
-              </button>
+              <gw-button variant="ghost" size="sm" leadingIcon="trash-2" class="branch-card__delete" (click)="deleteBranch(b)">Delete</gw-button>
             }
           </div>
         </div>
@@ -81,100 +70,60 @@
 </div>
 
 <!-- Add / Edit Modal -->
-@if (showForm()) {
-  <div class="modal-backdrop" (click)="showForm.set(false)">
-    <div class="modal modal--lg" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <div class="modal-title-group">
-          <div class="modal-title-icon">
-            <lucide-icon name="building-2" [size]="18" />
-          </div>
-          <div>
-            <h3 class="modal__title">{{ editBranch() ? 'Edit Branch' : 'Add Branch' }}</h3>
-            <p class="modal__sub">{{ editBranch() ? 'Update location details' : 'Set up a new clinic location' }}</p>
-          </div>
-        </div>
-        <button class="btn btn--ghost btn--icon" (click)="showForm.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
+<gw-dialog [open]="showForm()" (openChange)="showForm.set($event)" size="lg"
+           [title]="editBranch() ? 'Edit Branch' : 'Add Branch'"
+           [description]="editBranch() ? 'Update location details' : 'Set up a new clinic location'">
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <gw-form-field label="Branch Name" [required]="true">
+      <gw-input [(ngModel)]="form.name" placeholder="e.g. Main Branch, Downtown Clinic" />
+    </gw-form-field>
 
-      <div class="modal__body">
-        <!-- Branch Name -->
-        <div class="form-section">
-          <div class="field">
-            <label class="field__label">Branch Name <span class="required">*</span></label>
-            <input class="input" placeholder="e.g. Main Branch, Downtown Clinic" [(ngModel)]="form.name" autofocus>
-          </div>
-        </div>
-
-        <!-- Address Section -->
-        <div class="form-section">
-          <div class="form-section__title">
-            <lucide-icon name="map-pin" [size]="13" /> Address
-          </div>
-          <div class="form-grid">
-            <div class="field field--full">
-              <label class="field__label">Address Line 1</label>
-              <input class="input" placeholder="Street address, building name" [(ngModel)]="form.addressLine1">
-            </div>
-            <div class="field field--full">
-              <label class="field__label">Address Line 2</label>
-              <input class="input" placeholder="Floor, suite, landmark (optional)" [(ngModel)]="form.addressLine2">
-            </div>
-            <div class="field">
-              <label class="field__label">City</label>
-              <input class="input" placeholder="Mumbai" [(ngModel)]="form.city">
-            </div>
-            <div class="field">
-              <label class="field__label">State</label>
-              <input class="input" placeholder="Maharashtra" [(ngModel)]="form.state">
-            </div>
-            <div class="field">
-              <label class="field__label">Pincode</label>
-              <input class="input" placeholder="400001" [(ngModel)]="form.pincode">
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact Section -->
-        <div class="form-section">
-          <div class="form-section__title">
-            <lucide-icon name="phone" [size]="13" /> Contact
-          </div>
-          <div class="form-grid">
-            <div class="field">
-              <label class="field__label">Phone</label>
-              <input class="input" placeholder="+91 98765 43210" [(ngModel)]="form.phone">
-            </div>
-            <div class="field">
-              <label class="field__label">Email</label>
-              <input type="email" class="input" placeholder="branch@clinic.com" [(ngModel)]="form.email">
-            </div>
-          </div>
-        </div>
-
-        <!-- Head Office Toggle -->
-        <div class="form-section form-section--last">
-          <label class="toggle-field">
-            <div class="toggle-field__info">
-              <span class="toggle-field__label">Mark as Head Office</span>
-              <span class="toggle-field__hint">The primary location of your clinic</span>
-            </div>
-            <div class="toggle-switch" [class.toggle-switch--on]="form.isHeadOffice" (click)="form.isHeadOffice = !form.isHeadOffice">
-              <div class="toggle-switch__thumb"></div>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showForm.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="saving() || !form.name" (click)="saveForm()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          {{ editBranch() ? 'Save Changes' : 'Add Branch' }}
-        </button>
+    <div>
+      <p class="form-section__title" style="margin: 0 0 8px;">
+        <lucide-icon name="map-pin" [size]="13" /> Address
+      </p>
+      <div class="form-grid">
+        <gw-form-field label="Address Line 1" class="field--full">
+          <gw-input [(ngModel)]="form.addressLine1" placeholder="Street address, building name" />
+        </gw-form-field>
+        <gw-form-field label="Address Line 2" class="field--full">
+          <gw-input [(ngModel)]="form.addressLine2" placeholder="Floor, suite, landmark (optional)" />
+        </gw-form-field>
+        <gw-form-field label="City">
+          <gw-input [(ngModel)]="form.city" placeholder="Mumbai" />
+        </gw-form-field>
+        <gw-form-field label="State">
+          <gw-input [(ngModel)]="form.state" placeholder="Maharashtra" />
+        </gw-form-field>
+        <gw-form-field label="Pincode">
+          <gw-input [(ngModel)]="form.pincode" placeholder="400001" />
+        </gw-form-field>
       </div>
     </div>
+
+    <div>
+      <p class="form-section__title" style="margin: 0 0 8px;">
+        <lucide-icon name="phone" [size]="13" /> Contact
+      </p>
+      <div class="form-grid">
+        <gw-form-field label="Phone">
+          <gw-input [(ngModel)]="form.phone" placeholder="+91 98765 43210" />
+        </gw-form-field>
+        <gw-form-field label="Email">
+          <gw-input [(ngModel)]="form.email" type="email" placeholder="branch@clinic.com" />
+        </gw-form-field>
+      </div>
+    </div>
+
+    <gw-form-field label="Mark as Head Office" hint="The primary location of your clinic" [inline]="true">
+      <gw-toggle [(ngModel)]="form.isHeadOffice" />
+    </gw-form-field>
   </div>
-}
+
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showForm.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="saving()" [disabled]="!form.name" (click)="saveForm()">
+      {{ editBranch() ? 'Save Changes' : 'Add Branch' }}
+    </gw-button>
+  </ng-container>
+</gw-dialog>
