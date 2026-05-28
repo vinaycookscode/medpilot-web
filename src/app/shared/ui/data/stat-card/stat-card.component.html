@@ -1,0 +1,46 @@
+<div class="gw-stat__head">
+  <div class="gw-stat__label-row">
+    @if (icon) {
+      <span class="gw-stat__icon" aria-hidden="true">
+        <i [attr.data-lucide]="icon"></i>
+      </span>
+    }
+    <span class="gw-stat__label">{{ label }}</span>
+  </div>
+
+  @if (delta !== null || trend) {
+    <span class="gw-stat__delta"
+          [class.is-good]="isGood"
+          [class.is-bad]="!isGood && resolvedTrend !== 'flat'"
+          [class.is-flat]="resolvedTrend === 'flat'">
+      @switch (resolvedTrend) {
+        @case ('up') {
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3-3 3 3"/></svg>
+        }
+        @case ('down') {
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4l3 3 3-3"/></svg>
+        }
+        @default {
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 6h8"/></svg>
+        }
+      }
+      @if (delta !== null) { <span>{{ delta > 0 ? '+' : '' }}{{ delta }}%</span> }
+    </span>
+  }
+</div>
+
+<div class="gw-stat__value">
+  @if (loading) {
+    <span class="gw-stat__skel"></span>
+  } @else {
+    {{ value }}
+  }
+</div>
+
+@if (trendLabel) {
+  <p class="gw-stat__trend-label">{{ trendLabel }}</p>
+}
+
+<div class="gw-stat__extra">
+  <ng-content></ng-content>
+</div>

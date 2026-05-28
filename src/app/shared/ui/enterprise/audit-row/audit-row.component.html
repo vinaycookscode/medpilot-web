@@ -1,0 +1,16 @@
+<div class="gw-ar__lead">
+  <gw-avatar [name]="event.actor" [src]="event.actorAvatar || null" size="sm" />
+</div>
+<div class="gw-ar__main">
+  <p class="gw-ar__line">
+    <span class="gw-ar__actor">{{ event.actor }}</span>
+    <span class="gw-ar__action">{{ event.action }}</span>
+    @if (event.resource) { <span class="gw-ar__resource">{{ event.resource }}</span> }
+  </p>
+  @if (event.detail) { <p class="gw-ar__detail">{{ event.detail }}</p> }
+  <div class="gw-ar__meta">
+    @if (event.status) { <gw-badge [variant]="badgeVariant" tone="soft" size="sm">{{ event.status }}</gw-badge> }
+    @if (event.ip) { <code class="gw-ar__ip">{{ event.ip }}</code> }
+  </div>
+</div>
+<time class="gw-ar__time">{{ event.time }}</time>

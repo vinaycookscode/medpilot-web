@@ -1,0 +1,45 @@
+@if (open) {
+  <div class="gw-drawer__scrim"
+       role="presentation"
+       (mousedown)="onBackdrop($event)">
+    <aside #panel
+           class="gw-drawer__panel"
+           [class.gw-drawer__panel--left]="side === 'left'"
+           [class.gw-drawer__panel--right]="side === 'right'"
+           [class.gw-drawer__panel--top]="side === 'top'"
+           [class.gw-drawer__panel--bottom]="side === 'bottom'"
+           [class.gw-drawer__panel--sm]="size === 'sm'"
+           [class.gw-drawer__panel--md]="size === 'md'"
+           [class.gw-drawer__panel--lg]="size === 'lg'"
+           [class.gw-drawer__panel--xl]="size === 'xl'"
+           role="dialog"
+           aria-modal="true"
+           tabindex="-1">
+
+      @if (title || description || showClose) {
+        <header class="gw-drawer__header">
+          <div class="gw-drawer__heading">
+            @if (title) { <h2 class="gw-drawer__title">{{ title }}</h2> }
+            @if (description) { <p class="gw-drawer__desc">{{ description }}</p> }
+          </div>
+          @if (showClose) {
+            <button type="button" class="gw-drawer__close" aria-label="Close"
+                    (click)="close()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </button>
+          }
+        </header>
+      }
+
+      <div class="gw-drawer__body">
+        <ng-content></ng-content>
+      </div>
+
+      <footer class="gw-drawer__footer">
+        <ng-content select="[gw-drawer-footer]"></ng-content>
+      </footer>
+    </aside>
+  </div>
+}

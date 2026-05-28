@@ -1,0 +1,106 @@
+:host {
+  display: block;
+  width: 248px;
+  height: 100%;
+  background: var(--surface-card);
+  border-right: 1px solid var(--border);
+  font-family: var(--font-family);
+  transition: width var(--t-base) ease;
+}
+
+:host(.gw-sb-host--collapsed) { width: 60px; }
+
+.gw-sb {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px 8px;
+  gap: 12px;
+}
+
+.gw-sb__brand {
+  padding: 4px 8px 8px;
+  min-height: 32px;
+}
+
+.gw-sb__nav {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gw-sb__section-label {
+  margin: 0 0 4px;
+  padding: 0 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.gw-sb__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gw-sb__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: -0.005em;
+  transition: background-color var(--t-fast) ease, color var(--t-fast) ease;
+
+  &:hover { background: var(--bg-hover); color: var(--text-primary); }
+  &.is-active { background: var(--color-primary-subtle); color: var(--color-primary); }
+  &.is-disabled { color: var(--text-disabled); pointer-events: none; }
+}
+
+.gw-sb__icon {
+  display: inline-flex;
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+}
+
+.gw-sb__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gw-sb__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
+  height: 16px;
+  background: var(--surface-input);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.gw-sb__item.is-active .gw-sb__badge { background: rgba(37,99,235,0.16); color: var(--color-primary); }
+
+.gw-sb__footer { padding: 0 4px; }
+
+:host(.gw-sb-host--collapsed) .gw-sb__item {
+  justify-content: center;
+  padding: 7px;
+}

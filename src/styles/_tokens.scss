@@ -1,67 +1,67 @@
 // ─────────────────────────────────────────────────────────────
-// GotWell Design Tokens
-// Single source of truth. Swap this file to retheme the app.
-// Uses both SCSS vars (compile-time) + CSS custom props (runtime)
+// GotWell Design Tokens — enterprise refresh
+// Linear / Stripe / Vercel inspired: Inter typography, refined
+// indigo-blue, hairline borders, ring-based shadows.
 // ─────────────────────────────────────────────────────────────
 
 // ── SCSS Variables (for use inside component SCSS files) ──
 
-// Brand
-$color-primary:        #007AFF;
-$color-primary-hover:  #0066D6;
-$color-primary-active: #0051AA;
+// Brand — refined enterprise blue
+$color-primary:        #2563EB;
+$color-primary-hover:  #1D4ED8;
+$color-primary-active: #1E3A8A;
 
-// Semantic
-$color-success: #34C759;
-$color-warning: #FF9F0A;
-$color-danger:  #FF3B30;
-$color-info:    #5AC8FA;
-$color-purple:  #AF52DE;
+// Semantic — slightly desaturated vs the iOS originals
+$color-success: #16A34A;
+$color-warning: #D97706;
+$color-danger:  #DC2626;
+$color-info:    #0EA5E9;
+$color-purple:  #7C3AED;
 
-// Surfaces
-$surface-page:    #F2F2F7;
+// Surfaces — calmer neutrals
+$surface-page:    #FAFAFA;
 $surface-card:    #FFFFFF;
-$surface-input:   #F2F2F7;
+$surface-input:   #F4F4F5;
 $surface-sidebar: #FFFFFF;
 
-// Text
-$text-primary:   #1C1C1E;
-$text-secondary: #6C6C70;
-$text-tertiary:  #AEAEB2;
+// Text — true near-black on top, walked-down neutrals
+$text-primary:   #09090B;
+$text-secondary: #52525B;
+$text-tertiary:  #A1A1AA;
 $text-inverse:   #FFFFFF;
 
-// Border
-$border-color: #E5E5EA;
-$border-strong: #C7C7CC;
+// Border — hairlines
+$border-color:  #E4E4E7;
+$border-strong: #D4D4D8;
 
-// Spacing
+// Spacing — unchanged
 $sp-1:  4px;   $sp-2:  8px;   $sp-3:  12px;  $sp-4:  16px;
 $sp-5:  20px;  $sp-6:  24px;  $sp-8:  32px;  $sp-10: 40px;
 $sp-12: 48px;  $sp-16: 64px;  $sp-20: 80px;
 
-// Radius
-$radius-xs: 4px;   $radius-sm: 8px;   $radius-md: 12px;
-$radius-lg: 16px;  $radius-xl: 20px;  $radius-2xl: 28px;
+// Radius — sharpened
+$radius-xs: 4px;   $radius-sm: 6px;   $radius-md: 8px;
+$radius-lg: 12px;  $radius-xl: 16px;  $radius-2xl: 24px;
 $radius-full: 9999px;
 
-// Typography
-$font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-              'Helvetica Neue', Inter, Arial, sans-serif;
-$font-mono:   'SF Mono', 'Fira Code', Consolas, monospace;
+// Typography — Inter, tighter base
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+              Roboto, Helvetica, Arial, sans-serif;
+$font-mono:   'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
 
-$text-xs:   11px;  $text-sm:  13px;  $text-base: 15px;
-$text-md:   17px;  $text-lg:  20px;  $text-xl:   24px;
-$text-2xl:  28px;  $text-3xl: 34px;  $text-4xl:  48px;
+$text-xs:   11px;  $text-sm:  12px;  $text-base: 13px;
+$text-md:   14px;  $text-lg:  16px;  $text-xl:   18px;
+$text-2xl:  22px;  $text-3xl: 28px;  $text-4xl:  40px;
 
 // Layout
 $sidebar-width: 248px;
-$topbar-height: 60px;
+$topbar-height: 56px;
 
 // Transitions
 $t-fast: 120ms;
-$t-base: 220ms;
-$t-slow: 380ms;
-$ease:        cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$t-base: 200ms;
+$t-slow: 320ms;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
 $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -71,42 +71,42 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --color-primary:        #{$color-primary};
   --color-primary-hover:  #{$color-primary-hover};
   --color-primary-active: #{$color-primary-active};
-  --color-primary-subtle: rgba(0, 122, 255, 0.08);
-  --color-primary-light:  rgba(0, 122, 255, 0.14);
+  --color-primary-subtle: rgba(37, 99, 235, 0.08);
+  --color-primary-light:  rgba(37, 99, 235, 0.14);
 
   // Semantic
   --color-success:        #{$color-success};
-  --color-success-subtle: rgba(52, 199, 89, 0.10);
+  --color-success-subtle: rgba(22, 163, 74, 0.10);
   --color-warning:        #{$color-warning};
-  --color-warning-subtle: rgba(255, 159, 10, 0.10);
+  --color-warning-subtle: rgba(217, 119, 6, 0.10);
   --color-danger:         #{$color-danger};
-  --color-danger-subtle:  rgba(255, 59, 48, 0.10);
+  --color-danger-subtle:  rgba(220, 38, 38, 0.10);
   --color-purple:         #{$color-purple};
-  --color-purple-subtle:  rgba(175, 82, 222, 0.10);
-  --color-teal:           #5AC8FA;
-  --color-teal-subtle:    rgba(90, 200, 250, 0.10);
+  --color-purple-subtle:  rgba(124, 58, 237, 0.10);
+  --color-teal:           #{$color-info};
+  --color-teal-subtle:    rgba(14, 165, 233, 0.10);
 
   // Surfaces
-  --surface-page:     transparent;
+  --surface-page:     #{$surface-page};
   --surface-card:     #ffffff;
-  --surface-sidebar:  rgba(255, 255, 255, 0.88);
-  --surface-topbar:   rgba(255, 255, 255, 0.85);
+  --surface-sidebar:  rgba(255, 255, 255, 0.92);
+  --surface-topbar:   rgba(255, 255, 255, 0.88);
   --surface-input:    #{$surface-input};
-  --surface-overlay:  rgba(0, 0, 0, 0.36);
+  --surface-overlay:  rgba(9, 9, 11, 0.42);
   --bg-card:          var(--surface-card);
-  --bg-page:          #F5F5F7;
-  --bg-hover:         rgba(0, 0, 0, 0.04);
+  --bg-page:          #{$surface-page};
+  --bg-hover:         rgba(9, 9, 11, 0.04);
   --bg-input:         #ffffff;
 
   // Text
   --text-primary:   #{$text-primary};
   --text-secondary: #{$text-secondary};
   --text-tertiary:  #{$text-tertiary};
-  --text-disabled:  #C7C7CC;
+  --text-disabled:  #D4D4D8;
   --text-inverse:   #{$text-inverse};
 
   // Border
-  --border:       #{$border-color};
+  --border:        #{$border-color};
   --border-strong: #{$border-strong};
   --border-focus:  #{$color-primary};
 
@@ -122,14 +122,23 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --radius-xl:   #{$radius-xl};  --radius-2xl: #{$radius-2xl};
   --radius-full: #{$radius-full};
 
-  // Shadows
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.07), 0 4px 8px rgba(0,0,0,0.04);
-  --shadow-xl: 0 20px 40px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04);
-  --shadow-focus: 0 0 0 4px rgba(0, 122, 255, 0.20);
-  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.04);
+  // Shadows — Linear-style "ring + soft glow"
+  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.04),
+               0 1px 2px rgba(9, 9, 11, 0.04);
+  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 2px 4px rgba(9, 9, 11, 0.04),
+               0 4px 8px rgba(9, 9, 11, 0.04);
+  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 4px 8px rgba(9, 9, 11, 0.06),
+               0 12px 24px rgba(9, 9, 11, 0.06);
+  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.06),
+               0 8px 16px rgba(9, 9, 11, 0.08),
+               0 24px 48px rgba(9, 9, 11, 0.10);
+  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.06),
+                      0 4px 12px rgba(9, 9, 11, 0.08),
+                      0 12px 32px rgba(9, 9, 11, 0.08);
 
   // Typography
   --font-family: #{$font-family};
@@ -151,4 +160,71 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --z-topbar:   500;
   --z-modal:    600;
   --z-toast:    700;
+}
+
+// ── Dark theme ────────────────────────────────────────────────────────────
+// Activate by setting `data-theme="dark"` on <html> or a wrapping container.
+
+:root[data-theme='dark'],
+[data-theme='dark'] {
+  // Brand — slightly lifted for dark surface contrast
+  --color-primary:        #3B82F6;
+  --color-primary-hover:  #60A5FA;
+  --color-primary-active: #2563EB;
+  --color-primary-subtle: rgba(59, 130, 246, 0.14);
+  --color-primary-light:  rgba(59, 130, 246, 0.22);
+
+  // Semantic
+  --color-success:        #22C55E;
+  --color-success-subtle: rgba(34, 197, 94, 0.16);
+  --color-warning:        #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.16);
+  --color-danger:         #EF4444;
+  --color-danger-subtle:  rgba(239, 68, 68, 0.16);
+  --color-purple:         #A78BFA;
+  --color-purple-subtle:  rgba(167, 139, 250, 0.16);
+  --color-teal:           #38BDF8;
+  --color-teal-subtle:    rgba(56, 189, 248, 0.16);
+
+  // Surfaces
+  --surface-page:    #09090B;
+  --surface-card:    #18181B;
+  --surface-sidebar: rgba(24, 24, 27, 0.92);
+  --surface-topbar:  rgba(24, 24, 27, 0.92);
+  --surface-input:   #1F1F23;
+  --surface-overlay: rgba(0, 0, 0, 0.66);
+  --bg-card:         var(--surface-card);
+  --bg-page:         var(--surface-page);
+  --bg-hover:        rgba(255, 255, 255, 0.05);
+  --bg-input:        #18181B;
+
+  // Text
+  --text-primary:    #FAFAFA;
+  --text-secondary:  #A1A1AA;
+  --text-tertiary:   #71717A;
+  --text-disabled:   #52525B;
+  --text-inverse:    #09090B;
+
+  // Border
+  --border:        #27272A;
+  --border-strong: #3F3F46;
+  --border-focus:  var(--color-primary);
+
+  // Shadows — dark needs heavier opacity to register
+  --shadow-xs: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.04),
+               0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 2px 4px rgba(0, 0, 0, 0.32),
+               0 4px 8px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 4px 8px rgba(0, 0, 0, 0.34),
+               0 12px 24px rgba(0, 0, 0, 0.36);
+  --shadow-xl: 0 0 0 1px rgba(255, 255, 255, 0.06),
+               0 8px 16px rgba(0, 0, 0, 0.40),
+               0 24px 48px rgba(0, 0, 0, 0.50);
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.26);
+  --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                      0 4px 12px rgba(0, 0, 0, 0.36),
+                      0 12px 32px rgba(0, 0, 0, 0.38);
 }

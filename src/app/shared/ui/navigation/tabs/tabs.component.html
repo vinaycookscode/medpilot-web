@@ -1,0 +1,27 @@
+<div class="gw-tabs__list" role="tablist">
+  @for (t of tabs; track t.key) {
+    <button type="button"
+            class="gw-tabs__trigger"
+            role="tab"
+            [id]="'gw-tab-' + t.key"
+            [class.is-active]="t.active()"
+            [class.is-disabled]="t.disabled"
+            [disabled]="t.disabled"
+            [attr.aria-selected]="t.active()"
+            [attr.aria-controls]="'gw-tabpanel-' + t.key"
+            [attr.tabindex]="t.active() ? 0 : -1"
+            (click)="setActive(t.key)"
+            (keydown)="onHeaderKeydown($event, t)">
+      @if (t.icon) {
+        <i class="gw-tabs__icon" [attr.data-lucide]="t.icon" aria-hidden="true"></i>
+      }
+      <span>{{ t.label }}</span>
+      @if (t.badge !== null && t.badge !== undefined) {
+        <span class="gw-tabs__badge">{{ t.badge }}</span>
+      }
+    </button>
+  }
+</div>
+<div class="gw-tabs__panels">
+  <ng-content></ng-content>
+</div>

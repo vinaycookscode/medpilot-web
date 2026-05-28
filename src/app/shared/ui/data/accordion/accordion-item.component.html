@@ -1,0 +1,33 @@
+<button type="button"
+        class="gw-acc-item__header"
+        [id]="id + '-header'"
+        [attr.aria-expanded]="expanded()"
+        [attr.aria-controls]="id + '-panel'"
+        [disabled]="disabled"
+        (click)="handleHeaderClick()"
+        (keydown)="handleKeydown($event)">
+  @if (icon) {
+    <span class="gw-acc-item__icon" aria-hidden="true">
+      <i [attr.data-lucide]="icon"></i>
+    </span>
+  }
+  <div class="gw-acc-item__heading">
+    <span class="gw-acc-item__title">{{ title }}</span>
+    @if (description) { <span class="gw-acc-item__desc">{{ description }}</span> }
+  </div>
+  <span class="gw-acc-item__chev" aria-hidden="true">
+    <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 5l3 3 3-3"/>
+    </svg>
+  </span>
+</button>
+
+<div class="gw-acc-item__panel"
+     [id]="id + '-panel'"
+     role="region"
+     [attr.aria-labelledby]="id + '-header'"
+     [attr.hidden]="!expanded() ? '' : null">
+  <div class="gw-acc-item__panel-inner">
+    <ng-content></ng-content>
+  </div>
+</div>

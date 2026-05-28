@@ -1,0 +1,46 @@
+@if (open) {
+  <div class="gw-dialog__scrim"
+       role="presentation"
+       (mousedown)="onBackdrop($event)">
+    <div #panel
+         class="gw-dialog__panel"
+         [class.gw-dialog__panel--sm]="size === 'sm'"
+         [class.gw-dialog__panel--md]="size === 'md'"
+         [class.gw-dialog__panel--lg]="size === 'lg'"
+         [class.gw-dialog__panel--xl]="size === 'xl'"
+         [class.gw-dialog__panel--full]="size === 'full'"
+         role="dialog"
+         aria-modal="true"
+         tabindex="-1">
+
+      @if (!bareHeader) {
+        @if (title || description || showClose) {
+          <header class="gw-dialog__header">
+            <div class="gw-dialog__heading">
+              @if (title) { <h2 class="gw-dialog__title">{{ title }}</h2> }
+              @if (description) { <p class="gw-dialog__desc">{{ description }}</p> }
+            </div>
+            @if (showClose) {
+              <button type="button" class="gw-dialog__close" aria-label="Close dialog"
+                      (click)="close()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M6 6l12 12M18 6L6 18"/>
+                </svg>
+              </button>
+            }
+          </header>
+        }
+      } @else {
+        <ng-content select="[gw-dialog-header]"></ng-content>
+      }
+
+      <div class="gw-dialog__body">
+        <ng-content></ng-content>
+      </div>
+
+      <footer class="gw-dialog__footer">
+        <ng-content select="[gw-dialog-footer]"></ng-content>
+      </footer>
+    </div>
+  </div>
+}

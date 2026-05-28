@@ -1,0 +1,76 @@
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-primary);
+
+  --gw-alert-bg: var(--bg-card);
+  --gw-alert-border: var(--border);
+  --gw-alert-icon: var(--text-secondary);
+
+  background: var(--gw-alert-bg);
+  border-color: var(--gw-alert-border);
+}
+
+.gw-alert__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gw-alert-icon);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.gw-alert__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gw-alert__title { margin: 0; font-weight: 600; font-size: 13px; color: var(--text-primary); }
+.gw-alert__content { color: var(--text-secondary); }
+.gw-alert__actions:empty { display: none; }
+.gw-alert__actions { display: flex; gap: 8px; margin-top: 8px; }
+
+.gw-alert__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  margin: -2px -4px 0 0;
+  border: 0; background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  &:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+}
+
+:host(.gw-alert-host--info) {
+  --gw-alert-bg: rgba(37, 99, 235, 0.06);
+  --gw-alert-border: rgba(37, 99, 235, 0.18);
+  --gw-alert-icon: var(--color-primary);
+}
+
+:host(.gw-alert-host--success) {
+  --gw-alert-bg: var(--color-success-subtle);
+  --gw-alert-border: rgba(22, 163, 74, 0.25);
+  --gw-alert-icon: var(--color-success);
+}
+
+:host(.gw-alert-host--warning) {
+  --gw-alert-bg: var(--color-warning-subtle);
+  --gw-alert-border: rgba(217, 119, 6, 0.25);
+  --gw-alert-icon: var(--color-warning);
+}
+
+:host(.gw-alert-host--danger) {
+  --gw-alert-bg: var(--color-danger-subtle);
+  --gw-alert-border: rgba(220, 38, 38, 0.25);
+  --gw-alert-icon: var(--color-danger);
+}
+
+:host(.gw-alert-host--subtle) {
+  --gw-alert-bg: var(--surface-input);
+  --gw-alert-border: transparent;
+}

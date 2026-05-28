@@ -1,0 +1,72 @@
+<div class="gw-table__wrap">
+  <table class="gw-table" role="table">
+    <thead class="gw-table__head">
+      <tr>
+        @for (col of columns; track col.key) {
+          <th class="gw-table__th"
+              [class.is-sortable]="col.sortable"
+              [class.is-sorted]="sortIndicator(col)"
+              [class.gw-table__th--right]="col.align === 'right'"
+              [class.gw-table__th--center]="col.align === 'center'"
+              [class.gw-table__th--truncate]="col.truncate"
+              [ngClass]="col.headerClass || ''"
+              [style.width]="col.width || null"
+              [attr.aria-sort]="sortIndicator(col) ? (sortIndicator(col) === 'asc' ? 'ascending' : 'descending') : (col.sortable ? 'none' : null)"
+              (click)="onHeaderClick(col)">
+            <span class="gw-table__th-label">{{ col.label }}</span>
+            @if (col.sortable) {
+              <span class="gw-table__sort"
+                    [attr.data-dir]="sortIndicator(col)"
+                    aria-hidden="true">
+                <svg viewBox="0 0 12 12" width="10" height="10">
+                  <path d="M3 5l3-3 3 3M3 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody class="gw-table__body">
+      @if (loading) {
+        @for (i of skeletonRowsArray; track i) {
+          <tr class="gw-table__row gw-table__row--skel">
+            @for (col of columns; track col.key) {
+              <td class="gw-table__td">
+                <span class="gw-table__skel-bar" [style.width.%]="60 + ((i * 13) % 35)"></span>
+              </td>
+            }
+          </tr>
+        }
+      } @else if (data && data.length) {
+        @for (row of data; track trackRow($index, row); let i = $index) {
+          <tr class="gw-table__row"
+              [attr.tabindex]="rowClick.observed ? 0 : null"
+              [attr.role]="rowClick.observed ? 'button' : null"
+              (click)="rowClick.observed && rowClick.emit(row)">
+            @for (col of columns; track col.key) {
+              <td class="gw-table__td"
+                  [class.gw-table__td--right]="col.align === 'right'"
+                  [class.gw-table__td--center]="col.align === 'center'"
+                  [class.gw-table__td--truncate]="col.truncate"
+                  [ngClass]="col.cellClass || ''">
+                @if (cellTemplate(col.key); as tpl) {
+                  <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row, rowIndex: i }"></ng-container>
+                } @else {
+                  {{ cellValue(row, col.key) }}
+                }
+              </td>
+            }
+          </tr>
+        }
+      } @else {
+        <tr class="gw-table__row gw-table__row--empty">
+          <td class="gw-table__empty-cell" [attr.colspan]="columns.length">
+            <div class="gw-table__empty-default">{{ emptyText }}</div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

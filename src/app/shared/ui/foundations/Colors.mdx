@@ -1,0 +1,89 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Colors" />
+
+# Color
+
+The GotWell palette is rooted in a single restrained enterprise blue
+(`#2563EB`). Semantics (success / warning / danger / info) are 10–15%
+desaturated from their iOS-classic equivalents to read calmer at
+data-density.
+
+All colors are exposed as CSS custom properties so they swap cleanly
+between light and dark themes.
+
+## Brand
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+  {[
+    ['Primary',         'var(--color-primary)',        '#2563EB'],
+    ['Primary hover',   'var(--color-primary-hover)',  '#1D4ED8'],
+    ['Primary active',  'var(--color-primary-active)', '#1E3A8A'],
+  ].map(([name, tok, hex]) => (
+    <div key={name} style={{ border: '1px solid #E4E4E7', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: tok, height: 80 }} />
+      <div style={{ padding: 10, fontSize: 12 }}>
+        <div style={{ fontWeight: 600, color: '#09090B' }}>{name}</div>
+        <div style={{ color: '#52525B' }}>{hex}</div>
+        <code style={{ fontSize: 11, color: '#52525B' }}>{tok}</code>
+      </div>
+    </div>
+  ))}
+</div>
+
+## Semantic
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+  {[
+    ['Success', 'var(--color-success)', '#16A34A'],
+    ['Warning', 'var(--color-warning)', '#D97706'],
+    ['Danger',  'var(--color-danger)',  '#DC2626'],
+    ['Info',    'var(--color-teal)',    '#0EA5E9'],
+    ['Purple',  'var(--color-purple)',  '#7C3AED'],
+  ].map(([name, tok, hex]) => (
+    <div key={name} style={{ border: '1px solid #E4E4E7', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: tok, height: 64 }} />
+      <div style={{ padding: 8, fontSize: 12 }}>
+        <div style={{ fontWeight: 600, color: '#09090B' }}>{name}</div>
+        <div style={{ color: '#52525B' }}>{hex}</div>
+      </div>
+    </div>
+  ))}
+</div>
+
+## Neutrals (light theme)
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+  {[
+    ['Text primary',   '#09090B', '#fff'],
+    ['Text secondary', '#52525B', '#fff'],
+    ['Text tertiary',  '#A1A1AA', '#09090B'],
+    ['Text disabled',  '#D4D4D8', '#09090B'],
+    ['Border',         '#E4E4E7', '#09090B'],
+    ['Border strong',  '#D4D4D8', '#09090B'],
+    ['Surface page',   '#FAFAFA', '#09090B'],
+    ['Surface card',   '#FFFFFF', '#09090B'],
+  ].map(([name, hex, fg]) => (
+    <div key={name} style={{ border: '1px solid #E4E4E7', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: hex, color: fg, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500 }}>{hex}</div>
+      <div style={{ padding: 8, fontSize: 12, color: '#52525B' }}>{name}</div>
+    </div>
+  ))}
+</div>
+
+## Dark theme
+
+The same semantic tokens map to lifted hues with heavier shadows to
+register on dark surfaces. Activate by setting
+`data-theme="dark"` on `<html>` or any container.
+
+```scss
+:root[data-theme='dark'] {
+  --color-primary:   #3B82F6;
+  --surface-page:    #09090B;
+  --surface-card:    #18181B;
+  --text-primary:    #FAFAFA;
+  --border:          #27272A;
+  /* …full set in src/styles/_tokens.scss */
+}
+```

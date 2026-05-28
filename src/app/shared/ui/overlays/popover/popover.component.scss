@@ -1,0 +1,29 @@
+:host { display: contents; }
+
+.gw-popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-dropdown);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  min-width: 180px;
+  max-width: 360px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  pointer-events: none;
+
+  &.is-positioned {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-popover { transition-duration: 0ms; }
+}

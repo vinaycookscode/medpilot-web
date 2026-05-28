@@ -1,0 +1,45 @@
+<div class="gw-toast-stack"
+     [attr.data-pos]="svc.position()"
+     role="region"
+     aria-label="Notifications"
+     aria-live="polite">
+  @for (t of svc.toasts(); track t.id) {
+    <div class="gw-toast"
+         [class.gw-toast--info]="t.variant === 'info'"
+         [class.gw-toast--success]="t.variant === 'success'"
+         [class.gw-toast--warning]="t.variant === 'warning'"
+         [class.gw-toast--danger]="t.variant === 'danger'"
+         role="status">
+      <span class="gw-toast__icon" aria-hidden="true">
+        @switch (t.variant) {
+          @case ('success') {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+          }
+          @case ('warning') {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L1 21h22L12 2z"/><path d="M12 9v4"/></svg>
+          }
+          @case ('danger') {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          }
+          @default {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          }
+        }
+      </span>
+      <div class="gw-toast__body">
+        <p class="gw-toast__title">{{ t.title }}</p>
+        @if (t.description) { <p class="gw-toast__desc">{{ t.description }}</p> }
+      </div>
+      @if (t.action) {
+        <button type="button" class="gw-toast__action" (click)="t.action.onClick(); svc.dismiss(t.id)">
+          {{ t.action.label }}
+        </button>
+      }
+      <button type="button" class="gw-toast__close" aria-label="Dismiss" (click)="svc.dismiss(t.id)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+  }
+</div>

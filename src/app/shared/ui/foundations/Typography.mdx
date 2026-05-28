@@ -1,0 +1,65 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+The library uses **Inter** for UI text and **JetBrains Mono** for code,
+loaded from Google Fonts. The system stack is a fallback only — the
+font is not optional.
+
+```scss
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+              Roboto, Helvetica, Arial, sans-serif;
+$font-mono:   'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+```
+
+The body scale runs **11 → 40 px** with the default control / body size
+at **13 px** — denser than consumer apps, matched to data-heavy
+dashboards.
+
+## Scale
+
+<div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, alignItems: 'baseline' }}>
+  {[
+    ['11px / xs',    11, 400, '-0.005em', 'Caption · helper text'],
+    ['12px / sm',    12, 500, '-0.005em', 'Labels · meta · table head'],
+    ['13px / base',  13, 400, 'normal',   'Body · default control text'],
+    ['14px / md',    14, 500, '-0.005em', 'Emphasised body · button label'],
+    ['16px / lg',    16, 600, '-0.01em',  'Card titles · settings rows'],
+    ['18px / xl',    18, 600, '-0.015em', 'Section heads · drawer titles'],
+    ['22px / 2xl',   22, 600, '-0.02em',  'Page titles'],
+    ['28px / 3xl',   28, 600, '-0.025em', 'KPI numbers · feature headlines'],
+    ['40px / 4xl',   40, 700, '-0.03em',  'Display'],
+  ].map(([name, size, weight, ls, use]) => (
+    <>
+      <div key={name + 'k'} style={{ fontSize: 11, color: '#52525B', fontFamily: 'JetBrains Mono, monospace' }}>{name}</div>
+      <div key={name + 'v'} style={{ fontSize: size, fontWeight: weight, letterSpacing: ls, color: '#09090B', lineHeight: 1.2 }}>
+        Premium SaaS deserves typography that earns the price tag.
+        <div style={{ fontSize: 11, fontWeight: 400, color: '#A1A1AA', marginTop: 4, letterSpacing: 'normal' }}>{use}</div>
+      </div>
+    </>
+  ))}
+</div>
+
+## Weights
+
+<div style={{ display: 'flex', gap: 24, alignItems: 'baseline', fontSize: 18, color: '#09090B' }}>
+  <span style={{ fontWeight: 400 }}>Regular 400</span>
+  <span style={{ fontWeight: 500 }}>Medium 500</span>
+  <span style={{ fontWeight: 600 }}>Semibold 600</span>
+  <span style={{ fontWeight: 700 }}>Bold 700</span>
+</div>
+
+Only those four weights are loaded — they cover every UI need without
+inflating the font payload.
+
+## Numerics
+
+Tables, KPI cards, and timestamps use `font-variant-numeric:
+tabular-nums` so columns of numbers line up at fixed-width.
+
+<div style={{ fontFamily: 'Inter', fontVariantNumeric: 'tabular-nums', fontSize: 20, fontWeight: 600 }}>
+  <div>1,234,567.89</div>
+  <div>0,000,000.00</div>
+</div>

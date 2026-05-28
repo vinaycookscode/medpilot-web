@@ -1,0 +1,54 @@
+:host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--surface-input);
+  overflow: hidden;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+:host(.gw-avatar--xs) { width: 20px; height: 20px; font-size: 9px; }
+:host(.gw-avatar--sm) { width: 28px; height: 28px; font-size: 11px; }
+:host(.gw-avatar--lg) { width: 44px; height: 44px; font-size: 16px; }
+:host(.gw-avatar--xl) { width: 64px; height: 64px; font-size: 22px; }
+
+:host(.gw-avatar--square) { border-radius: var(--radius-sm); }
+:host(.gw-avatar--square.gw-avatar--lg),
+:host(.gw-avatar--square.gw-avatar--xl) { border-radius: var(--radius-md); }
+
+.gw-avatar__img,
+.gw-avatar__initials {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gw-avatar__status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30%;
+  height: 30%;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-card);
+  background: var(--text-disabled);
+
+  &[data-status='online']  { background: var(--color-success); }
+  &[data-status='busy']    { background: var(--color-danger); }
+  &[data-status='away']    { background: var(--color-warning); }
+  &[data-status='offline'] { background: var(--text-disabled); }
+}

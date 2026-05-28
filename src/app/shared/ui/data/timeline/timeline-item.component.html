@@ -1,0 +1,17 @@
+<span class="gw-tl-item__dot" aria-hidden="true">
+  @if (icon) {
+    <i [attr.data-lucide]="icon"></i>
+  } @else {
+    <span class="gw-tl-item__dot-inner"></span>
+  }
+</span>
+
+<div class="gw-tl-item__body">
+  <div class="gw-tl-item__head">
+    <span class="gw-tl-item__title">{{ title }}</span>
+    @if (time) { <time class="gw-tl-item__time">{{ time }}</time> }
+  </div>
+  <div class="gw-tl-item__content">
+    <ng-content></ng-content>
+  </div>
+</div>

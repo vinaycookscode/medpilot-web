@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Radius" />
+
+# Radius
+
+Radii are sharpened compared to consumer / iOS conventions — closer to
+Linear and Stripe than to Apple.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+  {[
+    ['--radius-xs',  4],
+    ['--radius-sm',  6],
+    ['--radius-md',  8],
+    ['--radius-lg',  12],
+    ['--radius-xl',  16],
+    ['--radius-2xl', 24],
+  ].map(([tok, px]) => (
+    <div key={tok} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+      <div style={{ width: 80, height: 80, background: '#FFFFFF', border: '1px solid #E4E4E7', borderRadius: px }} />
+      <code style={{ fontSize: 11, color: '#52525B', fontFamily: 'JetBrains Mono, monospace' }}>{tok}</code>
+      <span style={{ fontSize: 11, color: '#A1A1AA' }}>{px}px</span>
+    </div>
+  ))}
+</div>
+
+## Usage map
+
+| Element | Radius |
+|---|---|
+| Inline controls (input, button, select, badge bar) | `--radius-md` (8px) |
+| Tags, chips, pagination buttons | `--radius-sm` (6px) |
+| Cards, panels, dialogs, modal panels | `--radius-md` / `--radius-lg` |
+| Avatars (circle), status dots, pills, toggles | `--radius-full` |
+
+Avoid mixing `--radius-lg` (12px) and `--radius-md` (8px) in the same
+visual group — radius should compound consistently across nested
+elements (e.g. a card with `--radius-md` should contain inputs with
+`--radius-sm`, *not* equal or larger radii).

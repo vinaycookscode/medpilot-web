@@ -1,0 +1,26 @@
+// Outlet positions itself; the actual toast styling lives in toast.styles.scss
+// so the visual matches whether outlet is embedded in an Angular tree or
+// in a Storybook decorator wrapper.
+
+:host { display: contents; }
+
+.gw-toast-stack {
+  position: fixed;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  pointer-events: none;
+  max-width: 380px;
+
+  // Position variants
+  &[data-pos='top-right']    { top: 0; right: 0; }
+  &[data-pos='top-center']   { top: 0; left: 50%; transform: translateX(-50%); align-items: center; }
+  &[data-pos='top-left']     { top: 0; left: 0; }
+  &[data-pos='bottom-right'] { bottom: 0; right: 0; flex-direction: column-reverse; }
+  &[data-pos='bottom-center'] { bottom: 0; left: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
+  &[data-pos='bottom-left']  { bottom: 0; left: 0; flex-direction: column-reverse; }
+}
+
+.gw-toast { pointer-events: auto; }

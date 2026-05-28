@@ -1,0 +1,92 @@
+:host {
+  display: block;
+  width: 100%;
+  --gw-prog-accent: var(--color-primary);
+}
+
+:host(.gw-prog--circular) {
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+// Linear ---------------------------------------------------------------------
+.gw-prog__track {
+  position: relative;
+  height: 6px;
+  background: var(--surface-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  &[data-variant='primary'] { --gw-prog-accent: var(--color-primary); }
+  &[data-variant='success'] { --gw-prog-accent: var(--color-success); }
+  &[data-variant='warning'] { --gw-prog-accent: var(--color-warning); }
+  &[data-variant='danger']  { --gw-prog-accent: var(--color-danger);  }
+}
+
+.gw-prog__fill {
+  height: 100%;
+  background: var(--gw-prog-accent);
+  border-radius: inherit;
+  transition: width 220ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.is-indeterminate {
+    width: 35%;
+    animation: gw-prog-slide 1.4s ease-in-out infinite;
+  }
+}
+
+.gw-prog__label {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+// Circular -------------------------------------------------------------------
+.gw-prog__ring {
+  display: block;
+
+  &[data-variant='primary'] { --gw-prog-accent: var(--color-primary); }
+  &[data-variant='success'] { --gw-prog-accent: var(--color-success); }
+  &[data-variant='warning'] { --gw-prog-accent: var(--color-warning); }
+  &[data-variant='danger']  { --gw-prog-accent: var(--color-danger);  }
+}
+
+.gw-prog__ring-track {
+  stroke: var(--surface-input);
+}
+
+.gw-prog__ring-fill {
+  stroke: var(--gw-prog-accent);
+  transition: stroke-dashoffset 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gw-prog__ring.is-indeterminate {
+  animation: gw-prog-spin 1.4s linear infinite;
+  .gw-prog__ring-fill {
+    stroke-dasharray: 70 200;
+    stroke-dashoffset: 0;
+  }
+}
+
+.gw-prog__ring-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+@keyframes gw-prog-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(285%); }
+}
+@keyframes gw-prog-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-prog__fill.is-indeterminate,
+  .gw-prog__ring.is-indeterminate { animation: none; }
+}

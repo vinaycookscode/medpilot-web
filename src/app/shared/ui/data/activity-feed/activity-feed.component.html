@@ -1,0 +1,20 @@
+@if (items.length) {
+  <ul class="gw-af">
+    @for (item of items; track item.id) {
+      <li class="gw-af__item">
+        <gw-avatar [name]="item.actor" [src]="item.actorAvatar || null" size="sm" />
+        <div class="gw-af__body">
+          <p class="gw-af__line">
+            <span class="gw-af__actor">{{ item.actor }}</span>
+            <span class="gw-af__action">{{ item.action }}</span>
+            @if (item.target) { <span class="gw-af__target">{{ item.target }}</span> }
+          </p>
+          @if (item.detail) { <p class="gw-af__detail">{{ item.detail }}</p> }
+        </div>
+        <time class="gw-af__time">{{ item.time }}</time>
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="gw-af__empty">{{ emptyText }}</p>
+}

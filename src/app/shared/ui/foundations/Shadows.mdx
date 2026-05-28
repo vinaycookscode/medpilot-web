@@ -1,0 +1,42 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Shadows" />
+
+# Shadows
+
+GotWell uses **Linear-style elevation** — a tight ring + soft glow
+instead of the heavy drop shadows common to iOS / Material. The ring
+defines the surface, the glow hints depth.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, padding: 32, background: '#FAFAFA' }}>
+  {[
+    ['--shadow-xs',  '0 0 0 1px rgba(9,9,11,0.04)'],
+    ['--shadow-sm',  '0 0 0 1px rgba(9,9,11,0.04), 0 1px 2px rgba(9,9,11,0.04)'],
+    ['--shadow-md',  '0 0 0 1px rgba(9,9,11,0.05), 0 2px 4px rgba(9,9,11,0.04), 0 4px 8px rgba(9,9,11,0.04)'],
+    ['--shadow-lg',  '0 0 0 1px rgba(9,9,11,0.05), 0 4px 8px rgba(9,9,11,0.06), 0 12px 24px rgba(9,9,11,0.06)'],
+    ['--shadow-xl',  '0 0 0 1px rgba(9,9,11,0.06), 0 8px 16px rgba(9,9,11,0.08), 0 24px 48px rgba(9,9,11,0.10)'],
+    ['--shadow-focus', '0 0 0 3px rgba(37,99,235,0.16)'],
+  ].map(([tok, val]) => (
+    <div key={tok} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div style={{ width: 120, height: 80, background: '#FFFFFF', borderRadius: 8, boxShadow: val }} />
+      <code style={{ fontSize: 11, color: '#52525B', fontFamily: 'JetBrains Mono, monospace' }}>{tok}</code>
+    </div>
+  ))}
+</div>
+
+## Usage map
+
+| Token | Use |
+|---|---|
+| `--shadow-xs` | Hairline-only — inline inputs, default cards, table edges |
+| `--shadow-sm` | Toolbars, sticky headers, default cards lifted from page |
+| `--shadow-md` | Dropdowns, popovers, hover cards |
+| `--shadow-lg` | Combobox panels, multi-select panels, toasts |
+| `--shadow-xl` | Dialogs, drawers, peak overlays |
+| `--shadow-focus` | Universal keyboard focus ring (3px outer ring in primary tint) |
+
+## Dark theme
+
+In dark theme the same tokens use heavier opacity to register on dark
+surfaces. The ring becomes a light hairline; the glow goes to true
+black.
