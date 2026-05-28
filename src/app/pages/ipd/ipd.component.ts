@@ -15,13 +15,14 @@ import {
 } from '../../core/models/ipd.models';
 import { Patient } from '../../core/models/patient.models';
 import { forkJoin, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 type TabMode = 'admissions' | 'beds' | 'wards';
 
 @Component({
   selector: 'app-ipd',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, IconsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent],
   templateUrl: './ipd.component.html',
   styleUrl: './ipd.component.scss',
 })

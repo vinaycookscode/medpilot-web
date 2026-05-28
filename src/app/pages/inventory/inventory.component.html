@@ -5,9 +5,7 @@
       <p class="page-sub">Track medicine stock, flag low items, and manage supply levels.</p>
     </div>
     @if (canCreate()) {
-      <button class="btn btn--primary" (click)="openAdd()">
-        <lucide-icon name="plus" [size]="16" /> Add Item
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openAdd()">Add Item</gw-button>
     }
   </div>
 

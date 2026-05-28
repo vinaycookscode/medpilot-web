@@ -7,9 +7,7 @@
       <p class="page__subtitle">Bed management · admissions · patient care</p>
     </div>
     @if (canCreate()) {
-      <button class="btn btn--primary" (click)="openAdmitModal()">
-        <lucide-icon name="plus" [size]="15" /> Admit Patient
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openAdmitModal()">Admit Patient</gw-button>
     }
   </div>
 

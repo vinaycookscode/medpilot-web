@@ -6,13 +6,14 @@ import { InventoryService } from '../../core/services/inventory.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { InventoryItem, InventorySummary, stockStatus } from '../../core/models/inventory.models';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 type StockTab = 'all' | 'low' | 'out';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [FormsModule, IconsModule, DecimalPipe, DatePipe],
+  imports: [FormsModule, IconsModule, DecimalPipe, DatePipe, GwButtonComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
 })

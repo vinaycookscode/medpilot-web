@@ -26,10 +26,7 @@
         </button>
       </div>
       @if (canCreate()) {
-        <button class="btn btn--primary" (click)="openCreate()">
-          <lucide-icon name="plus" [size]="16" />
-          Book Appointment
-        </button>
+        <gw-button variant="primary" leadingIcon="plus" (click)="openCreate()">Book Appointment</gw-button>
       }
     </div>
   </div>

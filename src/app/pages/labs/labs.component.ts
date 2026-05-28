@@ -7,13 +7,14 @@ import { PatientsService } from '../../core/services/patients.service';
 import { Patient } from '../../core/models/patient.models';
 import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 type LabTab = 'orders' | 'catalog';
 
 @Component({
   selector: 'app-labs',
   standalone: true,
-  imports: [ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe],
+  imports: [ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe, GwButtonComponent],
   templateUrl: './labs.component.html',
   styleUrl: './labs.component.scss',
 })

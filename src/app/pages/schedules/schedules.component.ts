@@ -7,13 +7,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../core/models/api.models';
 import { DoctorSchedule, ScheduleOverride, DAYS, DAY_LABELS, DayOfWeek } from '../../core/models/schedule.models';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 interface Doctor { id: string; firstName: string; lastName: string; specialization?: string; }
 
 @Component({
   selector: 'app-schedules',
   standalone: true,
-  imports: [FormsModule, IconsModule],
+  imports: [FormsModule, IconsModule, GwButtonComponent],
   templateUrl: './schedules.component.html',
   styleUrl: './schedules.component.scss',
 })
