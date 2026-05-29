@@ -13,13 +13,14 @@ import { AppMetaService } from '../../core/services/app-meta.service';
 import { ToastService } from '../../core/services/toast.service';
 import { debounceTime, distinctUntilChanged, Subject, forkJoin } from 'rxjs';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
 
 type ViewMode = 'today' | 'calendar' | 'queue';
 
 @Component({
   selector: 'app-appointments',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent],
+  imports: [CommonModule, TitleCasePipe, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent, GwIconButtonComponent],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.scss',
 })

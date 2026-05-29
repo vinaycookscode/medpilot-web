@@ -11,11 +11,22 @@ import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-prescriptions',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, ReactiveFormsModule, IconsModule, GwButtonComponent],
+  imports: [
+    CommonModule, DatePipe, FormsModule, ReactiveFormsModule, IconsModule,
+    GwButtonComponent, GwIconButtonComponent,
+    GwFormFieldComponent, GwInputComponent, GwTextareaComponent, GwDateInputComponent,
+    GwDialogComponent,
+  ],
   templateUrl: './prescriptions.component.html',
   styleUrl: './prescriptions.component.scss',
 })

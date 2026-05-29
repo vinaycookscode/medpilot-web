@@ -235,99 +235,82 @@
 }
 
 <!-- ── Create Modal ── -->
-@if (showCreate()) {
-  <div class="modal-backdrop" (click)="closeCreate()">
-    <div class="modal modal--lg" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">New Prescription</h3>
-        <button class="btn btn--ghost btn--icon" (click)="closeCreate()">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
+<gw-dialog [open]="showCreate()" (openChange)="$event ? null : closeCreate()" title="New Prescription" size="lg">
+  <form [formGroup]="form" class="prescriptions__form-body">
 
-      <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="modal__body prescriptions__form-body">
-
-          <!-- Patient selector -->
-          <div class="field">
-            <label class="field__label">Patient *</label>
-            @if (selectedPatient()) {
-              <div class="prescriptions__selected-patient">
-                <div class="avatar avatar--sm">
-                  {{ selectedPatient()!.firstName[0] }}{{ selectedPatient()!.lastName[0] }}
+    <!-- Patient selector (custom search dropdown kept) -->
+    <gw-form-field label="Patient" [required]="true">
+      @if (selectedPatient()) {
+        <div class="prescriptions__selected-patient">
+          <div class="avatar avatar--sm">
+            {{ selectedPatient()!.firstName[0] }}{{ selectedPatient()!.lastName[0] }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p style="font-size:13px;font-weight:600">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</p>
+            <p class="text-xs text-tertiary">{{ selectedPatient()!.patientCode }} · {{ selectedPatient()!.phone }}</p>
+          </div>
+          <gw-icon-button icon="x" size="sm" ariaLabel="Clear" (click)="clearPatient()" />
+        </div>
+      } @else {
+        <div class="input-group" style="position:relative">
+          <span class="input-icon"><lucide-icon name="search" [size]="16" /></span>
+          <input class="input" type="search" placeholder="Search patient by name or phone…"
+                 (input)="onPatientSearch($event)" />
+        </div>
+        @if (showPatientDrop() && patientResults().length > 0) {
+          <div class="prescriptions__patient-drop">
+            @for (p of patientResults(); track p.id) {
+              <button type="button" class="prescriptions__patient-item" (click)="selectPatient(p)">
+                <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                <div>
+                  <p style="font-size:13px;font-weight:600">{{ p.firstName }} {{ p.lastName }}</p>
+                  <p class="text-xs text-tertiary">{{ p.phone }} · {{ p.patientCode }}</p>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p style="font-size:13px;font-weight:600">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</p>
-                  <p class="text-xs text-tertiary">{{ selectedPatient()!.patientCode }} · {{ selectedPatient()!.phone }}</p>
-                </div>
-                <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
-                  <lucide-icon name="x" [size]="14" />
-                </button>
-              </div>
-            } @else {
-              <div class="input-group" style="position:relative">
-                <span class="input-icon"><lucide-icon name="search" [size]="16" /></span>
-                <input class="input" type="search" placeholder="Search patient by name or phone…"
-                       (input)="onPatientSearch($event)" />
-              </div>
-              @if (showPatientDrop() && patientResults().length > 0) {
-                <div class="prescriptions__patient-drop">
-                  @for (p of patientResults(); track p.id) {
-                    <button type="button" class="prescriptions__patient-item" (click)="selectPatient(p)">
-                      <div class="avatar avatar--xs">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
-                      <div>
-                        <p style="font-size:13px;font-weight:600">{{ p.firstName }} {{ p.lastName }}</p>
-                        <p class="text-xs text-tertiary">{{ p.phone }} · {{ p.patientCode }}</p>
-                      </div>
-                    </button>
-                  }
-                </div>
-              }
+              </button>
             }
           </div>
+        }
+      }
+    </gw-form-field>
 
-          <!-- Diagnosis -->
-          <div class="form-grid">
-            <div class="field form-grid__full" style="position:relative">
-              <label class="field__label">Diagnosis *</label>
-              <input class="input" formControlName="diagnosis"
-                     placeholder="e.g. Upper Respiratory Tract Infection"
-                     (input)="onDiagnosisInput($event)"
-                     (blur)="closeDiagnosisDrop()"
-                     autocomplete="off" />
-              @if (showDiagnosisDrop() && diagnosisSuggestions().length > 0) {
-                <div class="prescriptions__patient-drop" style="z-index:30">
-                  @for (d of diagnosisSuggestions(); track d) {
-                    <button type="button" class="prescriptions__patient-item"
-                            (mousedown)="selectDiagnosis(d)">
-                      <lucide-icon name="stethoscope" [size]="13" style="color:var(--color-primary);flex-shrink:0" />
-                      <span style="font-size:13px">{{ d }}</span>
-                    </button>
-                  }
-                </div>
+    <!-- Diagnosis + top fields -->
+    <div class="form-grid">
+      <gw-form-field label="Diagnosis" [required]="true" class="form-grid__full">
+        <div style="position:relative">
+          <input class="input" formControlName="diagnosis"
+                 placeholder="e.g. Upper Respiratory Tract Infection"
+                 (input)="onDiagnosisInput($event)"
+                 (blur)="closeDiagnosisDrop()"
+                 autocomplete="off" />
+          @if (showDiagnosisDrop() && diagnosisSuggestions().length > 0) {
+            <div class="prescriptions__patient-drop" style="z-index:30">
+              @for (d of diagnosisSuggestions(); track d) {
+                <button type="button" class="prescriptions__patient-item"
+                        (mousedown)="selectDiagnosis(d)">
+                  <lucide-icon name="stethoscope" [size]="13" style="color:var(--color-primary);flex-shrink:0" />
+                  <span style="font-size:13px">{{ d }}</span>
+                </button>
               }
             </div>
-            <div class="field">
-              <label class="field__label">Chief Complaint</label>
-              <input class="input" formControlName="chiefComplaint" placeholder="Presenting complaints" />
-            </div>
-            <div class="field">
-              <label class="field__label">Follow Up Date</label>
-              <input class="input" type="date" formControlName="followUpDate" />
-            </div>
-            <div class="field form-grid__full">
-              <label class="field__label">Examination Notes</label>
-              <textarea class="input" formControlName="examinationNotes" rows="2" placeholder="Clinical findings…"></textarea>
-            </div>
-          </div>
+          }
+        </div>
+      </gw-form-field>
+      <gw-form-field label="Chief Complaint">
+        <gw-input formControlName="chiefComplaint" placeholder="Presenting complaints" />
+      </gw-form-field>
+      <gw-form-field label="Follow Up Date">
+        <gw-date-input formControlName="followUpDate" />
+      </gw-form-field>
+      <gw-form-field label="Examination Notes" class="form-grid__full">
+        <gw-textarea formControlName="examinationNotes" [rows]="2" placeholder="Clinical findings…" />
+      </gw-form-field>
+    </div>
 
-          <!-- Medicines -->
-          <div class="prescriptions__section-header">
-            <p class="label">Medicines</p>
-            <button type="button" class="btn btn--ghost btn--sm" (click)="addMedicine()">
-              <lucide-icon name="plus" [size]="14" /> Add Medicine
-            </button>
-          </div>
+    <!-- Medicines (FormArray with custom autocomplete — kept as-is) -->
+    <div class="prescriptions__section-header">
+      <p class="label">Medicines</p>
+      <gw-button variant="ghost" size="sm" leadingIcon="plus" (click)="addMedicine()">Add Medicine</gw-button>
+    </div>
 
           <div formArrayName="medicines" class="prescriptions__med-list">
             @for (med of medicines.controls; track $index; let i = $index) {
@@ -361,21 +344,16 @@
                   <input class="input" formControlName="duration" placeholder="Duration (e.g. 5 days)" />
                   <input class="input" formControlName="timing" placeholder="Timing (optional)" />
                 </div>
-                <button type="button" class="btn btn--ghost btn--icon btn--sm prescriptions__med-remove"
-                        (click)="removeMedicine(i)">
-                  <lucide-icon name="trash-2" [size]="14" />
-                </button>
+                <gw-icon-button class="prescriptions__med-remove" icon="trash-2" size="sm" ariaLabel="Remove medicine" (click)="removeMedicine(i)" />
               </div>
             }
           </div>
 
-          <!-- Tests -->
-          <div class="prescriptions__section-header mt-4">
-            <p class="label">Lab Tests</p>
-            <button type="button" class="btn btn--ghost btn--sm" (click)="addTest()">
-              <lucide-icon name="plus" [size]="14" /> Add Test
-            </button>
-          </div>
+    <!-- Tests -->
+    <div class="prescriptions__section-header mt-4">
+      <p class="label">Lab Tests</p>
+      <gw-button variant="ghost" size="sm" leadingIcon="plus" (click)="addTest()">Add Test</gw-button>
+    </div>
 
           <div formArrayName="tests">
             @for (test of tests.controls; track $index; let i = $index) {
@@ -398,31 +376,19 @@
                   }
                 </div>
                 <input class="input flex-1" formControlName="instructions" placeholder="Instructions (optional)" />
-                <button type="button" class="btn btn--ghost btn--icon btn--sm prescriptions__med-remove"
-                        (click)="removeTest(i)">
-                  <lucide-icon name="trash-2" [size]="14" />
-                </button>
+                <gw-icon-button class="prescriptions__med-remove" icon="trash-2" size="sm" ariaLabel="Remove test" (click)="removeTest(i)" />
               </div>
             }
           </div>
 
-          <!-- Advice -->
-          <div class="field mt-4">
-            <label class="field__label">Advice / Instructions</label>
-            <textarea class="input" formControlName="advice" rows="2"
-                      placeholder="Dietary advice, lifestyle recommendations…"></textarea>
-          </div>
+    <!-- Advice -->
+    <gw-form-field label="Advice / Instructions" style="margin-top: 16px;">
+      <gw-textarea formControlName="advice" [rows]="2" placeholder="Dietary advice, lifestyle recommendations…" />
+    </gw-form-field>
+  </form>
 
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="btn btn--secondary" (click)="closeCreate()">Cancel</button>
-          <button type="submit" class="btn btn--primary" [disabled]="form.invalid || saving()">
-            @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-            Save Prescription
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+  <ng-container gw-dialog-footer>
+    <gw-button variant="secondary" (click)="closeCreate()">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="form.invalid" [loading]="saving()" (click)="save()">Save Prescription</gw-button>
+  </ng-container>
+</gw-dialog>
