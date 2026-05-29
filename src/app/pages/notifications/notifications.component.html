@@ -5,46 +5,36 @@
       <p class="page-sub">
         Stay updated on appointments, billing, and clinic activity.
         @if (unreadCount() > 0) {
-          <span class="badge badge--primary" style="margin-left: 8px;">{{ unreadCount() }} unread</span>
+          <gw-badge variant="primary" tone="soft" style="margin-left: 8px;">{{ unreadCount() }} unread</gw-badge>
         }
       </p>
     </div>
     @if (unreadCount() > 0) {
-      <button class="btn btn--secondary" (click)="markAllRead()">
-        <lucide-icon name="check-circle-2" [size]="16" /> Mark all read
-      </button>
+      <gw-button variant="secondary" (click)="markAllRead()">
+        <lucide-icon name="check-circle-2" [size]="16" />
+        <span style="margin-left: 6px;">Mark all read</span>
+      </gw-button>
     }
   </div>
 
   <!-- Filter tabs -->
-  <div class="tab-bar" style="margin-bottom: 20px; width: fit-content;">
-    <button class="tab-btn" [class.tab-btn--active]="filter() === 'all'" (click)="setFilter('all')">
-      All
-    </button>
-    <button class="tab-btn" [class.tab-btn--active]="filter() === 'unread'" (click)="setFilter('unread')">
-      Unread
-      @if (unreadCount() > 0) {
-        <span class="badge badge--warning">{{ unreadCount() }}</span>
-      }
-    </button>
+  <div style="margin-bottom: 20px; width: fit-content;">
+    <gw-tabs variant="segmented" size="sm" [activeKey]="filter()" (activeKeyChange)="setFilter($any($event))">
+      <gw-tab key="all"    label="All"></gw-tab>
+      <gw-tab key="unread" label="Unread" [badge]="unreadCount() > 0 ? unreadCount() : null"></gw-tab>
+    </gw-tabs>
   </div>
 
-  <!-- Loading state -->
   @if (loading()) {
-    <div class="empty-state"><span class="spinner spinner--lg"></span></div>
-  } @else if (!filteredNotifications.length) {
-    <!-- Empty state -->
-    <div class="empty-state">
-      <div class="empty-state__icon">
-        <lucide-icon name="bell" [size]="28" />
-      </div>
-      <p class="empty-state__title">
-        {{ filter() === 'unread' ? 'All caught up!' : 'No notifications' }}
-      </p>
-      <p class="empty-state__subtitle">
-        {{ filter() === 'unread' ? 'No unread notifications.' : 'Notifications will appear here as activity happens.' }}
-      </p>
+    <div style="display: flex; justify-content: center; padding: 64px 0;">
+      <gw-spinner size="lg" />
     </div>
+  } @else if (!filteredNotifications.length) {
+    <gw-empty-state
+      icon="bell"
+      [title]="filter() === 'unread' ? 'All caught up!' : 'No notifications'"
+      [description]="filter() === 'unread' ? 'No unread notifications.' : 'Notifications will appear here as activity happens.'">
+    </gw-empty-state>
   } @else {
     <!-- Notifications list -->
     <div class="notif-list card card--flush">
@@ -63,20 +53,16 @@
             <div class="notif-item__message">{{ notif.message }}</div>
             <div class="notif-item__meta">
               <span class="notif-item__time">{{ timeAgo(notif.createdAt) }}</span>
-              <span class="badge badge--neutral notif-item__type">{{ notif.type }}</span>
+              <gw-badge variant="neutral" tone="soft" size="sm">{{ notif.type }}</gw-badge>
             </div>
           </div>
 
           <!-- Actions -->
           <div class="notif-item__actions">
             @if (!notif.isRead) {
-              <button class="btn btn--ghost btn--sm btn--icon" title="Mark as read" (click)="markRead(notif.id)">
-                <lucide-icon name="check-circle-2" [size]="16" />
-              </button>
+              <gw-icon-button icon="check-circle-2" size="sm" ariaLabel="Mark as read" (click)="markRead(notif.id)" />
             }
-            <button class="btn btn--ghost btn--sm btn--icon notif-item__delete" title="Delete" (click)="deleteNotif(notif.id)">
-              <lucide-icon name="trash-2" [size]="16" />
-            </button>
+            <gw-icon-button icon="trash-2" size="sm" variant="danger" ariaLabel="Delete" (click)="deleteNotif(notif.id)" />
           </div>
         </div>
       }

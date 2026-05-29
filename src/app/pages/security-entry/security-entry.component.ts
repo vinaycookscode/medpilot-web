@@ -5,6 +5,7 @@ import { IconsModule } from '../../shared/icons';
 import { AttendanceService, AttendanceEntry, ComplianceReport, AttendanceUser } from '../../core/services/attendance.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 // NABH calls out these roles as requiring bag-check at gate entry
 const BAG_CHECK_ROLES = new Set(['nursing', 'rmo', 'doctor', 'consultant']);
@@ -12,7 +13,7 @@ const BAG_CHECK_ROLES = new Set(['nursing', 'rmo', 'doctor', 'consultant']);
 @Component({
   selector: 'app-security-entry',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent],
   templateUrl: './security-entry.component.html',
   styleUrl: './security-entry.component.scss',
   encapsulation: ViewEncapsulation.None,

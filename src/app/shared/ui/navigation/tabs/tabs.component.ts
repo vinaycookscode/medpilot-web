@@ -11,6 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 import { GwTabComponent } from './tab.component';
 
 export type GwTabsVariant = 'line' | 'pill' | 'segmented';
@@ -19,7 +20,7 @@ export type GwTabsSize = 'sm' | 'md';
 @Component({
   selector: 'gw-tabs',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './tabs.component.html',
   styleUrl: './tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,4 +1,8 @@
-:host {
+// Host disappears from layout so the inner <button> behaves as a real
+// form submit button. Required for type="submit" inside <form>.
+:host { display: contents; }
+
+.gw-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12,6 +16,8 @@
   line-height: 1;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
@@ -23,48 +29,52 @@
               transform var(--t-fast) ease;
 
   &:focus-visible { box-shadow: var(--shadow-focus); outline: none; }
-  &:active:not([disabled]) { transform: translateY(0.5px); }
+  &:active:not(:disabled) { transform: translateY(0.5px); }
 
-  &[disabled] {
+  &:disabled {
     cursor: not-allowed;
     opacity: 0.55;
   }
-}
 
-:host(.gw-button-host--sm) { height: 28px; padding: 0 10px; font-size: 12px; }
-:host(.gw-button-host--lg) { height: 44px; padding: 0 18px; font-size: 14px; }
-:host(.gw-button-host--block) { display: flex; width: 100%; }
+  // Sizes
+  &--sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  &--lg { height: 44px; padding: 0 18px; font-size: 14px; }
+  &--block { display: flex; width: 100%; }
 
-:host(.gw-button-host--primary) {
-  background: var(--color-primary);
-  color: var(--text-inverse);
-  &:hover:not([disabled]) { background: var(--color-primary-hover); }
-  &:active:not([disabled]) { background: var(--color-primary-active); }
-}
+  // Variants
+  &--primary {
+    background: var(--color-primary);
+    color: var(--text-inverse);
+    &:hover:not(:disabled) { background: var(--color-primary-hover); }
+    &:active:not(:disabled) { background: var(--color-primary-active); }
+  }
 
-:host(.gw-button-host--secondary) {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border-color: var(--border);
-  &:hover:not([disabled]) { background: var(--surface-input); border-color: var(--border-strong); }
-}
+  &--secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border);
+    &:hover:not(:disabled) { background: var(--surface-input); border-color: var(--border-strong); }
+  }
 
-:host(.gw-button-host--ghost) {
-  background: transparent;
-  color: var(--text-secondary);
-  &:hover:not([disabled]) { background: var(--surface-input); color: var(--text-primary); }
-}
+  &--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    &:hover:not(:disabled) { background: var(--surface-input); color: var(--text-primary); }
+  }
 
-:host(.gw-button-host--subtle) {
-  background: var(--color-primary-subtle);
-  color: var(--color-primary);
-  &:hover:not([disabled]) { background: var(--color-primary-light); }
-}
+  &--subtle {
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    &:hover:not(:disabled) { background: var(--color-primary-light); }
+  }
 
-:host(.gw-button-host--danger) {
-  background: var(--color-danger);
-  color: var(--text-inverse);
-  &:hover:not([disabled]) { background: #d63027; }
+  &--danger {
+    background: var(--color-danger);
+    color: var(--text-inverse);
+    &:hover:not(:disabled) { background: #b91c1c; }
+  }
+
+  &--loading .gw-button__label { opacity: 0.6; }
 }
 
 .gw-button__icon {
@@ -81,8 +91,10 @@
   animation: gw-button-spin 0.7s linear infinite;
 }
 
-:host(.gw-button-host--loading) .gw-button__label { opacity: 0.6; }
-
 @keyframes gw-button-spin {
   to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-button__spinner { animation: none; }
 }

@@ -123,10 +123,8 @@
             [value]="notes()"
             (input)="notes.set($any($event.target).value)"
             placeholder="Notes (optional) — e.g. carrying lab samples" />
-          <button class="btn btn--ghost" (click)="clearSelection()">Cancel</button>
-          <button class="btn btn--primary" [disabled]="saving()" (click)="recordEntry()">
-            <lucide-icon name="log-in" [size]="15" /> Record Entry
-          </button>
+          <gw-button variant="ghost" (click)="clearSelection()">Cancel</gw-button>
+          <gw-button variant="primary" leadingIcon="log-in" [loading]="saving()" (click)="recordEntry()">Record Entry</gw-button>
         </div>
       </div>
     }

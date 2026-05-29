@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export type GwStatTrend = 'up' | 'down' | 'flat';
 
 @Component({
   selector: 'gw-stat-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './stat-card.component.html',
   styleUrl: './stat-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

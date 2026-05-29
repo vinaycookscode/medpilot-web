@@ -4,13 +4,14 @@ import { DecimalPipe, DatePipe, CurrencyPipe } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
 import { ReportsService } from '../../core/services/reports.service';
 import { ToastService } from '../../core/services/toast.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 type ReportTab = 'revenue' | 'appointments' | 'patients' | 'inventory';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe, CurrencyPipe],
+  imports: [ReactiveFormsModule, IconsModule, DecimalPipe, DatePipe, CurrencyPipe, GwButtonComponent],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })

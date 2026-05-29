@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface GwBreadcrumbItem {
   label: string;
@@ -14,7 +15,7 @@ export type GwBreadcrumbSeparator = 'chevron' | 'slash' | 'arrow';
 @Component({
   selector: 'gw-breadcrumbs',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './breadcrumbs.component.html',
   styleUrl: './breadcrumbs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

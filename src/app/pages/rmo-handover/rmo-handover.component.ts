@@ -7,13 +7,15 @@ import {
 } from '../../core/services/rmo.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 
 type Tab = 'handover' | 'pending' | 'history';
 
 @Component({
   selector: 'app-rmo-handover',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent, GwBadgeComponent],
   templateUrl: './rmo-handover.component.html',
   styleUrl: './rmo-handover.component.scss',
   encapsulation: ViewEncapsulation.None,

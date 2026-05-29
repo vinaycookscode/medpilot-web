@@ -530,15 +530,181 @@
     &__head:hover &__chevron { color: var(--color-primary); }
   }
 
-  // ── Scrollable zigzag timeline within each patient card ────────────
+  // ── Handover chat (refined two-party chat for the History tab) ────
+  // Outgoing handover on the left, acknowledgement on the right
+  // (Western L→R reading: request → reply). Date dividers between
+  // days. Pending state is a centered pill, not a bubble (it's a
+  // state, not a message).
+  &-chat {
+    position: relative;
+    padding: 18px 18px 22px;
+    background: var(--surface-page);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: nh-expand 240ms ease;
+
+    max-height: 580px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.18) transparent;
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+
+    // Date divider: hairline through, pill in the middle
+    &__date {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0 2px;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 50% 0 auto 0;
+        height: 1px;
+        background: var(--border);
+        z-index: 0;
+      }
+
+      span {
+        position: relative;
+        z-index: 1;
+        padding: 4px 12px;
+        background: var(--surface-page);
+        border-radius: var(--radius-full);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+    }
+
+    &__row {
+      display: flex;
+
+      &--out     { justify-content: flex-start; }
+      &--in      { justify-content: flex-end; }
+      &--pending {
+        justify-content: center;
+        margin-top: -6px;
+      }
+    }
+
+    &__msg {
+      max-width: min(540px, 78%);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+
+      &--right { align-items: flex-end; }
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 100%;
+
+      &--right { flex-direction: row; }
+    }
+
+    &__author { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+    &__sep    { color: var(--text-tertiary); }
+    &__time   { color: var(--text-tertiary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    &__role {
+      margin-left: 4px;
+      padding: 1px 7px;
+      background: var(--surface-input);
+      color: var(--text-secondary);
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+
+      &--ack {
+        background: var(--color-success-subtle);
+        color: var(--color-success);
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 10.5px;
+
+        lucide-icon { flex-shrink: 0; }
+      }
+    }
+
+    // The bubble itself. 8 px outer corners, 2 px on the "tail" corner
+    // so direction reads instantly without an arrow tail.
+    &__bubble {
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      border-radius: 8px;
+
+      &--out {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-top-left-radius: 2px;
+      }
+
+      &--in {
+        background: var(--color-primary-subtle);
+        border: 1px solid rgba(37, 99, 235, 0.18);
+        border-top-right-radius: 2px;
+      }
+    }
+
+    &__no-text {
+      color: var(--text-tertiary);
+      font-style: italic;
+      font-size: 12.5px;
+    }
+
+    // Pending acknowledgement = centered pill (state, not a message)
+    &__pending {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--color-warning-subtle);
+      border: 1px dashed rgba(217, 119, 6, 0.4);
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      color: var(--color-warning);
+      font-weight: 500;
+
+      lucide-icon { flex-shrink: 0; }
+      strong { color: var(--text-primary); font-weight: 600; }
+    }
+  }
+
+  // Hold-over: legacy zigzag styles kept so any other page that
+  // references nh-timeline / nh-msg doesn't break. The History tab
+  // no longer emits these classes.
   &-timeline {
     position: relative;
     padding: 20px 24px 24px;
-    background: linear-gradient(180deg, rgba(0,122,255,0.03), rgba(0,122,255,0.01));
-    border-top: 1px solid rgba(0,0,0,0.05);
+    background: var(--surface-page);
+    border-top: 1px solid var(--border);
     animation: nh-expand 240ms ease;
 
-    // Scroll container — keeps the page compact even with many handovers
     max-height: 520px;
     overflow-y: auto;
     scrollbar-width: thin;

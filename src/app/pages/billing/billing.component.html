@@ -5,10 +5,7 @@
       <p class="page__subtitle">{{ total() }} invoices</p>
     </div>
     @if (canCreate()) {
-      <button class="btn btn--primary" (click)="openCreate()">
-        <lucide-icon name="plus" [size]="16" />
-        New Invoice
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openCreate()">New Invoice</gw-button>
     }
   </div>
 
@@ -421,56 +418,33 @@
 }
 
 <!-- ── Record Payment Modal ── -->
-@if (paymentInvoice()) {
-  <div class="modal-backdrop" (click)="closePayment()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">Record Payment</h3>
-        <button class="btn btn--ghost btn--icon" (click)="closePayment()">
-          <lucide-icon name="x" [size]="18" />
-        </button>
+<gw-dialog [open]="!!paymentInvoice()" (openChange)="$event ? null : closePayment()" title="Record Payment">
+  @if (paymentInvoice(); as inv) {
+    <form [formGroup]="payForm" class="billing__pay-form">
+      <div class="d-flex items-center gap-3 p-3 rounded-md" style="background:var(--color-primary-subtle)">
+        <lucide-icon name="receipt" [size]="18" style="color:var(--color-primary)" />
+        <div>
+          <p style="font-size:13px;font-weight:600">{{ inv.invoiceNumber }}</p>
+          <p class="text-xs text-tertiary">Balance Due: ₹{{ inv.balanceDue | number:'1.0-0' }}</p>
+        </div>
       </div>
 
-      <form [formGroup]="payForm" (ngSubmit)="savePayment()">
-        <div class="modal__body billing__pay-form">
-          <div class="d-flex items-center gap-3 p-3 rounded-md" style="background:var(--color-primary-subtle)">
-            <lucide-icon name="receipt" [size]="18" style="color:var(--color-primary)" />
-            <div>
-              <p style="font-size:13px;font-weight:600">{{ paymentInvoice()!.invoiceNumber }}</p>
-              <p class="text-xs text-tertiary">Balance Due: ₹{{ paymentInvoice()!.balanceDue | number:'1.0-0' }}</p>
-            </div>
-          </div>
+      <div class="form-grid" style="margin-top: 14px;">
+        <gw-form-field label="Amount" [required]="true">
+          <gw-input formControlName="amount" type="number" placeholder="₹ Amount" />
+        </gw-form-field>
+        <gw-form-field label="Payment Method" [required]="true">
+          <gw-select formControlName="method" [options]="paymentMethods" />
+        </gw-form-field>
+        <gw-form-field label="Notes" class="form-grid__full">
+          <gw-input formControlName="notes" placeholder="Reference / transaction ID…" />
+        </gw-form-field>
+      </div>
+    </form>
+  }
 
-          <div class="form-grid">
-            <div class="field">
-              <label class="field__label">Amount *</label>
-              <input class="input" type="number" formControlName="amount" placeholder="₹ Amount" min="1" />
-            </div>
-            <div class="field">
-              <label class="field__label">Payment Method *</label>
-              <select class="select" formControlName="method">
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
-                <option value="upi">UPI</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="insurance">Insurance</option>
-              </select>
-            </div>
-            <div class="field form-grid__full">
-              <label class="field__label">Notes</label>
-              <input class="input" formControlName="notes" placeholder="Reference / transaction ID…" />
-            </div>
-          </div>
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="btn btn--secondary" (click)="closePayment()">Cancel</button>
-          <button type="submit" class="btn btn--primary" [disabled]="payForm.invalid || saving()">
-            @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-            Record Payment
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+  <ng-container gw-dialog-footer>
+    <gw-button variant="secondary" (click)="closePayment()">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="payForm.invalid" [loading]="saving()" (click)="savePayment()">Record Payment</gw-button>
+  </ng-container>
+</gw-dialog>

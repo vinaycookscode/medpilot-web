@@ -7,14 +7,14 @@
         <li class="gw-bc__item">
           @if (isItemCurrent(item, i)) {
             <span class="gw-bc__current" [attr.aria-current]="'page'">
-              @if (item.icon) { <i class="gw-bc__icon" [attr.data-lucide]="item.icon" aria-hidden="true"></i> }
+              @if (item.icon) { <lucide-icon class="gw-bc__icon" [name]="item.icon!" [size]="12" /> }
               {{ item.label }}
             </span>
           } @else {
             <a class="gw-bc__link"
                [href]="item.link || '#'"
                (click)="handleClick(item, $event)">
-              @if (item.icon) { <i class="gw-bc__icon" [attr.data-lucide]="item.icon" aria-hidden="true"></i> }
+              @if (item.icon) { <lucide-icon class="gw-bc__icon" [name]="item.icon!" [size]="12" /> }
               {{ item.label }}
             </a>
           }

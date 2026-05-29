@@ -13,11 +13,19 @@ import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { printInvoice } from '../../shared/print-invoice';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent } from '../../shared/ui/forms/select/select.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-billing',
   standalone: true,
-  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule, ReactiveFormsModule, IconsModule],
+  imports: [
+    CommonModule, DatePipe, DecimalPipe, FormsModule, ReactiveFormsModule, IconsModule,
+    GwButtonComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwDialogComponent,
+  ],
   templateUrl: './billing.component.html',
   styleUrl: './billing.component.scss',
 })
@@ -31,6 +39,14 @@ export class BillingComponent implements OnInit {
   private fb          = inject(FormBuilder);
 
   readonly canCreate  = computed(() => this.appMeta.canDo('billing', 'canCreate'));
+
+  readonly paymentMethods = [
+    { value: 'cash',          label: 'Cash' },
+    { value: 'card',          label: 'Card' },
+    { value: 'upi',           label: 'UPI' },
+    { value: 'bank_transfer', label: 'Bank Transfer' },
+    { value: 'insurance',     label: 'Insurance' },
+  ];
 
   readonly invoices       = signal<Invoice[]>([]);
   readonly total          = signal(0);

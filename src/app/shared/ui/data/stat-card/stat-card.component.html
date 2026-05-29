@@ -2,7 +2,7 @@
   <div class="gw-stat__label-row">
     @if (icon) {
       <span class="gw-stat__icon" aria-hidden="true">
-        <i [attr.data-lucide]="icon"></i>
+        <lucide-icon [name]="icon!" [size]="14" />
       </span>
     }
     <span class="gw-stat__label">{{ label }}</span>

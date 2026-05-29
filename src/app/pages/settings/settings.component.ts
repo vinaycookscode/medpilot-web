@@ -1,16 +1,29 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwPasswordInputComponent } from '../../shared/ui/forms/password-input/password-input.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwCardComponent } from '../../shared/ui/display/card/card.component';
+import { GwTabsComponent } from '../../shared/ui/navigation/tabs/tabs.component';
+import { GwTabComponent } from '../../shared/ui/navigation/tabs/tab.component';
 
 type Tab = 'profile' | 'security' | 'clinic';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IconsModule],
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule, IconsModule,
+    GwFormFieldComponent, GwInputComponent, GwPasswordInputComponent,
+    GwButtonComponent, GwBadgeComponent, GwCardComponent,
+    GwTabsComponent, GwTabComponent,
+  ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
 })
@@ -19,11 +32,8 @@ export class SettingsComponent {
   readonly toast = inject(ToastService);
   private fb     = inject(FormBuilder);
 
-  readonly activeTab   = signal<Tab>('profile');
-  readonly pwLoading   = signal(false);
-  readonly showCurrent = signal(false);
-  readonly showNew     = signal(false);
-  readonly showConfirm = signal(false);
+  readonly activeTab = signal<Tab>('profile');
+  readonly pwLoading = signal(false);
 
   readonly pwForm = this.fb.nonNullable.group({
     currentPassword: ['', Validators.required],
@@ -31,11 +41,7 @@ export class SettingsComponent {
     confirmPassword: ['', Validators.required],
   });
 
-  readonly tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'profile',  label: 'Profile',       icon: 'user'       },
-    { id: 'security', label: 'Security',       icon: 'shield-check' },
-    { id: 'clinic',   label: 'Clinic Info',    icon: 'building-2' },
-  ];
+  setTab(tab: string) { this.activeTab.set(tab as Tab); }
 
   changePassword() {
     if (this.pwForm.invalid || this.pwLoading()) return;

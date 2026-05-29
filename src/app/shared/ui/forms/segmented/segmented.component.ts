@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, forwardRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export interface GwSegmentOption<T = string | number> {
@@ -12,7 +13,7 @@ export interface GwSegmentOption<T = string | number> {
 @Component({
   selector: 'gw-segmented',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './segmented.component.html',
   styleUrl: './segmented.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

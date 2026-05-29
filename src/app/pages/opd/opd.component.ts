@@ -7,13 +7,25 @@ import { AppointmentsService } from '../../core/services/appointments.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Appointment, AppointmentStatus, OpdQueueStats, TriageVitals } from '../../core/models/appointment.models';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 type QueueFilter = '' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'no_show';
 
 @Component({
   selector: 'app-opd',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, IconsModule],
+  imports: [
+    CommonModule, DatePipe, FormsModule, IconsModule,
+    GwButtonComponent, GwIconButtonComponent,
+    GwFormFieldComponent, GwInputComponent, GwTextareaComponent, GwDateInputComponent,
+    GwDialogComponent,
+  ],
   templateUrl: './opd.component.html',
   styleUrl: './opd.component.scss',
 })

@@ -10,11 +10,10 @@
       </p>
     </div>
     <div class="d-flex gap-2 items-center">
-      <input type="date" class="form-control" style="width:155px"
-             [value]="date()" (change)="onDateChange($any($event.target).value)" />
-      <button class="btn btn--ghost btn--icon" (click)="load()" title="Refresh">
-        <lucide-icon name="refresh-cw" [size]="15" />
-      </button>
+      <div style="width:155px">
+        <gw-date-input [ngModel]="date()" (ngModelChange)="onDateChange($event)" />
+      </div>
+      <gw-icon-button icon="refresh-cw" ariaLabel="Refresh" (click)="load()" />
     </div>
   </div>
 
@@ -151,14 +150,10 @@
                       @if (appt.triageVitals?.temperature) {
                         <span class="vital-chip"><span class="vital-chip__key">T</span>{{ appt.triageVitals?.temperature }}°</span>
                       }
-                      <button class="btn btn--ghost btn--icon btn--xs" (click)="openTriage(appt)" title="Edit triage">
-                        <lucide-icon name="pencil" [size]="11" />
-                      </button>
+                      <gw-icon-button icon="pencil" size="sm" ariaLabel="Edit triage" (click)="openTriage(appt)" />
                     </div>
                   } @else {
-                    <button class="btn btn--sm btn--outline" (click)="openTriage(appt)">
-                      <lucide-icon name="activity" [size]="13" /> Triage
-                    </button>
+                    <gw-button variant="secondary" size="sm" leadingIcon="activity" (click)="openTriage(appt)">Triage</gw-button>
                   }
                 </td>
 
@@ -173,19 +168,13 @@
                 <td>
                   <div class="d-flex gap-1">
                     @if (appt.status === 'confirmed' || appt.status === 'scheduled') {
-                      <button class="btn btn--sm btn--primary" (click)="updateStatus(appt.id, 'in_progress')">
-                        Start
-                      </button>
+                      <gw-button variant="primary" size="sm" (click)="updateStatus(appt.id, 'in_progress')">Start</gw-button>
                     }
                     @if (appt.status === 'in_progress') {
-                      <button class="btn btn--sm btn--success" (click)="updateStatus(appt.id, 'completed')">
-                        Done
-                      </button>
+                      <gw-button variant="primary" size="sm" (click)="updateStatus(appt.id, 'completed')">Done</gw-button>
                     }
                     @if (appt.status !== 'completed' && appt.status !== 'cancelled' && appt.status !== 'no_show') {
-                      <button class="btn btn--sm btn--ghost" (click)="updateStatus(appt.id, 'no_show')" title="Mark no-show">
-                        NS
-                      </button>
+                      <gw-button variant="ghost" size="sm" (click)="updateStatus(appt.id, 'no_show')">NS</gw-button>
                     }
                   </div>
                 </td>
@@ -204,16 +193,11 @@
           {{ rowOffset + 1 }}–{{ endRow }} of {{ total() }}
         </span>
         <div class="d-flex gap-1 items-center">
-          <button class="btn btn--ghost btn--icon btn--sm" (click)="setPage(page() - 1)" [disabled]="page() === 1">
-            <lucide-icon name="chevron-left" [size]="15" />
-          </button>
+          <gw-icon-button icon="chevron-left" size="sm" ariaLabel="Previous page" [disabled]="page() === 1" (click)="setPage(page() - 1)" />
           @for (p of pageRange(); track p) {
-            <button class="btn btn--sm" [class.btn--primary]="p === page()" [class.btn--ghost]="p !== page()"
-                    (click)="setPage(p)">{{ p }}</button>
+            <gw-button [variant]="p === page() ? 'primary' : 'ghost'" size="sm" (click)="setPage(p)">{{ p }}</gw-button>
           }
-          <button class="btn btn--ghost btn--icon btn--sm" (click)="setPage(page() + 1)" [disabled]="page() === totalPages">
-            <lucide-icon name="chevron-right" [size]="15" />
-          </button>
+          <gw-icon-button icon="chevron-right" size="sm" ariaLabel="Next page" [disabled]="page() === totalPages" (click)="setPage(page() + 1)" />
         </div>
         <select class="form-control" style="width:auto;padding:.25rem .5rem;font-size:.8rem"
                 [value]="limit()" (change)="limit.set(+$any($event.target).value); page.set(1); load()">
@@ -228,59 +212,34 @@
 </div>
 
 <!-- Triage Modal -->
-@if (triageModal()) {
-  <div class="modal-backdrop" (click)="triageModal.set(false)"></div>
-  <div class="modal modal--sm">
-    <div class="modal__header">
-      <div>
-        <h3>Triage Vitals</h3>
-        @if (triageAppt()) {
-          <p class="text-muted text-sm" style="margin:0">
-            {{ triageAppt()?.patient?.firstName }} {{ triageAppt()?.patient?.lastName }}
-            &nbsp;·&nbsp; Token {{ triageAppt()?.tokenNumber }}
-          </p>
-        }
-      </div>
-      <button class="modal__close" (click)="triageModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
-    </div>
-    <div class="modal__body">
-      <div class="form-grid form-grid--2">
-        <div class="form-group">
-          <label class="form-label">Blood Pressure</label>
-          <input class="form-control" placeholder="120/80 mmHg" [(ngModel)]="vitals.bp" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Pulse (bpm)</label>
-          <input class="form-control" type="number" placeholder="72" [(ngModel)]="vitals.pulse" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temperature (°F)</label>
-          <input class="form-control" type="number" placeholder="98.6" [(ngModel)]="vitals.temperature" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">SpO2 (%)</label>
-          <input class="form-control" type="number" placeholder="98" [(ngModel)]="vitals.spo2" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Resp. Rate (/min)</label>
-          <input class="form-control" type="number" placeholder="16" [(ngModel)]="vitals.respiratoryRate" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Weight (kg)</label>
-          <input class="form-control" type="number" placeholder="70" [(ngModel)]="vitals.weight" step="0.1" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Triage Notes</label>
-        <textarea class="form-control" rows="2" placeholder="Any observations…" [(ngModel)]="vitals.notes"></textarea>
-      </div>
-    </div>
-    <div class="modal__footer">
-      <button class="btn btn--ghost" (click)="triageModal.set(false)">Cancel</button>
-      <button class="btn btn--primary" (click)="saveTriage()" [disabled]="triageSaving()">
-        @if (triageSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
-        Save Vitals
-      </button>
-    </div>
+<gw-dialog [open]="triageModal()" (openChange)="triageModal.set($event)" size="sm"
+           title="Triage Vitals"
+           [description]="triageAppt() ? (triageAppt()?.patient?.firstName + ' ' + triageAppt()?.patient?.lastName + ' · Token ' + triageAppt()?.tokenNumber) : null">
+  <div class="form-grid form-grid--2">
+    <gw-form-field label="Blood Pressure">
+      <gw-input [(ngModel)]="vitals.bp" placeholder="120/80 mmHg" />
+    </gw-form-field>
+    <gw-form-field label="Pulse (bpm)">
+      <gw-input [(ngModel)]="vitals.pulse" type="number" placeholder="72" />
+    </gw-form-field>
+    <gw-form-field label="Temperature (°F)">
+      <gw-input [(ngModel)]="vitals.temperature" type="number" placeholder="98.6" />
+    </gw-form-field>
+    <gw-form-field label="SpO2 (%)">
+      <gw-input [(ngModel)]="vitals.spo2" type="number" placeholder="98" />
+    </gw-form-field>
+    <gw-form-field label="Resp. Rate (/min)">
+      <gw-input [(ngModel)]="vitals.respiratoryRate" type="number" placeholder="16" />
+    </gw-form-field>
+    <gw-form-field label="Weight (kg)">
+      <gw-input [(ngModel)]="vitals.weight" type="number" placeholder="70" />
+    </gw-form-field>
   </div>
-}
+  <gw-form-field label="Triage Notes" style="margin-top: 12px;">
+    <gw-textarea [(ngModel)]="vitals.notes" [rows]="2" placeholder="Any observations…" />
+  </gw-form-field>
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="triageModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="triageSaving()" (click)="saveTriage()">Save Vitals</gw-button>
+  </ng-container>
+</gw-dialog>

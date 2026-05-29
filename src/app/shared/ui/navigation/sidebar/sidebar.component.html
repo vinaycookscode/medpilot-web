@@ -17,7 +17,7 @@
                  [attr.aria-current]="isActive(item) ? 'page' : null"
                  [attr.title]="collapsed ? item.label : null">
                 @if (item.icon) {
-                  <i class="gw-sb__icon" [attr.data-lucide]="item.icon" aria-hidden="true"></i>
+                  <lucide-icon class="gw-sb__icon" [name]="item.icon!" [size]="16" />
                 }
                 @if (!collapsed) {
                   <span class="gw-sb__label">{{ item.label }}</span>

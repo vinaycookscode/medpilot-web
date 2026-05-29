@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-no-access',
   standalone: true,
-  imports: [IconsModule],
+  imports: [IconsModule, GwButtonComponent],
   templateUrl: './no-access.component.html',
   styleUrl: './no-access.component.scss',
 })

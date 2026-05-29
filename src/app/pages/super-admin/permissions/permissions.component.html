@@ -13,10 +13,8 @@
     </div>
     @if (dirty()) {
       <div class="perm-actions">
-        <button class="btn btn--ghost btn--sm" (click)="reset()">Reset</button>
-        <button class="btn btn--primary btn--sm" [disabled]="saving()" (click)="save()">
-          @if (saving()) { <lucide-icon name="loader-2" [size]="14" class="spin" /> } Save Changes
-        </button>
+        <gw-button variant="ghost" size="sm" (click)="reset()">Reset</gw-button>
+        <gw-button variant="primary" size="sm" [loading]="saving()" (click)="save()">Save Changes</gw-button>
       </div>
     }
   </div>

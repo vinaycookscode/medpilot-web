@@ -3,11 +3,21 @@ import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwPasswordInputComponent } from '../../shared/ui/forms/password-input/password-input.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 
 @Component({
   selector: 'app-super-admin-login',
   standalone: true,
-  imports: [ReactiveFormsModule, IconsModule],
+  imports: [
+    ReactiveFormsModule,
+    IconsModule,
+    GwFormFieldComponent, GwInputComponent, GwPasswordInputComponent,
+    GwButtonComponent, GwAlertComponent,
+  ],
   templateUrl: './super-admin-login.component.html',
   styleUrl: './super-admin-login.component.scss',
 })
@@ -23,7 +33,6 @@ export class SuperAdminLoginComponent {
 
   readonly loading      = signal(false);
   readonly errorMessage = signal('');
-  readonly showPassword = signal(false);
 
   onSubmit() {
     if (this.form.invalid || this.loading()) return;
@@ -46,6 +55,4 @@ export class SuperAdminLoginComponent {
       },
     });
   }
-
-  togglePassword() { this.showPassword.update(v => !v); }
 }

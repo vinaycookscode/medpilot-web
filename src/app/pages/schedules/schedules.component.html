@@ -39,13 +39,8 @@
               <p class="sched-panel__sub">Toggle days and set working hours. Click Save when done.</p>
             </div>
             <div class="sched-panel__actions">
-              <button class="btn btn--secondary" (click)="showOverride.set(true)">
-                <lucide-icon name="calendar-x" [size]="16" /> Add Day Off
-              </button>
-              <button class="btn btn--primary" [disabled]="saving()" (click)="saveSchedules()">
-                @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-                Save Schedule
-              </button>
+              <gw-button variant="secondary" leadingIcon="calendar-x" (click)="showOverride.set(true)">Add Day Off</gw-button>
+              <gw-button variant="primary" [loading]="saving()" (click)="saveSchedules()">Save Schedule</gw-button>
             </div>
           </div>
 

@@ -44,7 +44,7 @@
   &:focus,
   &:focus-within {
     border-color: var(--color-danger);
-    box-shadow: 0 0 0 4px var(--color-danger-subtle);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.20);
   }
 }
 

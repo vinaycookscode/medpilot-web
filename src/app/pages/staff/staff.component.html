@@ -6,13 +6,9 @@
     </div>
     <div class="d-flex gap-2">
       @if (auth.isAdmin()) {
-        <button class="btn btn--primary" (click)="openStaffModal()">
-          <lucide-icon name="user-plus" [size]="16" /> Add Staff
-        </button>
+        <gw-button variant="primary" leadingIcon="user-plus" (click)="openStaffModal()">Add Staff</gw-button>
       }
-      <button class="btn btn--secondary" (click)="openLeaveModal()">
-        <lucide-icon name="calendar-plus" [size]="16" /> Request Leave
-      </button>
+      <gw-button variant="secondary" leadingIcon="calendar-plus" (click)="openLeaveModal()">Request Leave</gw-button>
     </div>
   </div>
 
@@ -187,147 +183,75 @@
 </div>
 
 <!-- Add Staff Modal -->
-@if (showStaffModal()) {
-  <div class="modal-backdrop" (click)="closeStaffModal()">
-    <div class="modal modal--lg" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">Add Staff Member</h3>
-        <button class="btn btn--ghost btn--icon" (click)="closeStaffModal()">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-
-      <form [formGroup]="staffForm" (ngSubmit)="submitStaff()">
-        <div class="modal__body">
-          <div class="form-grid">
-            <div class="field">
-              <label class="field__label">First Name *</label>
-              <input class="input" formControlName="firstName" placeholder="First name" />
-            </div>
-            <div class="field">
-              <label class="field__label">Last Name *</label>
-              <input class="input" formControlName="lastName" placeholder="Last name" />
-            </div>
-            <div class="field">
-              <label class="field__label">Email *</label>
-              <input class="input" type="email" formControlName="email" placeholder="email@clinic.com" />
-            </div>
-            <div class="field">
-              <label class="field__label">Password *</label>
-              <input class="input" type="password" formControlName="password" placeholder="Min 6 characters" />
-            </div>
-            <div class="field">
-              <label class="field__label">Role *</label>
-              <select class="select" formControlName="role">
-                <option value="admin">Admin</option>
-                <option value="doctor">Doctor / Consultant</option>
-                <option value="rmo">RMO</option>
-                <option value="nursing">Nursing</option>
-                <option value="receptionist">Receptionist</option>
-                <option value="billing_staff">Billing Staff</option>
-                <option value="lab_tech">Lab Technician</option>
-                <option value="pharmacist">Pharmacist</option>
-                <option value="ot_staff">OT Staff</option>
-                <option value="attendant">Attendant (Mama/Maushi)</option>
-                <option value="security">Security</option>
-              </select>
-            </div>
-            <div class="field">
-              <label class="field__label">Phone</label>
-              <input class="input" formControlName="phone" placeholder="+91 00000 00000" />
-            </div>
-          </div>
-
-          @if (selectedRole === 'doctor') {
-            <div class="staff-modal-section">
-              <div class="staff-modal-section__label">Doctor Details</div>
-              <div class="form-grid">
-                <div class="field">
-                  <label class="field__label">Specialization</label>
-                  <select class="select" formControlName="specialization">
-                    <option value="">— Select specialization —</option>
-                    @for (s of specializations(); track s.value) {
-                      <option [value]="s.value">{{ s.label }}</option>
-                    }
-                  </select>
-                </div>
-                <div class="field">
-                  <label class="field__label">Qualification</label>
-                  <input class="input" formControlName="qualification" placeholder="e.g. MBBS, MD" />
-                </div>
-                <div class="field">
-                  <label class="field__label">Registration No.</label>
-                  <input class="input" formControlName="registrationNo" placeholder="Medical council reg. no." />
-                </div>
-                <div class="field">
-                  <label class="field__label">Consultation Fee (₹)</label>
-                  <input class="input" type="number" formControlName="consultationFee" placeholder="500" />
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="modal__footer">
-          <button type="button" class="btn btn--secondary" (click)="closeStaffModal()">Cancel</button>
-          <button type="submit" class="btn btn--primary" [disabled]="staffForm.invalid || saving()">
-            @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-            Add Staff Member
-          </button>
-        </div>
-      </form>
+<gw-dialog [open]="showStaffModal()" (openChange)="$event ? null : closeStaffModal()" size="lg" title="Add Staff Member">
+  <form [formGroup]="staffForm">
+    <div class="form-grid">
+      <gw-form-field label="First Name" [required]="true">
+        <gw-input formControlName="firstName" placeholder="First name" />
+      </gw-form-field>
+      <gw-form-field label="Last Name" [required]="true">
+        <gw-input formControlName="lastName" placeholder="Last name" />
+      </gw-form-field>
+      <gw-form-field label="Email" [required]="true">
+        <gw-input formControlName="email" type="email" placeholder="email@clinic.com" />
+      </gw-form-field>
+      <gw-form-field label="Password" [required]="true">
+        <gw-password-input formControlName="password" placeholder="Min 6 characters" autocomplete="new-password" />
+      </gw-form-field>
+      <gw-form-field label="Role" [required]="true">
+        <gw-select formControlName="role" [options]="roleOptions" placeholder="Select role" />
+      </gw-form-field>
+      <gw-form-field label="Phone">
+        <gw-input formControlName="phone" placeholder="+91 00000 00000" />
+      </gw-form-field>
     </div>
-  </div>
-}
+
+    @if (selectedRole === 'doctor') {
+      <div class="staff-modal-section">
+        <div class="staff-modal-section__label">Doctor Details</div>
+        <div class="form-grid">
+          <gw-form-field label="Specialization">
+            <gw-select formControlName="specialization" [options]="specializations()" placeholder="Select specialization" />
+          </gw-form-field>
+          <gw-form-field label="Qualification">
+            <gw-input formControlName="qualification" placeholder="e.g. MBBS, MD" />
+          </gw-form-field>
+          <gw-form-field label="Registration No.">
+            <gw-input formControlName="registrationNo" placeholder="Medical council reg. no." />
+          </gw-form-field>
+          <gw-form-field label="Consultation Fee (₹)">
+            <gw-input formControlName="consultationFee" type="number" placeholder="500" />
+          </gw-form-field>
+        </div>
+      </div>
+    }
+  </form>
+  <ng-container gw-dialog-footer>
+    <gw-button variant="secondary" (click)="closeStaffModal()">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="staffForm.invalid" [loading]="saving()" (click)="submitStaff()">Add Staff Member</gw-button>
+  </ng-container>
+</gw-dialog>
 
 <!-- Leave Request Modal -->
-@if (showLeaveModal()) {
-  <div class="modal-backdrop" (click)="closeLeaveModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">Request Leave</h3>
-        <button class="btn btn--ghost btn--icon" (click)="closeLeaveModal()">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-
-      <div class="modal__body">
-        <form [formGroup]="leaveForm" class="modal-form">
-          <div class="field">
-            <label class="field__label">Leave Type <span style="color: var(--color-danger);">*</span></label>
-            <select class="select" formControlName="leaveType">
-              <option value="">Select type</option>
-              @for (lt of leaveTypes(); track lt.value) {
-                <option [value]="lt.value">{{ lt.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-grid" style="margin-top: 16px;">
-            <div class="field">
-              <label class="field__label">Start Date <span style="color: var(--color-danger);">*</span></label>
-              <input type="date" class="input" formControlName="startDate" />
-            </div>
-            <div class="field">
-              <label class="field__label">End Date <span style="color: var(--color-danger);">*</span></label>
-              <input type="date" class="input" formControlName="endDate" />
-            </div>
-          </div>
-
-          <div class="field" style="margin-top: 16px;">
-            <label class="field__label">Reason</label>
-            <textarea class="input" rows="3" placeholder="Brief reason for leave..." formControlName="reason"></textarea>
-          </div>
-        </form>
-      </div>
-
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="closeLeaveModal()">Cancel</button>
-        <button class="btn btn--primary" [disabled]="leaveForm.invalid || saving()" (click)="submitLeave()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          Submit Request
-        </button>
-      </div>
+<gw-dialog [open]="showLeaveModal()" (openChange)="$event ? null : closeLeaveModal()" title="Request Leave">
+  <form [formGroup]="leaveForm" class="modal-form" style="display: flex; flex-direction: column; gap: 14px;">
+    <gw-form-field label="Leave Type" [required]="true">
+      <gw-select formControlName="leaveType" [options]="leaveTypes()" placeholder="Select type" />
+    </gw-form-field>
+    <div class="form-grid">
+      <gw-form-field label="Start Date" [required]="true">
+        <gw-date-input formControlName="startDate" />
+      </gw-form-field>
+      <gw-form-field label="End Date" [required]="true">
+        <gw-date-input formControlName="endDate" />
+      </gw-form-field>
     </div>
-  </div>
-}
+    <gw-form-field label="Reason">
+      <gw-textarea formControlName="reason" [rows]="3" placeholder="Brief reason for leave..." />
+    </gw-form-field>
+  </form>
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="closeLeaveModal()">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="leaveForm.invalid" [loading]="saving()" (click)="submitLeave()">Submit Request</gw-button>
+  </ng-container>
+</gw-dialog>

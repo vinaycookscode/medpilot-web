@@ -15,7 +15,7 @@
 
   @if (files().length === 0) {
     <div class="gw-file__placeholder">
-      <i class="gw-file__icon" [attr.data-lucide]="icon" aria-hidden="true"></i>
+      <lucide-icon class="gw-file__icon" [name]="icon" [size]="32" />
       <p class="gw-file__hint">{{ hint }}</p>
       @if (accept || maxMb !== null) {
         <p class="gw-file__meta">
@@ -29,7 +29,7 @@
     <ul class="gw-file__list" (click)="$event.stopPropagation()">
       @for (file of files(); track file.name + file.size; let i = $index) {
         <li class="gw-file__row">
-          <i class="gw-file__row-icon" [attr.data-lucide]="'file'" aria-hidden="true"></i>
+          <lucide-icon class="gw-file__row-icon" name="file" [size]="16" />
           <span class="gw-file__row-name">{{ file.name }}</span>
           <span class="gw-file__row-size">{{ formatSize(file.size) }}</span>
           @if (!disabled()) {
@@ -44,7 +44,7 @@
       }
       @if (multiple) {
         <li class="gw-file__add" (click)="trigger()">
-          <i [attr.data-lucide]="'plus'" aria-hidden="true"></i>
+          <lucide-icon name="plus" [size]="14" />
           <span>Add more</span>
         </li>
       }

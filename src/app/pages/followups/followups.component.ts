@@ -4,11 +4,17 @@ import { RouterLink } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
 import { PrescriptionsService } from '../../core/services/prescriptions.service';
 import { Prescription } from '../../core/models/prescription.models';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { GwSkeletonComponent } from '../../shared/ui/display/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-followups',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, IconsModule],
+  imports: [
+    CommonModule, DatePipe, RouterLink, IconsModule,
+    GwButtonComponent, GwEmptyStateComponent, GwSkeletonComponent,
+  ],
   templateUrl: './followups.component.html',
   styleUrl: './followups.component.scss',
 })

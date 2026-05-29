@@ -122,10 +122,9 @@
             (input)="instrDraft.set($any($event.target).value)"></textarea>
 
           <div class="cr-actions">
-            <button type="button" class="btn btn--primary" [disabled]="!noteDraft().trim() || saving()" (click)="submitRound()">
-              <lucide-icon name="check-circle" [size]="15" />
+            <gw-button variant="primary" leadingIcon="check-circle" [loading]="saving()" [disabled]="!noteDraft().trim()" (click)="submitRound()">
               {{ instrDraft().trim() ? 'Log Round + Send Instruction' : 'Log Round' }}
-            </button>
+            </gw-button>
           </div>
         </div>
 

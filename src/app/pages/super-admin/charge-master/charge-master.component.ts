@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconsModule } from '../../../shared/icons';
 import { ChargeMasterService, ChargeMaster, Department, CHARGE_CATEGORIES } from '../../../core/services/charge-master.service';
+import { GwButtonComponent } from '../../../shared/ui/buttons/button/button.component';
 
 type View = 'charges' | 'departments';
 
 @Component({
   selector: 'app-charge-master',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule],
+  imports: [CommonModule, FormsModule, IconsModule, GwButtonComponent],
   templateUrl: './charge-master.component.html',
   styleUrl: './charge-master.component.scss',
 })

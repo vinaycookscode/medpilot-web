@@ -6,177 +6,124 @@
     </div>
   </div>
 
-  <div class="settings__layout">
-    <!-- Sidebar tabs -->
-    <nav class="settings__nav">
-      @for (tab of tabs; track tab.id) {
-        <button class="settings__nav-item"
-                [class.settings__nav-item--active]="activeTab() === tab.id"
-                (click)="activeTab.set(tab.id)">
-          <lucide-icon [name]="tab.icon" [size]="16" />
-          {{ tab.label }}
-        </button>
-      }
-    </nav>
+  <div style="max-width: 720px;">
+    <gw-tabs variant="line" [activeKey]="activeTab()" (activeKeyChange)="setTab($event)">
+      <gw-tab key="profile"  label="Profile"      icon="user"></gw-tab>
+      <gw-tab key="security" label="Security"     icon="shield-check"></gw-tab>
+      <gw-tab key="clinic"   label="Clinic Info"  icon="building-2"></gw-tab>
+    </gw-tabs>
+  </div>
 
-    <!-- Content -->
-    <div class="settings__content">
+  <div class="settings__content" style="max-width: 720px;">
 
-      <!-- Profile tab -->
-      @if (activeTab() === 'profile') {
-        <div class="card">
-          <div class="card__header">
-            <span class="card__title">Profile Information</span>
-          </div>
-          <div class="card__body">
-            <div class="settings__profile-header">
-              <div class="settings__profile-avatar">{{ auth.user()?.firstName?.[0] }}{{ auth.user()?.lastName?.[0] }}</div>
-              <div>
-                <p class="settings__profile-name">{{ auth.user()?.firstName }} {{ auth.user()?.lastName }}</p>
-                <p class="settings__profile-email">{{ auth.user()?.email }}</p>
-                <span class="badge badge--primary mt-2">{{ auth.user()?.role }}</span>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="form-grid" style="margin-top:0">
-              <div class="field">
-                <label class="field__label">First Name</label>
-                <input class="input" [value]="auth.user()?.firstName" readonly />
-              </div>
-              <div class="field">
-                <label class="field__label">Last Name</label>
-                <input class="input" [value]="auth.user()?.lastName" readonly />
-              </div>
-              <div class="field">
-                <label class="field__label">Email</label>
-                <input class="input" [value]="auth.user()?.email" readonly />
-              </div>
-              <div class="field">
-                <label class="field__label">Role</label>
-                <input class="input" [value]="auth.user()?.role" readonly />
-              </div>
-            </div>
-
-            <p class="text-tertiary text-sm mt-4">
-              Contact your clinic administrator to update profile information.
-            </p>
-          </div>
+    <!-- Profile tab -->
+    @if (activeTab() === 'profile') {
+      <gw-card>
+        <div gw-card-header>
+          <span class="card__title">Profile Information</span>
         </div>
-      }
-
-      <!-- Security tab -->
-      @if (activeTab() === 'security') {
-        <div class="card">
-          <div class="card__header">
-            <span class="card__title">Change Password</span>
-          </div>
-          <div class="card__body">
-            <form [formGroup]="pwForm" (ngSubmit)="changePassword()" class="settings__pw-form">
-              <div class="field">
-                <label class="field__label">Current Password</label>
-                <div class="input-group input-group--right">
-                  <input class="input"
-                         [type]="showCurrent() ? 'text' : 'password'"
-                         formControlName="currentPassword"
-                         placeholder="Enter current password" />
-                  <button type="button" class="input-icon btn btn--ghost"
-                          style="pointer-events:auto"
-                          (click)="showCurrent.update(v => !v)">
-                    <lucide-icon [name]="showCurrent() ? 'eye-off' : 'eye'" [size]="16" />
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="field__label">New Password</label>
-                <div class="input-group input-group--right">
-                  <input class="input"
-                         [type]="showNew() ? 'text' : 'password'"
-                         formControlName="newPassword"
-                         placeholder="At least 8 characters" />
-                  <button type="button" class="input-icon btn btn--ghost"
-                          style="pointer-events:auto"
-                          (click)="showNew.update(v => !v)">
-                    <lucide-icon [name]="showNew() ? 'eye-off' : 'eye'" [size]="16" />
-                  </button>
-                </div>
-                @if (pwForm.get('newPassword')?.invalid && pwForm.get('newPassword')?.touched) {
-                  <p class="field__error">Minimum 8 characters required</p>
-                }
-              </div>
-
-              <div class="field">
-                <label class="field__label">Confirm New Password</label>
-                <div class="input-group input-group--right">
-                  <input class="input"
-                         [type]="showConfirm() ? 'text' : 'password'"
-                         formControlName="confirmPassword"
-                         placeholder="Repeat new password" />
-                  <button type="button" class="input-icon btn btn--ghost"
-                          style="pointer-events:auto"
-                          (click)="showConfirm.update(v => !v)">
-                    <lucide-icon [name]="showConfirm() ? 'eye-off' : 'eye'" [size]="16" />
-                  </button>
-                </div>
-              </div>
-
-              <div class="settings__pw-actions">
-                <button type="button" class="btn btn--secondary" (click)="pwForm.reset()">Cancel</button>
-                <button type="submit" class="btn btn--primary" [disabled]="pwForm.invalid || pwLoading()">
-                  @if (pwLoading()) { <span class="spinner spinner--sm spinner--white"></span> }
-                  Update Password
-                </button>
-              </div>
-            </form>
+        <div class="settings__profile-header">
+          <div class="settings__profile-avatar">{{ auth.user()?.firstName?.[0] }}{{ auth.user()?.lastName?.[0] }}</div>
+          <div>
+            <p class="settings__profile-name">{{ auth.user()?.firstName }} {{ auth.user()?.lastName }}</p>
+            <p class="settings__profile-email">{{ auth.user()?.email }}</p>
+            <gw-badge variant="primary" tone="soft" style="margin-top: 8px;">{{ auth.user()?.role }}</gw-badge>
           </div>
         </div>
 
-        <div class="card mt-4">
-          <div class="card__header">
-            <span class="card__title">Active Sessions</span>
+        <div class="divider"></div>
+
+        <div class="form-grid" style="margin-top:0">
+          <gw-form-field label="First Name">
+            <gw-input [ngModel]="auth.user()?.firstName" [disabled]="true" />
+          </gw-form-field>
+          <gw-form-field label="Last Name">
+            <gw-input [ngModel]="auth.user()?.lastName" [disabled]="true" />
+          </gw-form-field>
+          <gw-form-field label="Email">
+            <gw-input [ngModel]="auth.user()?.email" [disabled]="true" />
+          </gw-form-field>
+          <gw-form-field label="Role">
+            <gw-input [ngModel]="auth.user()?.role" [disabled]="true" />
+          </gw-form-field>
+        </div>
+
+        <p class="text-tertiary text-sm mt-4">
+          Contact your clinic administrator to update profile information.
+        </p>
+      </gw-card>
+    }
+
+    <!-- Security tab -->
+    @if (activeTab() === 'security') {
+      <gw-card>
+        <div gw-card-header>
+          <span class="card__title">Change Password</span>
+        </div>
+
+        <form [formGroup]="pwForm" (ngSubmit)="changePassword()" class="settings__pw-form" style="display: flex; flex-direction: column; gap: 14px;">
+          <gw-form-field label="Current Password" [required]="true">
+            <gw-password-input formControlName="currentPassword" placeholder="Enter current password" autocomplete="current-password" />
+          </gw-form-field>
+
+          <gw-form-field label="New Password" hint="At least 8 characters" [required]="true"
+                         [error]="(pwForm.get('newPassword')?.invalid && pwForm.get('newPassword')?.touched) ? 'Minimum 8 characters required' : null">
+            <gw-password-input formControlName="newPassword" placeholder="At least 8 characters" autocomplete="new-password" [showStrength]="true"
+                               [invalid]="!!(pwForm.get('newPassword')?.invalid && pwForm.get('newPassword')?.touched)" />
+          </gw-form-field>
+
+          <gw-form-field label="Confirm New Password" [required]="true">
+            <gw-password-input formControlName="confirmPassword" placeholder="Repeat new password" autocomplete="new-password" />
+          </gw-form-field>
+
+          <div class="settings__pw-actions" style="display: flex; gap: 8px; justify-content: flex-end;">
+            <gw-button variant="secondary" type="button" (click)="pwForm.reset()">Cancel</gw-button>
+            <gw-button variant="primary" type="submit" [loading]="pwLoading()" [disabled]="pwForm.invalid">
+              Update Password
+            </gw-button>
           </div>
-          <div class="card__body">
-            <div class="settings__session">
-              <div class="settings__session-icon">
-                <lucide-icon name="shield-check" [size]="18" />
-              </div>
-              <div>
-                <p style="font-size:13px;font-weight:600">Current session</p>
-                <p style="font-size:12px;color:var(--text-tertiary)">Signed in as {{ auth.user()?.email }}</p>
-              </div>
-              <span class="badge badge--success" style="margin-left:auto">Active</span>
-            </div>
+        </form>
+      </gw-card>
+
+      <gw-card style="margin-top: 16px;">
+        <div gw-card-header>
+          <span class="card__title">Active Sessions</span>
+        </div>
+        <div class="settings__session">
+          <div class="settings__session-icon">
+            <lucide-icon name="shield-check" [size]="18" />
+          </div>
+          <div>
+            <p style="font-size:13px;font-weight:600">Current session</p>
+            <p style="font-size:12px;color:var(--text-tertiary)">Signed in as {{ auth.user()?.email }}</p>
+          </div>
+          <gw-badge variant="success" tone="soft" style="margin-left: auto;">Active</gw-badge>
+        </div>
+      </gw-card>
+    }
+
+    <!-- Clinic info tab -->
+    @if (activeTab() === 'clinic') {
+      <gw-card>
+        <div gw-card-header>
+          <span class="card__title">Clinic Information</span>
+        </div>
+        <div class="settings__clinic-header">
+          <div class="settings__clinic-icon">
+            <lucide-icon name="building-2" [size]="24" />
+          </div>
+          <div>
+            <p class="settings__profile-name">GotWell Demo Clinic</p>
+            <p class="settings__profile-email">Clinic ID: {{ auth.user()?.clinicId }}</p>
           </div>
         </div>
-      }
+        <div class="divider"></div>
+        <p class="text-tertiary text-sm">
+          Clinic settings can only be modified by an administrator via the API.
+          Contact support if you need to update clinic information.
+        </p>
+      </gw-card>
+    }
 
-      <!-- Clinic info tab -->
-      @if (activeTab() === 'clinic') {
-        <div class="card">
-          <div class="card__header">
-            <span class="card__title">Clinic Information</span>
-          </div>
-          <div class="card__body">
-            <div class="settings__clinic-header">
-              <div class="settings__clinic-icon">
-                <lucide-icon name="building-2" [size]="24" />
-              </div>
-              <div>
-                <p class="settings__profile-name">GotWell Demo Clinic</p>
-                <p class="settings__profile-email">Clinic ID: {{ auth.user()?.clinicId }}</p>
-              </div>
-            </div>
-            <div class="divider"></div>
-            <p class="text-tertiary text-sm">
-              Clinic settings can only be modified by an administrator via the API.
-              Contact support if you need to update clinic information.
-            </p>
-          </div>
-        </div>
-      }
-
-    </div>
   </div>
 </div>

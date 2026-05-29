@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface GwTreeNode {
   key: string;
@@ -15,7 +16,7 @@ export interface GwTreeNode {
 @Component({
   selector: 'gw-tree-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './tree-view.component.html',
   styleUrl: './tree-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

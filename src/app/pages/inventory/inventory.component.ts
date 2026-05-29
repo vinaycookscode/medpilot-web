@@ -6,13 +6,21 @@ import { InventoryService } from '../../core/services/inventory.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
 import { InventoryItem, InventorySummary, stockStatus } from '../../core/models/inventory.models';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 type StockTab = 'all' | 'low' | 'out';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [FormsModule, IconsModule, DecimalPipe, DatePipe],
+  imports: [
+    FormsModule, IconsModule, DecimalPipe, DatePipe, GwButtonComponent,
+    GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwDialogComponent,
+  ],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
 })

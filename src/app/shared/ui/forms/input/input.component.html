@@ -6,7 +6,7 @@
 
   @if (leadingIcon) {
     <span class="gw-input__icon gw-input__icon--leading" aria-hidden="true">
-      <i [attr.data-lucide]="leadingIcon"></i>
+      <lucide-icon [name]="leadingIcon" [size]="16" />
     </span>
   }
 
@@ -26,7 +26,7 @@
 
   @if (trailingIcon) {
     <span class="gw-input__icon gw-input__icon--trailing" aria-hidden="true">
-      <i [attr.data-lucide]="trailingIcon"></i>
+      <lucide-icon [name]="trailingIcon" [size]="16" />
     </span>
   }
 </div>

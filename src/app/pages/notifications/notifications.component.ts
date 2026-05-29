@@ -3,11 +3,23 @@ import { CommonModule } from '@angular/common';
 import { IconsModule } from '../../shared/icons';
 import { NotificationsService, Notification } from '../../core/services/notifications.service';
 import { ToastService } from '../../core/services/toast.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
+import { GwTabsComponent } from '../../shared/ui/navigation/tabs/tabs.component';
+import { GwTabComponent } from '../../shared/ui/navigation/tabs/tab.component';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, IconsModule],
+  imports: [
+    CommonModule, IconsModule,
+    GwButtonComponent, GwIconButtonComponent, GwBadgeComponent,
+    GwEmptyStateComponent, GwSpinnerComponent,
+    GwTabsComponent, GwTabComponent,
+  ],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })

@@ -7,11 +7,25 @@ import { StaffService, Staff, StaffLeave } from '../../core/services/staff.servi
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent } from '../../shared/ui/forms/select/select.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwPasswordInputComponent } from '../../shared/ui/forms/password-input/password-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-staff',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, IconsModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, FormsModule, IconsModule,
+    GwButtonComponent, GwSpinnerComponent,
+    GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent,
+    GwDateInputComponent, GwPasswordInputComponent, GwDialogComponent,
+  ],
   templateUrl: './staff.component.html',
   styleUrl: './staff.component.scss',
 })
@@ -24,6 +38,20 @@ export class StaffComponent implements OnInit {
 
   readonly specializations = this.appMeta.specializations;
   readonly leaveTypes      = this.appMeta.leaveTypes;
+
+  readonly roleOptions = [
+    { value: 'admin',         label: 'Admin' },
+    { value: 'doctor',        label: 'Doctor / Consultant' },
+    { value: 'rmo',           label: 'RMO' },
+    { value: 'nursing',       label: 'Nursing' },
+    { value: 'receptionist',  label: 'Receptionist' },
+    { value: 'billing_staff', label: 'Billing Staff' },
+    { value: 'lab_tech',      label: 'Lab Technician' },
+    { value: 'pharmacist',    label: 'Pharmacist' },
+    { value: 'ot_staff',      label: 'OT Staff' },
+    { value: 'attendant',     label: 'Attendant (Mama/Maushi)' },
+    { value: 'security',      label: 'Security' },
+  ];
 
   readonly staff = signal<Staff[]>([]);
   readonly leaves = signal<StaffLeave[]>([]);

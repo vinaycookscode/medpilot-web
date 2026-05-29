@@ -86,17 +86,15 @@
 
             @if (noteFor() === t.id) {
               <div class="at-task__note-form">
-                <textarea
-                  class="input at-task__note"
-                  rows="2"
+                <gw-textarea
+                  class="at-task__note"
+                  [rows]="2"
                   placeholder="Optional note on what you did…"
-                  [value]="doneNote()"
-                  (input)="doneNote.set($any($event.target).value)"></textarea>
+                  [ngModel]="doneNote()"
+                  (ngModelChange)="doneNote.set($event)" />
                 <div class="at-task__note-actions">
-                  <button type="button" class="btn btn--ghost btn--sm" (click)="closeNote()">Cancel</button>
-                  <button type="button" class="btn btn--primary btn--sm" (click)="complete(t, true)" [disabled]="actioning() === t.id">
-                    <lucide-icon name="check-circle" [size]="13" /> Done
-                  </button>
+                  <gw-button variant="ghost" size="sm" (click)="closeNote()">Cancel</gw-button>
+                  <gw-button variant="primary" size="sm" leadingIcon="check-circle" [disabled]="actioning() === t.id" (click)="complete(t, true)">Done</gw-button>
                 </div>
               </div>
             } @else {

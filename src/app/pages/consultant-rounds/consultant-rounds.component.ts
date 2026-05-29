@@ -7,11 +7,12 @@ import {
 } from '../../core/services/consultant.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 
 @Component({
   selector: 'app-consultant-rounds',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent],
   templateUrl: './consultant-rounds.component.html',
   styleUrl: './consultant-rounds.component.scss',
   encapsulation: ViewEncapsulation.None,

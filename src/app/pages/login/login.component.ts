@@ -4,11 +4,21 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconsModule } from '../../shared/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { AppMetaService } from '../../core/services/app-meta.service';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwPasswordInputComponent } from '../../shared/ui/forms/password-input/password-input.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, IconsModule],
+  imports: [
+    ReactiveFormsModule,
+    IconsModule,
+    GwFormFieldComponent, GwInputComponent, GwPasswordInputComponent,
+    GwButtonComponent, GwAlertComponent,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -25,7 +35,6 @@ export class LoginComponent {
 
   readonly loading      = signal(false);
   readonly errorMessage = signal('');
-  readonly showPassword = signal(false);
 
   onSubmit() {
     if (this.form.invalid || this.loading()) return;
@@ -39,8 +48,6 @@ export class LoginComponent {
         if (role === 'super_admin') {
           this.router.navigate(['/super-admin']);
         } else {
-          // Send each role to the first page they actually have access to,
-          // instead of /dashboard which roles like 'security' can't view.
           this.router.navigate([this.appMeta.firstAccessibleRoute()]);
         }
       },
@@ -50,8 +57,6 @@ export class LoginComponent {
       },
     });
   }
-
-  togglePassword() { this.showPassword.update(v => !v); }
 
   fillDemo(role: 'admin' | 'doctor' | 'receptionist' | 'security') {
     const creds = {

@@ -5,9 +5,7 @@
       <p class="page-sub">Track medicine stock, flag low items, and manage supply levels.</p>
     </div>
     @if (canCreate()) {
-      <button class="btn btn--primary" (click)="openAdd()">
-        <lucide-icon name="plus" [size]="16" /> Add Item
-      </button>
+      <gw-button variant="primary" leadingIcon="plus" (click)="openAdd()">Add Item</gw-button>
     }
   </div>
 
@@ -161,163 +159,113 @@
 </div>
 
 <!-- Add / Edit Item Modal -->
-@if (showForm()) {
-  <div class="modal-backdrop" (click)="showForm.set(false)">
-    <div class="modal modal--lg" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <div class="modal-title-group">
-          <div class="modal-title-icon">
-            <lucide-icon name="pill" [size]="18" />
-          </div>
-          <div>
-            <h3 class="modal__title">{{ editItem() ? 'Edit Item' : 'Add Item' }}</h3>
-            <p class="modal__sub">{{ editItem() ? 'Update medicine or supply details' : 'Add a new medicine or supply to inventory' }}</p>
-          </div>
-        </div>
-        <button class="btn btn--ghost btn--icon" (click)="showForm.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <!-- Basic info -->
-        <div class="form-section">
-          <div class="form-grid">
-            <div class="field field--full">
-              <label class="field__label">Name <span class="required">*</span></label>
-              <input class="input" placeholder="e.g. Paracetamol 500mg" [(ngModel)]="form.name" autofocus>
-            </div>
-            <div class="field">
-              <label class="field__label">Category</label>
-              <input class="input" placeholder="Medicine / Supplies…" [(ngModel)]="form.category">
-            </div>
-            <div class="field">
-              <label class="field__label">Unit</label>
-              <input class="input" placeholder="tablets / ml / units" [(ngModel)]="form.unit">
-            </div>
-          </div>
-        </div>
-
-        <!-- Stock & Pricing -->
-        <div class="form-section">
-          <div class="form-section__title">
-            <lucide-icon name="trending-up" [size]="13" /> Stock &amp; Pricing
-          </div>
-          <div class="form-grid">
-            <div class="field">
-              <label class="field__label">Quantity</label>
-              <input type="number" class="input" min="0" [(ngModel)]="form.quantity">
-            </div>
-            <div class="field">
-              <label class="field__label">Reorder Level</label>
-              <input type="number" class="input" min="0" [(ngModel)]="form.reorderLevel">
-            </div>
-            <div class="field">
-              <label class="field__label">Cost Price (₹)</label>
-              <input type="number" class="input" min="0" step="0.01" [(ngModel)]="form.costPrice">
-            </div>
-            <div class="field">
-              <label class="field__label">Selling Price (₹)</label>
-              <input type="number" class="input" min="0" step="0.01" [(ngModel)]="form.sellingPrice">
-            </div>
-          </div>
-        </div>
-
-        <!-- Details -->
-        <div class="form-section form-section--last">
-          <div class="form-section__title">
-            <lucide-icon name="info" [size]="13" /> Additional Details
-          </div>
-          <div class="form-grid">
-            <div class="field">
-              <label class="field__label">Manufacturer</label>
-              <input class="input" placeholder="Optional" [(ngModel)]="form.manufacturer">
-            </div>
-            <div class="field">
-              <label class="field__label">Batch No.</label>
-              <input class="input" placeholder="Optional" [(ngModel)]="form.batchNumber">
-            </div>
-            <div class="field">
-              <label class="field__label">Expiry Date</label>
-              <input type="date" class="input" [(ngModel)]="form.expiryDate">
-            </div>
-            <div class="field">
-              <label class="field__label">Description</label>
-              <input class="input" placeholder="Optional notes" [(ngModel)]="form.description">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showForm.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="saving() || !form.name" (click)="saveForm()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          {{ editItem() ? 'Save Changes' : 'Add Item' }}
-        </button>
-      </div>
+<gw-dialog [open]="showForm()" (openChange)="showForm.set($event)" size="lg"
+           [title]="editItem() ? 'Edit Item' : 'Add Item'"
+           [description]="editItem() ? 'Update medicine or supply details' : 'Add a new medicine or supply to inventory'">
+  <div class="form-section">
+    <div class="form-grid">
+      <gw-form-field label="Name" [required]="true" class="field--full">
+        <gw-input [(ngModel)]="form.name" placeholder="e.g. Paracetamol 500mg" />
+      </gw-form-field>
+      <gw-form-field label="Category">
+        <gw-input [(ngModel)]="form.category" placeholder="Medicine / Supplies…" />
+      </gw-form-field>
+      <gw-form-field label="Unit">
+        <gw-input [(ngModel)]="form.unit" placeholder="tablets / ml / units" />
+      </gw-form-field>
     </div>
   </div>
-}
+
+  <div class="form-section">
+    <p class="form-section__title">
+      <lucide-icon name="trending-up" [size]="13" /> Stock &amp; Pricing
+    </p>
+    <div class="form-grid">
+      <gw-form-field label="Quantity">
+        <gw-input [(ngModel)]="form.quantity" type="number" />
+      </gw-form-field>
+      <gw-form-field label="Reorder Level">
+        <gw-input [(ngModel)]="form.reorderLevel" type="number" />
+      </gw-form-field>
+      <gw-form-field label="Cost Price (₹)">
+        <gw-input [(ngModel)]="form.costPrice" type="number" />
+      </gw-form-field>
+      <gw-form-field label="Selling Price (₹)">
+        <gw-input [(ngModel)]="form.sellingPrice" type="number" />
+      </gw-form-field>
+    </div>
+  </div>
+
+  <div class="form-section form-section--last">
+    <p class="form-section__title">
+      <lucide-icon name="info" [size]="13" /> Additional Details
+    </p>
+    <div class="form-grid">
+      <gw-form-field label="Manufacturer">
+        <gw-input [(ngModel)]="form.manufacturer" placeholder="Optional" />
+      </gw-form-field>
+      <gw-form-field label="Batch No.">
+        <gw-input [(ngModel)]="form.batchNumber" placeholder="Optional" />
+      </gw-form-field>
+      <gw-form-field label="Expiry Date">
+        <gw-date-input [(ngModel)]="form.expiryDate" />
+      </gw-form-field>
+      <gw-form-field label="Description">
+        <gw-input [(ngModel)]="form.description" placeholder="Optional notes" />
+      </gw-form-field>
+    </div>
+  </div>
+
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showForm.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="saving()" [disabled]="!form.name" (click)="saveForm()">
+      {{ editItem() ? 'Save Changes' : 'Add Item' }}
+    </gw-button>
+  </ng-container>
+</gw-dialog>
 
 <!-- Adjust Stock Modal -->
-@if (adjustTarget()) {
-  <div class="modal-backdrop" (click)="adjustTarget.set(null)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <div class="modal-title-group">
-          <div class="modal-title-icon modal-title-icon--green">
-            <lucide-icon name="trending-up" [size]="18" />
-          </div>
-          <div>
-            <h3 class="modal__title">Adjust Stock</h3>
-            <p class="modal__sub">{{ adjustTarget()!.name }}</p>
-          </div>
-        </div>
-        <button class="btn btn--ghost btn--icon" (click)="adjustTarget.set(null)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <div class="current-stock-card">
-          <div class="current-stock-card__label">Current stock</div>
-          <div class="current-stock-card__val">
-            <span [class]="'qty qty--' + stockStatus(adjustTarget()!)">{{ adjustTarget()!.quantity }}</span>
-            <span class="current-stock-card__unit">{{ adjustTarget()!.unit }}</span>
-          </div>
-        </div>
-
-        <div class="field" style="margin-bottom:16px">
-          <label class="field__label">Transaction Type</label>
-          <div class="type-selector">
-            <button class="type-btn" [class.type-btn--active]="adjustType==='in'" (click)="adjustType='in'">
-              <lucide-icon name="plus" [size]="16" />
-              <span>Stock In</span>
-            </button>
-            <button class="type-btn type-btn--out" [class.type-btn--active]="adjustType==='out'" (click)="adjustType='out'">
-              <lucide-icon name="trending-up" [size]="16" style="transform:rotate(180deg)" />
-              <span>Stock Out</span>
-            </button>
-            <button class="type-btn type-btn--set" [class.type-btn--active]="adjustType==='adjustment'" (click)="adjustType='adjustment'">
-              <lucide-icon name="hash" [size]="16" />
-              <span>Set Exact</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="form-grid-2">
-          <div class="field">
-            <label class="field__label">Quantity</label>
-            <input type="number" class="input" min="0.01" step="1" [(ngModel)]="adjustQty">
-          </div>
-          <div class="field">
-            <label class="field__label">Note (optional)</label>
-            <input class="input" placeholder="Reason…" [(ngModel)]="adjustNote">
-          </div>
-        </div>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="adjustTarget.set(null)">Cancel</button>
-        <button class="btn btn--primary" (click)="saveAdjust()">Save Adjustment</button>
+<gw-dialog [open]="!!adjustTarget()" (openChange)="$event ? null : adjustTarget.set(null)"
+           title="Adjust Stock"
+           [description]="adjustTarget()?.name || ''">
+  @if (adjustTarget(); as a) {
+    <div class="current-stock-card">
+      <div class="current-stock-card__label">Current stock</div>
+      <div class="current-stock-card__val">
+        <span [class]="'qty qty--' + stockStatus(a)">{{ a.quantity }}</span>
+        <span class="current-stock-card__unit">{{ a.unit }}</span>
       </div>
     </div>
-  </div>
-}
+
+    <div class="field" style="margin-bottom:16px">
+      <label class="field__label">Transaction Type</label>
+      <div class="type-selector">
+        <button class="type-btn" [class.type-btn--active]="adjustType==='in'" (click)="adjustType='in'">
+          <lucide-icon name="plus" [size]="16" />
+          <span>Stock In</span>
+        </button>
+        <button class="type-btn type-btn--out" [class.type-btn--active]="adjustType==='out'" (click)="adjustType='out'">
+          <lucide-icon name="trending-up" [size]="16" style="transform:rotate(180deg)" />
+          <span>Stock Out</span>
+        </button>
+        <button class="type-btn type-btn--set" [class.type-btn--active]="adjustType==='adjustment'" (click)="adjustType='adjustment'">
+          <lucide-icon name="hash" [size]="16" />
+          <span>Set Exact</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-grid-2">
+      <gw-form-field label="Quantity">
+        <gw-input [(ngModel)]="adjustQty" type="number" />
+      </gw-form-field>
+      <gw-form-field label="Note (optional)">
+        <gw-input [(ngModel)]="adjustNote" placeholder="Reason…" />
+      </gw-form-field>
+    </div>
+  }
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="adjustTarget.set(null)">Cancel</gw-button>
+    <gw-button variant="primary" (click)="saveAdjust()">Save Adjustment</gw-button>
+  </ng-container>
+</gw-dialog>

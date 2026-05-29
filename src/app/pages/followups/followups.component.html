@@ -4,26 +4,20 @@
       <h2 class="page__title">Follow-ups</h2>
       <p class="page__subtitle">Patients due for a return visit</p>
     </div>
-    <button class="btn btn--secondary btn--sm" (click)="load()">
-      <lucide-icon name="refresh-cw" [size]="14" /> Refresh
-    </button>
+    <gw-button variant="secondary" size="sm" leadingIcon="refresh-cw" (click)="load()">Refresh</gw-button>
   </div>
 
   @if (loading()) {
     <!-- Skeleton -->
     <div class="followups__skeleton-wrap">
       @for (i of [1,2,3,4,5,6]; track i) {
-        <div class="skeleton followups__skeleton-card"></div>
+        <gw-skeleton class="followups__skeleton-card" style="height: 96px;" />
       }
     </div>
   } @else if (total() === 0) {
-    <div class="card">
-      <div class="empty-state" style="padding:64px 24px">
-        <div class="empty-state__icon"><lucide-icon name="calendar-check" [size]="28" /></div>
-        <p class="empty-state__title">No follow-ups scheduled</p>
-        <p class="empty-state__subtitle">Patients with follow-up dates will appear here</p>
-      </div>
-    </div>
+    <gw-empty-state icon="calendar-check"
+                    title="No follow-ups scheduled"
+                    description="Patients with follow-up dates will appear here"></gw-empty-state>
   } @else {
 
     <!-- Summary strip -->

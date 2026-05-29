@@ -13,7 +13,7 @@
             (click)="setActive(t.key)"
             (keydown)="onHeaderKeydown($event, t)">
       @if (t.icon) {
-        <i class="gw-tabs__icon" [attr.data-lucide]="t.icon" aria-hidden="true"></i>
+        <lucide-icon class="gw-tabs__icon" [name]="t.icon!" [size]="14" />
       }
       <span>{{ t.label }}</span>
       @if (t.badge !== null && t.badge !== undefined) {

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconsModule } from '../../../shared/icons';
 import { NabhService, NabhItem, NabhDailyRow, NabhMonthlyReport } from '../../../core/services/nabh.service';
+import { GwButtonComponent } from '../../../shared/ui/buttons/button/button.component';
 
 type View = 'daily' | 'items' | 'report';
 
 @Component({
   selector: 'app-nabh',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule],
+  imports: [CommonModule, FormsModule, IconsModule, GwButtonComponent],
   templateUrl: './nabh.component.html',
   styleUrl: './nabh.component.scss',
 })

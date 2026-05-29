@@ -4,11 +4,26 @@ import { IconsModule } from '../../shared/icons';
 import { BranchesService } from '../../core/services/branches.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Branch } from '../../core/models/branch.models';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwToggleComponent } from '../../shared/ui/forms/toggle/toggle.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { GwSpinnerComponent } from '../../shared/ui/display/spinner/spinner.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-branches',
   standalone: true,
-  imports: [FormsModule, IconsModule],
+  imports: [
+    FormsModule, IconsModule,
+    GwFormFieldComponent, GwInputComponent, GwToggleComponent,
+    GwButtonComponent, GwIconButtonComponent,
+    GwBadgeComponent, GwEmptyStateComponent, GwSpinnerComponent,
+    GwDialogComponent,
+  ],
   templateUrl: './branches.component.html',
   styleUrl: './branches.component.scss',
 })
