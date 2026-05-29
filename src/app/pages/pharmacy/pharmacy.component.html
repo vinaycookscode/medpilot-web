@@ -1,0 +1,270 @@
+<div class="ph-page">
+
+  <!-- ── Header ──────────────────────────────────────────────────── -->
+  <header class="ph-page__header">
+    <div class="ph-page__title">
+      <lucide-icon name="pill" [size]="20" />
+      <h1>Pharmacy</h1>
+    </div>
+    @if (canCreate()) {
+      <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openCreateModal()">
+        Create order
+      </gw-button>
+    }
+  </header>
+
+  <!-- ── Tabs ─────────────────────────────────────────────────────── -->
+  <div class="ph-page__tabs">
+    <button class="ph-tab" [class.ph-tab--active]="activeTab() === 'in_house'"
+      (click)="switchTab('in_house')">
+      <lucide-icon name="building-2" [size]="14" />
+      In-House
+    </button>
+    <button class="ph-tab" [class.ph-tab--active]="activeTab() === 'out_house'"
+      (click)="switchTab('out_house')">
+      <lucide-icon name="store" [size]="14" />
+      Out-House
+    </button>
+  </div>
+
+  <!-- ── Stats ─────────────────────────────────────────────────────── -->
+  <div class="ph-page__stats">
+    <gw-stat-card label="Pending orders" [value]="count('pending')" icon="clock" />
+    <gw-stat-card label="Dispensed today" [value]="count('dispensed')" icon="check-circle-2" />
+    <gw-stat-card label="Pending billing" [value]="pendingBillingCount()" icon="indian-rupee" />
+    <gw-stat-card label="Total bill value" [value]="'₹' + (totalValue() | number:'1.0-0')" icon="bar-chart-2" />
+  </div>
+
+  <!-- ── Orders table ──────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="ph-page__loading"><gw-spinner size="md" /></div>
+  } @else if (!orders().length) {
+    <gw-empty-state
+      icon="pill"
+      title="No pharmacy orders"
+      description="Create an order from a doctor's prescription or manually."
+    />
+  } @else {
+    <gw-card elevation="sm" padding="none">
+      <div class="ph-table">
+        <div class="ph-table__head">
+          <span>Order #</span>
+          <span>Patient</span>
+          <span>Prescription</span>
+          <span>Items</span>
+          <span>Amount</span>
+          <span>Status</span>
+          <span>Billing</span>
+          <span></span>
+        </div>
+
+        @for (order of orders(); track order.id) {
+          <div class="ph-table__row">
+            <span class="ph-table__order-no">{{ order.orderNumber }}</span>
+
+            <span class="ph-table__patient">
+              <gw-avatar [name]="fullName(order.patient)" size="xs" />
+              {{ fullName(order.patient) }}
+            </span>
+
+            <span class="ph-table__presc">
+              {{ order.prescriptionId ? ('RX-' + order.prescriptionId.slice(0,8).toUpperCase()) : '—' }}
+            </span>
+
+            <span class="ph-table__items">{{ order.items?.length ?? 0 }} item{{ (order.items?.length ?? 0) !== 1 ? 's' : '' }}</span>
+
+            <span class="ph-table__amount">
+              @if (order.totalAmount > 0) {
+                <span [class.ph-table__amount--over]="order.totalAmount > THRESHOLD">
+                  ₹{{ order.totalAmount | number:'1.2-2' }}
+                </span>
+              } @else { — }
+            </span>
+
+            <span>
+              <gw-badge [variant]="statusVariant(order.status)" tone="soft" size="sm">
+                {{ order.status | titlecase }}
+              </gw-badge>
+            </span>
+
+            <span>
+              <gw-badge [variant]="billingVariant(order.billingStatus)" tone="soft" size="sm">
+                {{ order.billingStatus | titlecase }}
+              </gw-badge>
+            </span>
+
+            <span class="ph-table__actions">
+              @if (canDispense(order)) {
+                <gw-button variant="secondary" size="sm" leadingIcon="package"
+                  (click)="openDispenseModal(order)">Dispense</gw-button>
+              }
+              @if (canBill(order)) {
+                <gw-button variant="secondary" size="sm" leadingIcon="indian-rupee"
+                  (click)="billOrder(order)">Bill</gw-button>
+              }
+              @if (canClearOut(order)) {
+                <gw-button variant="ghost" size="sm" (click)="clearOutbound(order)">Clear</gw-button>
+              }
+              @if (canCancel(order)) {
+                <gw-icon-button icon="x" ariaLabel="Cancel order" variant="ghost" size="sm"
+                  (click)="cancelOrder(order)" />
+              }
+            </span>
+          </div>
+        }
+      </div>
+    </gw-card>
+  }
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- Modal: Create Order                              -->
+  <!-- ──────────────────────────────────────────────── -->
+  <gw-dialog [open]="showCreateModal()" size="lg" title="Create Pharmacy Order"
+    (closed)="showCreateModal.set(false)">
+
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+
+      <!-- Pending prescriptions -->
+      <div class="ph-modal__section">
+        <p class="ph-modal__label">Select from pending prescriptions</p>
+        @if (prescLoading()) {
+          <div class="ph-modal__loading"><gw-spinner size="sm" /></div>
+        } @else if (!pendingPrescriptions().length) {
+          <p class="ph-modal__empty">No unfulfilled prescriptions found.</p>
+        } @else {
+          <div class="ph-modal__presc-list">
+            @for (p of pendingPrescriptions(); track p.id) {
+              <button type="button"
+                class="ph-modal__presc-card"
+                [class.ph-modal__presc-card--selected]="selectedPrescription()?.id === p.id"
+                (click)="selectPrescription(p)">
+                <div class="ph-modal__presc-header">
+                  <gw-avatar [name]="fullName(p.patient)" size="sm" />
+                  <div>
+                    <strong>{{ fullName(p.patient) }}</strong>
+                    <small>Dr. {{ fullName(p.doctor) }} · {{ p.createdAt | date:'dd MMM' }}</small>
+                  </div>
+                  <gw-badge variant="neutral" tone="soft" size="sm">
+                    {{ p.medicines.length }} med{{ p.medicines.length !== 1 ? 's' : '' }}
+                  </gw-badge>
+                </div>
+                <p class="ph-modal__presc-diag">{{ p.diagnosis }}</p>
+                <div class="ph-modal__meds">
+                  @for (m of p.medicines.slice(0, 3); track m.id) {
+                    <span class="ph-modal__med-chip">{{ m.medicineName }}</span>
+                  }
+                  @if (p.medicines.length > 3) {
+                    <span class="ph-modal__med-chip ph-modal__med-chip--more">+{{ p.medicines.length - 3 }} more</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Or: manual patient search -->
+      <div class="ph-modal__divider">
+        <span>or add patient manually</span>
+      </div>
+
+      <div style="position:relative">
+        @if (!selectedPatient()) {
+          <gw-form-field label="Patient search">
+            <gw-input placeholder="Search by name or phone…"
+              [(ngModel)]="patientSearchStr" [ngModelOptions]="{standalone:true}"
+              (ngModelChange)="onPatientSearch($event)" />
+          </gw-form-field>
+          @if (patientResults().length) {
+            <div class="ph-modal__dropdown">
+              @for (p of patientResults(); track p.id) {
+                <button type="button" class="ph-modal__dropdown-item" (click)="selectPatient(p)">
+                  <gw-avatar [name]="p.firstName + ' ' + p.lastName" size="xs" />
+                  {{ p.firstName }} {{ p.lastName }}
+                  <span class="ph-modal__dropdown-sub">{{ p.phone }}</span>
+                </button>
+              }
+            </div>
+          }
+        } @else if (!selectedPrescription()) {
+          <div class="ph-modal__patient-chip">
+            <gw-avatar [name]="fullName(selectedPatient())" size="sm" />
+            <span>{{ fullName(selectedPatient()) }}</span>
+            <gw-icon-button icon="x" ariaLabel="Clear patient" variant="ghost" size="sm" (click)="selectedPatient.set(null)" />
+          </div>
+        }
+      </div>
+
+      <gw-form-field label="Notes">
+        <gw-textarea formControlName="notes" [rows]="2" />
+      </gw-form-field>
+
+      <div class="ph-modal__footer">
+        <gw-button variant="ghost" type="button" (click)="showCreateModal.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" type="submit" [loading]="saving()">Create order</gw-button>
+      </div>
+    </form>
+  </gw-dialog>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- Modal: Dispense                                  -->
+  <!-- ──────────────────────────────────────────────── -->
+  <gw-dialog [open]="showDispenseModal()" size="lg"
+    [title]="'Dispense — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showDispenseModal.set(false)">
+
+    @if (selectedOrder(); as order) {
+      <form [formGroup]="dispenseForm" (ngSubmit)="submitDispense()">
+
+        <div class="ph-dispense__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          @if (order.prescriptionId) {
+            <span><strong>Rx:</strong> RX-{{ order.prescriptionId.slice(0,8).toUpperCase() }}</span>
+          }
+        </div>
+
+        <!-- Per-item dispensing -->
+        <div class="ph-dispense__table">
+          <div class="ph-dispense__head">
+            <span>Medicine</span><span>Qty dispensed</span><span>Unit price (₹)</span><span>Total</span>
+          </div>
+
+          @for (ctrl of dispenseItems.controls; track $index) {
+            <div class="ph-dispense__row" [formGroup]="$any(ctrl)">
+              <span class="ph-dispense__med">{{ ctrl.get('medicineName')?.value }}</span>
+              <gw-number-input formControlName="dispensedQty" [min]="0" [step]="1" />
+              <gw-currency-input formControlName="unitPrice" />
+              <span class="ph-dispense__line-total">
+                ₹{{ ((ctrl.get('dispensedQty')?.value || 0) * (ctrl.get('unitPrice')?.value || 0)) | number:'1.2-2' }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- Live total + threshold alert -->
+        <div class="ph-dispense__total">
+          <span>Total</span>
+          <strong [class.ph-dispense__total--over]="overThreshold()">
+            ₹{{ dispenseTotal() | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        @if (overThreshold()) {
+          <gw-alert variant="warning">
+            Bill exceeds ₹{{ THRESHOLD | number }}. Billing staff and admin will be notified when billed.
+          </gw-alert>
+        }
+
+        <gw-form-field label="Notes" class="mt-12">
+          <gw-textarea formControlName="notes" [rows]="2" />
+        </gw-form-field>
+
+        <div class="ph-modal__footer">
+          <gw-button variant="ghost" type="button" (click)="showDispenseModal.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Confirm dispense</gw-button>
+        </div>
+      </form>
+    }
+  </gw-dialog>
+
+</div>

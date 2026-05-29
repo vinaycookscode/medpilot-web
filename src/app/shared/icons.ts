@@ -39,6 +39,8 @@ import {
   // Showcase / reports
   BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
   Star, Quote, ChevronsRight,
+  // Investigations + Pharmacy
+  ScanLine, Scan, CircleDot, Inbox, Store, Upload,
 } from 'lucide-angular';
 
 @NgModule({
@@ -70,6 +72,8 @@ import {
   // Showcase / reports
   BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
   Star, Quote, ChevronsRight,
+  // Investigations + Pharmacy
+  ScanLine, Scan, CircleDot, Inbox, Store, Upload,
     }),
   ],
   exports: [LucideAngularModule],

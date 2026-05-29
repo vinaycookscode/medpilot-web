@@ -1,0 +1,346 @@
+<div class="inv-page">
+
+  <!-- ── Page header ──────────────────────────────────────────────── -->
+  <header class="inv-page__header">
+    <div class="inv-page__title">
+      <lucide-icon name="scan-line" [size]="20" />
+      <h1>Investigations</h1>
+    </div>
+    <div class="inv-page__actions">
+      @if (isDeptUser()) {
+        <gw-button variant="secondary" size="sm" leadingIcon="inbox"
+          (click)="viewMode.set('queue')">
+          My queue
+          @if (queueCount()) {
+            <gw-badge variant="primary" size="sm" class="ml-1">{{ queueCount() }}</gw-badge>
+          }
+        </gw-button>
+      }
+      @if (isBillingUser()) {
+        <gw-button variant="secondary" size="sm" leadingIcon="indian-rupee"
+          (click)="viewMode.set('billing')">
+          Pending billing
+          @if (pendingBillingCount()) {
+            <gw-badge variant="warning" size="sm" class="ml-1">{{ pendingBillingCount() }}</gw-badge>
+          }
+        </gw-button>
+      }
+      @if (canCreate()) {
+        <gw-button variant="primary" size="sm" leadingIcon="plus"
+          (click)="openCreateModal()">
+          Order investigation
+        </gw-button>
+      }
+    </div>
+  </header>
+
+  <!-- ── Department tabs ──────────────────────────────────────────── -->
+  <div class="inv-page__tabs">
+    @for (dept of depts; track dept) {
+      <button class="inv-tab" [class.inv-tab--active]="activeTab() === dept"
+        (click)="switchTab(dept)">
+        <lucide-icon [name]="deptIcons[dept]" [size]="15" />
+        {{ deptLabels[dept] }}
+      </button>
+    }
+  </div>
+
+  <!-- ── Stats strip ──────────────────────────────────────────────── -->
+  <div class="inv-page__stats">
+    <gw-stat-card label="Ordered today" [value]="count('ordered')" icon="clipboard-list" />
+    <gw-stat-card label="In progress" [value]="count('in_progress') + count('sample_collected')" icon="activity" />
+    <gw-stat-card label="Reported" [value]="count('reported')" icon="check-circle-2" />
+    <gw-stat-card label="Pending billing" [value]="pendingBillingCount()" icon="indian-rupee" />
+  </div>
+
+  <!-- ── Orders table ─────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="inv-page__loading"><gw-spinner size="md" /></div>
+  } @else if (!orders().length) {
+    <gw-empty-state
+      icon="scan-line"
+      title="No investigation orders"
+      [description]="'No ' + deptLabels[activeTab()] + ' orders found.'"
+    />
+  } @else {
+    <gw-card elevation="sm" padding="none" class="inv-page__table-card">
+      <div class="inv-table">
+        <div class="inv-table__head">
+          <span>Order #</span>
+          <span>Patient</span>
+          <span>Ordered by</span>
+          <span>Urgency</span>
+          <span>Expected</span>
+          <span>Status</span>
+          <span>Billing</span>
+          <span></span>
+        </div>
+
+        @for (order of orders(); track order.id) {
+          <div class="inv-table__row">
+            <span class="inv-table__order-no">{{ order.orderNumber }}</span>
+
+            <span class="inv-table__patient">
+              <gw-avatar [name]="fullName(order.patient)" size="xs" />
+              <span>{{ fullName(order.patient) }}</span>
+            </span>
+
+            <span class="inv-table__doctor">{{ fullName(order.orderedBy) }}</span>
+
+            <span>
+              <gw-badge [variant]="urgencyVariant(order.urgency)" tone="soft" size="sm">
+                {{ titleCase(order.urgency) }}
+              </gw-badge>
+            </span>
+
+            <span class="inv-table__date">
+              {{ order.expectedReportAt ? (order.expectedReportAt | date:'dd MMM, HH:mm') : '—' }}
+            </span>
+
+            <span>
+              <gw-badge [variant]="statusVariant(order.status)" tone="soft" size="sm">
+                {{ titleCase(order.status) }}
+              </gw-badge>
+            </span>
+
+            <span>
+              <gw-badge
+                [variant]="order.billingStatus === 'cleared' ? 'success' : 'neutral'"
+                tone="soft" size="sm">
+                {{ titleCase(order.billingStatus) }}
+              </gw-badge>
+            </span>
+
+            <span class="inv-table__row-actions">
+              @if (isDeptUser()) {
+                @if (canAccept(order)) {
+                  <gw-button variant="ghost" size="sm" (click)="acceptOrder(order)">Accept</gw-button>
+                }
+                @if (canCollect(order)) {
+                  <gw-button variant="ghost" size="sm" (click)="collectSample(order)">Collect</gw-button>
+                }
+                @if (canReport(order)) {
+                  <gw-button variant="secondary" size="sm" leadingIcon="upload"
+                    (click)="openReportModal(order)">Report</gw-button>
+                }
+              }
+              @if (isBillingUser() && canBill(order)) {
+                <gw-button variant="secondary" size="sm" leadingIcon="indian-rupee"
+                  (click)="openBillingModal(order)">Clear billing</gw-button>
+              }
+              @if (canCancel(order)) {
+                <gw-icon-button icon="x" ariaLabel="Cancel order" variant="ghost" size="sm"
+                  (click)="cancelOrder(order)" />
+              }
+            </span>
+          </div>
+        }
+      </div>
+    </gw-card>
+  }
+
+  <!-- ── Modal: Create Investigation Order ────────────────────────── -->
+  <gw-dialog [open]="showCreateModal()" size="lg"
+    [title]="'Order ' + deptLabels[activeTab()] + ' Investigation'"
+    (closed)="showCreateModal.set(false)">
+
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+
+      <gw-form-field label="Patient" [required]="true" style="position:relative">
+        @if (!selectedPatient()) {
+          <gw-input placeholder="Search by name or phone…"
+            [(ngModel)]="patientSearch" [ngModelOptions]="{standalone:true}"
+            (ngModelChange)="onPatientSearch($event)" />
+          @if (patientResults().length) {
+            <div class="inv-modal__dropdown">
+              @for (p of patientResults(); track p.id) {
+                <button type="button" class="inv-modal__dropdown-item" (click)="selectPatient(p)">
+                  <gw-avatar [name]="p.firstName + ' ' + p.lastName" size="xs" />
+                  <span>{{ p.firstName }} {{ p.lastName }}</span>
+                  <span class="inv-modal__dropdown-sub">{{ p.phone }}</span>
+                </button>
+              }
+            </div>
+          }
+        } @else {
+          <div class="inv-modal__patient-chip">
+            <gw-avatar [name]="fullName(selectedPatient())" size="sm" />
+            <span>{{ fullName(selectedPatient()) }}</span>
+            <gw-icon-button icon="x" ariaLabel="Clear patient" variant="ghost" size="sm"
+              (click)="clearPatient()" />
+          </div>
+        }
+      </gw-form-field>
+
+      <div class="inv-modal__row">
+        <gw-form-field label="Clinical indication" [required]="true" class="inv-modal__grow">
+          <gw-textarea formControlName="clinicalIndication" placeholder="Reason for investigation…" [rows]="2" />
+        </gw-form-field>
+        <gw-form-field label="Urgency">
+          <gw-select formControlName="urgency" [options]="urgencyOptions" />
+        </gw-form-field>
+      </div>
+
+      <gw-form-field label="Expected report by">
+        <gw-datetime-input formControlName="expectedReportAt" />
+      </gw-form-field>
+
+      @if (activeTab() === 'pathology' && catalog().length) {
+        <div class="inv-modal__tests">
+          <p class="inv-modal__tests-label">Tests to be ordered ({{ catalog().length }})</p>
+          <div class="inv-modal__tests-grid">
+            @for (item of catalog(); track item.id) {
+              <div class="inv-modal__test-chip">
+                <lucide-icon name="flask-conical" [size]="13" />
+                {{ item.name }}
+                <span class="inv-modal__test-price">₹{{ item.defaultAmount | number }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'cathlab') {
+        <div class="inv-modal__row">
+          <gw-form-field label="Procedure type" class="inv-modal__grow">
+            <gw-input formControlName="procedureType" placeholder="e.g. Angiography, Angioplasty" />
+          </gw-form-field>
+        </div>
+      }
+
+      <div class="inv-modal__footer">
+        <gw-button variant="ghost" type="button" (click)="showCreateModal.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" type="submit" [loading]="saving()">Place order</gw-button>
+      </div>
+    </form>
+  </gw-dialog>
+
+  <!-- ── Modal: Submit Report ──────────────────────────────────────── -->
+  <gw-dialog [open]="showReportModal()" size="lg"
+    [title]="'Enter Report — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showReportModal.set(false)">
+
+    @if (selectedOrder(); as order) {
+      <div class="inv-report">
+        <div class="inv-report__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          <span><strong>Ordered by:</strong> {{ fullName(order.orderedBy) }}</span>
+          <span><strong>Indication:</strong> {{ order.clinicalIndication }}</span>
+        </div>
+
+        @if (!isImaging(order)) {
+          <div class="inv-report__items">
+            <div class="inv-report__items-head">
+              <span>Test</span><span>Result</span><span>Abnormal</span><span>Remarks</span>
+            </div>
+            @for (item of order.items; track item.id) {
+              <div class="inv-report__item-row">
+                <span class="inv-report__test-name">
+                  {{ item.testName }}
+                  @if (item.normalRange) {
+                    <small>Normal: {{ item.normalRange }} {{ item.unit }}</small>
+                  }
+                </span>
+                <gw-input size="sm" placeholder="Result"
+                  [ngModel]="editedItems()[item.id]?.result ?? ''"
+                  [ngModelOptions]="{standalone:true}"
+                  (ngModelChange)="setItemField(item.id, 'result', $event)" />
+                <gw-toggle
+                  [ngModel]="editedItems()[item.id]?.isAbnormal ?? false"
+                  [ngModelOptions]="{standalone:true}"
+                  (ngModelChange)="setItemField(item.id, 'isAbnormal', $event)" />
+                <gw-input size="sm" placeholder="Remarks"
+                  [ngModel]="editedItems()[item.id]?.remarks ?? ''"
+                  [ngModelOptions]="{standalone:true}"
+                  (ngModelChange)="setItemField(item.id, 'remarks', $event)" />
+              </div>
+            }
+          </div>
+        }
+
+        @if (isImaging(order)) {
+          <gw-form-field label="Report file (PDF / image)">
+            <gw-file-input accept=".pdf,image/*"
+              [ngModel]="null" [ngModelOptions]="{standalone:true}"
+              (ngModelChange)="reportFileUrl.set($event?.[0]?.name ?? '')" />
+          </gw-form-field>
+          <gw-form-field label="Report notes">
+            <gw-textarea
+              [ngModel]="reportNotes()" [ngModelOptions]="{standalone:true}"
+              (ngModelChange)="reportNotes.set($event)"
+              placeholder="Radiologist findings, impressions…" [rows]="4" />
+          </gw-form-field>
+        }
+      </div>
+
+      <div class="inv-modal__footer">
+        <gw-button variant="ghost" (click)="showReportModal.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" (click)="submitReport()">Submit report</gw-button>
+      </div>
+    }
+  </gw-dialog>
+
+  <!-- ── Modal: Billing Clearance ─────────────────────────────────── -->
+  <gw-dialog [open]="showBillingModal()" size="md"
+    [title]="'Billing Clearance — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showBillingModal.set(false)">
+
+    @if (selectedOrder(); as order) {
+      <form [formGroup]="billingForm" (ngSubmit)="submitBillingClearance()">
+        <div class="inv-billing__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          <span><strong>Dept:</strong> {{ deptLabels[order.departmentType] }}</span>
+        </div>
+
+        <gw-form-field label="Total investigation amount" [required]="true">
+          <gw-currency-input formControlName="totalAmount" />
+        </gw-form-field>
+
+        <div class="inv-billing__split">
+          <gw-form-field label="Hospital payable">
+            <gw-currency-input formControlName="hospitalPayable" />
+          </gw-form-field>
+          <gw-form-field label="Customer payable">
+            <gw-currency-input formControlName="customerPayable" />
+          </gw-form-field>
+          <gw-form-field label="Insurance payable">
+            <gw-currency-input formControlName="insurancePayable" />
+          </gw-form-field>
+        </div>
+
+        @if (!billingSplitValid() && billingTotal() > 0) {
+          <gw-alert variant="danger">
+            Amounts must sum to ₹{{ billingTotal() | number:'1.2-2' }}
+          </gw-alert>
+        }
+
+        @if ((billingForm.value.insurancePayable ?? 0) > 0) {
+          <div class="inv-billing__insurance">
+            <gw-form-field label="Insurance provider ID">
+              <gw-input formControlName="insuranceProviderId" placeholder="Provider UUID" />
+            </gw-form-field>
+            <gw-form-field label="Policy number">
+              <gw-input formControlName="policyNumber" />
+            </gw-form-field>
+            <gw-form-field label="Member name">
+              <gw-input formControlName="memberName" />
+            </gw-form-field>
+          </div>
+        }
+
+        <gw-form-field label="Billing notes">
+          <gw-textarea formControlName="billingNotes" [rows]="2" />
+        </gw-form-field>
+
+        <div class="inv-modal__footer">
+          <gw-button variant="ghost" type="button" (click)="showBillingModal.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()"
+            [disabled]="!billingSplitValid()">
+            Clear &amp; post to invoice
+          </gw-button>
+        </div>
+      </form>
+    }
+  </gw-dialog>
+
+</div>

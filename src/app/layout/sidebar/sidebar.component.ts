@@ -107,8 +107,9 @@ export class SidebarComponent {
     {
       title: 'Clinical',
       items: [
-        { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'], module: 'prescriptions' },
-        { label: 'Labs',          route: '/labs',           icon: 'flask-conical', roles: ['admin', 'doctor'], module: 'labs' },
+        { label: 'Prescriptions',   route: '/prescriptions',   icon: 'file-text',     roles: ['admin', 'doctor', 'consultant', 'rmo'], module: 'prescriptions' },
+        { label: 'Investigations', route: '/investigations',  icon: 'scan-line',     roles: ['admin', 'doctor', 'consultant', 'rmo', 'lab_tech', 'radiology_tech', 'billing_staff'], module: 'investigations' },
+        { label: 'Pharmacy',       route: '/pharmacy',        icon: 'pill',          roles: ['admin', 'pharmacist', 'billing_staff', 'nursing', 'doctor', 'consultant', 'rmo'], module: 'pharmacy' },
       ],
     },
     {

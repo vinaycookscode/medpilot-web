@@ -1,0 +1,343 @@
+:host { display: block; }
+
+.inv-page {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    lucide-icon { color: var(--color-primary); }
+  }
+
+  &__actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 540px) { grid-template-columns: 1fr; }
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  &__table-card { overflow: hidden; }
+}
+
+.inv-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: color var(--t-fast) ease;
+
+  &:hover { color: var(--text-primary); }
+
+  &--active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+// ── Table ──────────────────────────────────────────────────────────────────
+.inv-table {
+  &__head, &__row {
+    display: grid;
+    grid-template-columns: 110px 1.5fr 1fr 90px 120px 100px 90px 180px;
+    gap: 12px;
+    padding: 10px 16px;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  &__head {
+    background: var(--surface-input);
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__row {
+    border-top: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 13px;
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__order-no {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  &__patient {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__doctor {
+    color: var(--text-secondary);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__date { color: var(--text-secondary); font-size: 12px; }
+
+  &__row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 1100px) {
+    &__head, &__row {
+      grid-template-columns: 100px 1.2fr 1fr 80px 1fr 90px;
+    }
+    .inv-table__date, .inv-table__doctor { display: none; }
+  }
+}
+
+// ── Modal internals ───────────────────────────────────────────────────────
+.inv-modal {
+  &__section { margin-bottom: 16px; }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+
+  &__grow { flex: 1; }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  &__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: transparent;
+    border: 0;
+    width: 100%;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-primary);
+    &:hover { background: var(--surface-input); }
+  }
+
+  &__dropdown-sub { margin-left: auto; color: var(--text-tertiary); font-size: 12px; }
+
+  &__patient-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &__tests { margin-top: 8px; }
+  &__tests-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+  &__tests-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  &__test-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    lucide-icon { flex-shrink: 0; }
+  }
+  &__test-price {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    margin-left: 2px;
+  }
+}
+
+// ── Report modal ──────────────────────────────────────────────────────────
+.inv-report {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-secondary);
+    strong { color: var(--text-primary); }
+  }
+
+  &__items { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+
+  &__items-head {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 80px 1fr;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface-input);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+  }
+
+  &__item-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 80px 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    align-items: center;
+  }
+
+  &__test-name {
+    font-size: 13px;
+    font-weight: 500;
+    small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+  }
+}
+
+// ── Billing clearance modal ───────────────────────────────────────────────
+.inv-billing {
+  &__meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    strong { color: var(--text-primary); }
+  }
+
+  &__split {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__insurance {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    margin-top: 4px;
+  }
+}
+
+.ml-1 { margin-left: 4px; }
