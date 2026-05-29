@@ -16,13 +16,24 @@ import {
 import { Patient } from '../../core/models/patient.models';
 import { forkJoin, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent } from '../../shared/ui/forms/select/select.component';
+import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwTimeInputComponent } from '../../shared/ui/forms/time-input/time-input.component';
+import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 
 type TabMode = 'admissions' | 'beds' | 'wards';
 
 @Component({
   selector: 'app-ipd',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent],
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent,
+    GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent,
+    GwDateInputComponent, GwTimeInputComponent, GwDialogComponent,
+  ],
   templateUrl: './ipd.component.html',
   styleUrl: './ipd.component.scss',
 })
@@ -74,6 +85,15 @@ export class IpdComponent implements OnInit {
   });
 
   readonly admissionTypes = this.appMeta.admissionTypes;
+
+  readonly bedOptions = computed(() => this.availableBeds().map(b => ({
+    value: b.id,
+    label: `${b.ward?.name ?? ''} — Bed ${b.bedNumber} (${(b.bedType ?? '').toString()})`,
+  })));
+  readonly doctorOptions = computed(() => this.doctors().map(d => ({
+    value: d.id,
+    label: `Dr. ${d.firstName} ${d.lastName}`,
+  })));
 
   readonly filterOptions: { value: string; label: string }[] = [
     { value: '',            label: 'All' },

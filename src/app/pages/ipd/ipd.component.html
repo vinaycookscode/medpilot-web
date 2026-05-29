@@ -229,102 +229,68 @@
 </div>
 
 <!-- ─── Admit Patient Modal ──────────────────────────────────────────────── -->
-@if (admitModal()) {
-  <div class="modal-backdrop" (click)="admitModal.set(false)"></div>
-  <div class="modal">
-    <div class="modal__header">
-      <h3>Admit Patient</h3>
-      <button class="modal__close" (click)="admitModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
-    </div>
-    <div class="modal__body">
-      <form [formGroup]="admitForm">
-        <div class="form-section-label">Patient</div>
-        <div class="form-group" style="position:relative">
-          <label class="form-label required">Search Patient</label>
-          <input class="form-control" placeholder="Name or phone number…"
-                 [value]="patientQuery()"
-                 (input)="onPatientSearch($any($event.target).value)" />
-          @if (patients().length > 0) {
-            <div class="autocomplete-dropdown">
-              @for (p of patients(); track p.id) {
-                <div class="autocomplete-item" (click)="selectPatient(p)">
-                  <div class="fw-medium">{{ p.firstName }} {{ p.lastName }}</div>
-                  <div class="text-muted text-sm">{{ p.phone }} · {{ p.patientCode }}</div>
-                </div>
-              }
-            </div>
-          }
-        </div>
+<gw-dialog [open]="admitModal()" (openChange)="admitModal.set($event)" title="Admit Patient" size="md">
+  <form [formGroup]="admitForm">
+    <div class="form-section-label">Patient</div>
+    <gw-form-field label="Search Patient" [required]="true">
+      <div style="position:relative">
+        <input class="input" placeholder="Name or phone number…"
+               [value]="patientQuery()"
+               (input)="onPatientSearch($any($event.target).value)" />
+        @if (patients().length > 0) {
+          <div class="autocomplete-dropdown">
+            @for (p of patients(); track p.id) {
+              <div class="autocomplete-item" (click)="selectPatient(p)">
+                <div class="fw-medium">{{ p.firstName }} {{ p.lastName }}</div>
+                <div class="text-muted text-sm">{{ p.phone }} · {{ p.patientCode }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </gw-form-field>
 
-        <div class="form-section-label" style="margin-top:1rem">Admission Details</div>
-        <div class="form-grid form-grid--2">
-          <div class="form-group">
-            <label class="form-label required">Available Bed</label>
-            <select class="form-control" formControlName="bedId">
-              <option value="">Select bed…</option>
-              @for (b of availableBeds(); track b.id) {
-                <option [value]="b.id">{{ b.ward?.name }} — Bed {{ b.bedNumber }} ({{ b.bedType | titlecase }})</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Admitting Doctor</label>
-            <select class="form-control" formControlName="admittingDoctorId">
-              <option value="">Select doctor…</option>
-              @for (d of doctors(); track d.id) {
-                <option [value]="d.id">Dr. {{ d.firstName }} {{ d.lastName }}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Admission Date</label>
-            <input type="date" class="form-control" formControlName="admissionDate" />
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Time</label>
-            <input type="time" class="form-control" formControlName="admissionTime" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Admission Type</label>
-            <select class="form-control" formControlName="admissionType">
-              @for (t of admissionTypes(); track t.value) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label required">Provisional Diagnosis</label>
-          <input class="form-control" placeholder="e.g. Acute appendicitis" formControlName="admissionDiagnosis" />
-        </div>
+    <div class="form-section-label" style="margin-top:1rem">Admission Details</div>
+    <div class="form-grid form-grid--2">
+      <gw-form-field label="Available Bed" [required]="true">
+        <gw-select formControlName="bedId" [options]="bedOptions()" placeholder="Select bed…" />
+      </gw-form-field>
+      <gw-form-field label="Admitting Doctor" [required]="true">
+        <gw-select formControlName="admittingDoctorId" [options]="doctorOptions()" placeholder="Select doctor…" />
+      </gw-form-field>
+      <gw-form-field label="Admission Date" [required]="true">
+        <gw-date-input formControlName="admissionDate" />
+      </gw-form-field>
+      <gw-form-field label="Time" [required]="true">
+        <gw-time-input formControlName="admissionTime" />
+      </gw-form-field>
+      <gw-form-field label="Admission Type">
+        <gw-select formControlName="admissionType" [options]="admissionTypes()" />
+      </gw-form-field>
+    </div>
+    <gw-form-field label="Provisional Diagnosis" [required]="true">
+      <gw-input formControlName="admissionDiagnosis" placeholder="e.g. Acute appendicitis" />
+    </gw-form-field>
 
-        <div class="form-section-label" style="margin-top:1rem">Attendant / Next of Kin</div>
-        <div class="form-grid form-grid--3">
-          <div class="form-group">
-            <label class="form-label">Name</label>
-            <input class="form-control" formControlName="attendantName" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Phone</label>
-            <input class="form-control" formControlName="attendantPhone" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Relation</label>
-            <input class="form-control" placeholder="e.g. Spouse" formControlName="attendantRelation" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notes</label>
-          <textarea class="form-control" rows="2" formControlName="notes"></textarea>
-        </div>
-      </form>
+    <div class="form-section-label" style="margin-top:1rem">Attendant / Next of Kin</div>
+    <div class="form-grid form-grid--3">
+      <gw-form-field label="Name">
+        <gw-input formControlName="attendantName" />
+      </gw-form-field>
+      <gw-form-field label="Phone">
+        <gw-input formControlName="attendantPhone" />
+      </gw-form-field>
+      <gw-form-field label="Relation">
+        <gw-input formControlName="attendantRelation" placeholder="e.g. Spouse" />
+      </gw-form-field>
     </div>
-    <div class="modal__footer">
-      <button class="btn btn--ghost" (click)="admitModal.set(false)">Cancel</button>
-      <button class="btn btn--primary" (click)="admit()" [disabled]="admitForm.invalid || saving()">
-        @if (saving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
-        Admit Patient
-      </button>
-    </div>
-  </div>
-}
+    <gw-form-field label="Notes">
+      <gw-textarea formControlName="notes" [rows]="2" />
+    </gw-form-field>
+  </form>
+
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="admitModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="admitForm.invalid" [loading]="saving()" (click)="admit()">Admit Patient</gw-button>
+  </ng-container>
+</gw-dialog>

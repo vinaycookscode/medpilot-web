@@ -137,147 +137,106 @@
 </div>
 
 <!-- New Order Modal -->
-@if (showOrderModal()) {
-  <div class="modal-backdrop" (click)="showOrderModal.set(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">New Lab Order</h3>
-        <button class="btn btn--ghost btn--icon" (click)="showOrderModal.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <!-- Patient search (outside form to avoid form interference) -->
-        <div class="field">
-          <label class="field__label">Patient <span style="color:var(--color-danger)">*</span></label>
-          <div class="patient-search">
-            @if (selectedPatient()) {
-              <div class="patient-selected">
-                <div class="patient-selected__info">
-                  <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
-                  <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
-                </div>
-                <button type="button" class="btn btn--ghost btn--icon btn--sm" (click)="clearPatient()">
-                  <lucide-icon name="x" [size]="14" />
-                </button>
-              </div>
-            } @else {
-              <div class="patient-search-wrap">
-                <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
-                  placeholder="Search by name or phone…" autocomplete="off" autofocus>
-                @if (patientSearching()) {
-                  <span class="patient-search-spinner"><span class="spinner spinner--sm"></span></span>
-                }
-              </div>
-              @if (patientSearching()) {
-                <div class="patient-search-status">Searching…</div>
-              } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
-                <div class="patient-search-status">No patients found</div>
-              }
-              @if (patientDropdown().length) {
-                <div class="patient-dropdown">
-                  @for (p of patientDropdown(); track p.id) {
-                    <div class="patient-dropdown__item" (click)="selectPatient(p)">
-                      <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
-                      <span class="patient-dropdown__phone">{{ p.phone }}</span>
-                    </div>
-                  }
-                </div>
-              }
-            }
+<gw-dialog [open]="showOrderModal()" (openChange)="showOrderModal.set($event)" title="New Lab Order">
+  <!-- Patient search (page-specific UI kept) -->
+  <gw-form-field label="Patient" [required]="true">
+    <div class="patient-search">
+      @if (selectedPatient()) {
+        <div class="patient-selected">
+          <div class="patient-selected__info">
+            <span class="patient-selected__name">{{ selectedPatient()!.firstName }} {{ selectedPatient()!.lastName }}</span>
+            <span class="patient-selected__phone">{{ selectedPatient()!.phone }}</span>
           </div>
+          <gw-icon-button icon="x" size="sm" ariaLabel="Clear" (click)="clearPatient()" />
         </div>
-
-        <!-- Test selection (outside form — managed by selectedTestIds signal) -->
-        <div class="field">
-          <label class="field__label">Select Tests <span style="color:var(--color-danger)">*</span></label>
-          @if (!catalog().length) {
-            <p class="field__hint">No tests in catalog. Add tests first.</p>
-          } @else {
-            <div class="test-checklist">
-              @for (test of catalog(); track test.id) {
-                <div class="test-check-item" [class.test-check-item--selected]="selectedTestIds().has(test.id)"
-                     (click)="toggleTest(test.id)">
-                  <div class="test-check-item__box">
-                    @if (selectedTestIds().has(test.id)) {
-                      <lucide-icon name="check" [size]="12" />
-                    }
-                  </div>
-                  <span class="test-check-item__name">{{ test.name }}</span>
-                  <span class="test-check-item__cat badge badge--neutral">{{ test.category }}</span>
-                  <span class="test-check-item__price">₹{{ test.price | number:'1.0-0' }}</span>
-                </div>
-              }
-            </div>
-            @if (selectedTestIds().size > 0) {
-              <p class="field__hint">{{ selectedTestIds().size }} test(s) selected</p>
-            }
+      } @else {
+        <div class="patient-search-wrap">
+          <input class="input" [value]="patientQuery()" (input)="onPatientSearch($event)"
+            placeholder="Search by name or phone…" autocomplete="off" autofocus>
+          @if (patientSearching()) {
+            <span class="patient-search-spinner"><gw-spinner size="sm" /></span>
           }
         </div>
-
-        <!-- Notes (inside form) -->
-        <form [formGroup]="orderForm">
-          <div class="field">
-            <label class="field__label">Notes</label>
-            <textarea class="input" formControlName="notes" placeholder="Clinical notes or special instructions" rows="3"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showOrderModal.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="orderForm.invalid || saving()" (click)="submitOrder()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          Create Order
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Results Modal -->
-@if (showResultModal() && selectedOrder()) {
-  <div class="modal-backdrop" (click)="showResultModal.set(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <div>
-          <h3 class="modal__title">Enter Results</h3>
-          <p class="modal__sub">{{ orderNumber(selectedOrder()) }} — {{ patientName(selectedOrder()) }}</p>
-        </div>
-        <button class="btn btn--ghost btn--icon" (click)="showResultModal.set(false)">
-          <lucide-icon name="x" [size]="18" />
-        </button>
-      </div>
-      <div class="modal__body">
-        <div class="field__hint" style="margin-bottom:12px">Saving will mark this order as <strong>Completed</strong>. Use the ✕ button on the orders table to cancel.</div>
-        <form [formGroup]="resultForm">
-          <div class="field">
-            <label class="field__label">Notes</label>
-            <textarea class="input" formControlName="notes" placeholder="Result notes…" rows="3"></textarea>
-          </div>
-        </form>
-
-        <!-- Items list -->
-        @if (selectedOrder()?.items?.length) {
-          <div class="result-items">
-            <div class="result-items__title">Tests in this order</div>
-            @for (item of selectedOrder()!.items; track item.id) {
-              <div class="result-item" [class.result-item--abnormal]="item.isAbnormal">
-                <span class="result-item__name">{{ itemName(item) }}</span>
-                @if (item.result) {
-                  <span class="result-item__result">{{ item.result }} {{ item.unit }}</span>
-                }
+        @if (patientSearching()) {
+          <div class="patient-search-status">Searching…</div>
+        } @else if (patientQuery().length >= 2 && !patientDropdown().length) {
+          <div class="patient-search-status">No patients found</div>
+        }
+        @if (patientDropdown().length) {
+          <div class="patient-dropdown">
+            @for (p of patientDropdown(); track p.id) {
+              <div class="patient-dropdown__item" (click)="selectPatient(p)">
+                <span class="patient-dropdown__name">{{ p.firstName }} {{ p.lastName }}</span>
+                <span class="patient-dropdown__phone">{{ p.phone }}</span>
               </div>
             }
           </div>
         }
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" (click)="showResultModal.set(false)">Cancel</button>
-        <button class="btn btn--primary" [disabled]="saving()" (click)="submitResults()">
-          @if (saving()) { <span class="spinner spinner--sm spinner--white"></span> }
-          Save Results
-        </button>
-      </div>
+      }
     </div>
-  </div>
-}
+  </gw-form-field>
+
+  <!-- Test selection (page-specific checklist kept) -->
+  <gw-form-field label="Select Tests" [required]="true"
+                 [hint]="!catalog().length ? 'No tests in catalog. Add tests first.' : (selectedTestIds().size > 0 ? selectedTestIds().size + ' test(s) selected' : null)">
+    @if (catalog().length) {
+      <div class="test-checklist">
+        @for (test of catalog(); track test.id) {
+          <div class="test-check-item" [class.test-check-item--selected]="selectedTestIds().has(test.id)"
+               (click)="toggleTest(test.id)">
+            <div class="test-check-item__box">
+              @if (selectedTestIds().has(test.id)) {
+                <lucide-icon name="check" [size]="12" />
+              }
+            </div>
+            <span class="test-check-item__name">{{ test.name }}</span>
+            <span class="test-check-item__cat badge badge--neutral">{{ test.category }}</span>
+            <span class="test-check-item__price">₹{{ test.price | number:'1.0-0' }}</span>
+          </div>
+        }
+      </div>
+    }
+  </gw-form-field>
+
+  <form [formGroup]="orderForm">
+    <gw-form-field label="Notes">
+      <gw-textarea formControlName="notes" placeholder="Clinical notes or special instructions" [rows]="3" />
+    </gw-form-field>
+  </form>
+
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showOrderModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [disabled]="orderForm.invalid" [loading]="saving()" (click)="submitOrder()">Create Order</gw-button>
+  </ng-container>
+</gw-dialog>
+
+<!-- Results Modal -->
+<gw-dialog [open]="showResultModal() && !!selectedOrder()" (openChange)="$event ? null : showResultModal.set(false)"
+           title="Enter Results"
+           [description]="selectedOrder() ? (orderNumber(selectedOrder()) + ' — ' + patientName(selectedOrder())) : null">
+  <div class="field__hint" style="margin-bottom:12px">Saving will mark this order as <strong>Completed</strong>. Use the ✕ button on the orders table to cancel.</div>
+  <form [formGroup]="resultForm">
+    <gw-form-field label="Notes">
+      <gw-textarea formControlName="notes" placeholder="Result notes…" [rows]="3" />
+    </gw-form-field>
+  </form>
+
+  @if (selectedOrder()?.items?.length) {
+    <div class="result-items">
+      <div class="result-items__title">Tests in this order</div>
+      @for (item of selectedOrder()!.items; track item.id) {
+        <div class="result-item" [class.result-item--abnormal]="item.isAbnormal">
+          <span class="result-item__name">{{ itemName(item) }}</span>
+          @if (item.result) {
+            <span class="result-item__result">{{ item.result }} {{ item.unit }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <ng-container gw-dialog-footer>
+    <gw-button variant="ghost" (click)="showResultModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="saving()" (click)="submitResults()">Save Results</gw-button>
+  </ng-container>
+</gw-dialog>
