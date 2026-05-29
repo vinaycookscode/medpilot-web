@@ -36,6 +36,9 @@ import {
   Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
   // Empty-state screens
   Compass,
+  // Showcase / reports
+  BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
+  Star, Quote, ChevronsRight,
 } from 'lucide-angular';
 
 @NgModule({
@@ -64,6 +67,9 @@ import {
       Tag, Filter, Database, ToggleLeft, ToggleRight, GripVertical, Save,
   // Empty-state screens
   Compass,
+  // Showcase / reports
+  BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
+  Star, Quote, ChevronsRight,
     }),
   ],
   exports: [LucideAngularModule],

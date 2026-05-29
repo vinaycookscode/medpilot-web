@@ -1423,9 +1423,10 @@ $border2: rgba(255, 255, 255, 0.12);
     max-width: 1200px;
     margin: 0 auto;
     padding: 32px 24px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    gap: 16px;
   }
 
   &__brand {
@@ -1449,10 +1450,44 @@ $border2: rgba(255, 255, 255, 0.12);
     color: #fff;
   }
 
+  &__contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    justify-self: center;
+    font-size: t.$text-sm;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: $text2;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 160ms ease;
+
+      lucide-icon { color: $cyan; }
+      &:hover { color: $text; }
+    }
+  }
+
   &__copy {
     font-size: t.$text-sm;
     color: $text3;
     margin: 0;
+    justify-self: end;
+  }
+
+  @media (max-width: 900px) {
+    &__inner {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      text-align: center;
+    }
+    &__brand,
+    &__contact,
+    &__copy { justify-self: center; }
+    &__contact { flex-wrap: wrap; justify-content: center; gap: 14px; }
   }
 }
 

@@ -1,0 +1,584 @@
+<div class="sc">
+
+  <!-- ─── Top nav ─────────────────────────────────────────── -->
+  <header class="sc-nav">
+    <div class="sc-nav__brand">
+      <span class="sc-nav__glyph">M</span>
+      <span class="sc-nav__name">MedPilot</span>
+    </div>
+    <nav class="sc-nav__links">
+      <button type="button" (click)="scrollTo('preview')">Product</button>
+      <button type="button" (click)="scrollTo('features')">Platform</button>
+      <button type="button" (click)="scrollTo('hierarchy')">Workflow</button>
+      <button type="button" (click)="scrollTo('compliance')">Compliance</button>
+    </nav>
+    <div class="sc-nav__cta">
+      <gw-button class="sc-nav__signin" variant="ghost" size="sm" (click)="goLogin()">Sign in</gw-button>
+      <gw-button variant="primary" size="sm" trailingIcon="arrow-right" (click)="scrollTo('demo')">Book demo</gw-button>
+    </div>
+  </header>
+
+  <!-- ─── Hero ────────────────────────────────────────────── -->
+  <section class="sc-hero">
+    <div class="sc-hero__grid" aria-hidden="true"></div>
+    <div class="sc-hero__glow" aria-hidden="true"></div>
+
+    <div class="sc-hero__inner">
+      <div class="sc-hero__eyebrow">
+        <span class="sc-hero__dot"></span>
+        Built for Indian clinics and NABH-track hospitals
+      </div>
+
+      <h1 class="sc-hero__title">
+        The HMS your clinical staff
+        <span class="sc-hero__title-accent">will actually use.</span>
+      </h1>
+
+      <p class="sc-hero__sub">
+        MedPilot replaces fragmented HMS tools, paper handovers, and Excel-based billing
+        with one audit-ready platform for OPD, IPD, prescriptions, pharmacy, labs, billing,
+        and compliance.
+      </p>
+
+      <div class="sc-hero__actions">
+        <gw-button variant="primary" size="lg" trailingIcon="arrow-right" (click)="scrollTo('demo')">
+          Book a 30-minute demo
+        </gw-button>
+        <gw-button variant="ghost" size="lg" (click)="scrollTo('preview')">
+          See it in action
+        </gw-button>
+      </div>
+
+      <div class="sc-hero__stats">
+        <div class="sc-hero__stat">
+          <strong>16</strong>
+          <span>integrated modules</span>
+        </div>
+        <div class="sc-hero__stat">
+          <strong>12</strong>
+          <span>clinical roles</span>
+        </div>
+        <div class="sc-hero__stat">
+          <strong>NABH</strong>
+          <span>compliance ready</span>
+        </div>
+        <div class="sc-hero__stat">
+          <strong>ABDM</strong>
+          <span>ABHA-linked</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero "browser frame" with a real-looking dashboard mockup -->
+    <div class="sc-hero__product">
+      <div class="sc-browser">
+        <div class="sc-browser__bar">
+          <span class="sc-browser__dot sc-browser__dot--r"></span>
+          <span class="sc-browser__dot sc-browser__dot--y"></span>
+          <span class="sc-browser__dot sc-browser__dot--g"></span>
+          <span class="sc-browser__url">
+            <lucide-icon name="lock" [size]="11" />
+            app.medpilot.in / dashboard
+          </span>
+        </div>
+        <div class="sc-browser__body">
+          <!-- Mock sidebar -->
+          <aside class="sc-mock__side">
+            <div class="sc-mock__side-brand">
+              <span class="sc-nav__glyph">M</span>
+              <span>MedPilot</span>
+            </div>
+            @for (m of modules.slice(0, 8); track m.label; let i = $index) {
+              <div class="sc-mock__side-item" [class.is-active]="i === 1">
+                <lucide-icon [name]="m.icon" [size]="14" />
+                <span>{{ m.label }}</span>
+              </div>
+            }
+          </aside>
+
+          <!-- Mock content: dashboard with KPI tiles + table -->
+          <div class="sc-mock__main">
+            <div class="sc-mock__topbar">
+              <div class="sc-mock__crumb">Workspace · Admissions</div>
+              <div class="sc-mock__search">
+                <lucide-icon name="search" [size]="12" />
+                <span>Search patients…</span>
+              </div>
+            </div>
+
+            <div class="sc-mock__kpis">
+              <div class="sc-mock__kpi">
+                <span class="sc-mock__kpi-label">Admissions today</span>
+                <span class="sc-mock__kpi-value">42</span>
+                <span class="sc-mock__kpi-trend sc-mock__kpi-trend--up">+12%</span>
+              </div>
+              <div class="sc-mock__kpi">
+                <span class="sc-mock__kpi-label">OPD visits</span>
+                <span class="sc-mock__kpi-value">186</span>
+                <span class="sc-mock__kpi-trend sc-mock__kpi-trend--down">−4%</span>
+              </div>
+              <div class="sc-mock__kpi">
+                <span class="sc-mock__kpi-label">ICU beds free</span>
+                <span class="sc-mock__kpi-value">3</span>
+                <span class="sc-mock__kpi-trend">stable</span>
+              </div>
+              <div class="sc-mock__kpi">
+                <span class="sc-mock__kpi-label">Avg. wait</span>
+                <span class="sc-mock__kpi-value">14m</span>
+                <span class="sc-mock__kpi-trend sc-mock__kpi-trend--up">−22%</span>
+              </div>
+            </div>
+
+            <div class="sc-mock__table">
+              <div class="sc-mock__table-head">
+                <span>Patient</span><span>Ward</span><span>Status</span><span>Doctor</span>
+              </div>
+              <div class="sc-mock__row">
+                <span class="sc-mock__row-name"><span class="sc-mock__av sc-mock__av--blue">RV</span> Riya Verma</span>
+                <span>ICU-3</span>
+                <span><span class="sc-mock__pill sc-mock__pill--danger">Critical</span></span>
+                <span>Dr. Sharma</span>
+              </div>
+              <div class="sc-mock__row">
+                <span class="sc-mock__row-name"><span class="sc-mock__av sc-mock__av--green">KM</span> Karan Mehta</span>
+                <span>Gen-12</span>
+                <span><span class="sc-mock__pill sc-mock__pill--success">Stable</span></span>
+                <span>Dr. Iyer</span>
+              </div>
+              <div class="sc-mock__row">
+                <span class="sc-mock__row-name"><span class="sc-mock__av sc-mock__av--purple">AS</span> Anjali Singh</span>
+                <span>Mat-4</span>
+                <span><span class="sc-mock__pill sc-mock__pill--success">Stable</span></span>
+                <span>Dr. Rao</span>
+              </div>
+              <div class="sc-mock__row">
+                <span class="sc-mock__row-name"><span class="sc-mock__av sc-mock__av--amber">VK</span> Vivaan Kapoor</span>
+                <span>ICU-1</span>
+                <span><span class="sc-mock__pill sc-mock__pill--warning">Observation</span></span>
+                <span>Dr. Sharma</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sc-hero__trust">
+      Designed by clinicians and engineers who've actually stood at a nursing station at 2 AM.
+    </p>
+  </section>
+
+  <!-- ─── Product preview ───────────────────────────────────── -->
+  <section class="sc-section sc-preview" id="preview">
+    <div class="sc-section__head">
+      <gw-badge variant="primary" tone="soft" [dot]="true">See it in action</gw-badge>
+      <h2>Three screens, ten minutes of your team's life saved per shift.</h2>
+      <p class="sc-section__sub">
+        These are real screens from MedPilot — not Figma mockups. Every pixel ships.
+      </p>
+    </div>
+
+    <div class="sc-preview__grid">
+      <!-- OPD Queue mockup -->
+      <gw-card elevation="md" padding="none" class="sc-preview__card">
+        <div class="sc-preview__card-head">
+          <gw-badge variant="primary" tone="soft" size="sm">OPD Queue</gw-badge>
+          <span>Token board · 14 waiting</span>
+        </div>
+        <div class="sc-preview__opd">
+          <div class="sc-preview__token sc-preview__token--in">
+            <strong>14</strong><span>In progress · Dr. Sharma</span>
+          </div>
+          <div class="sc-preview__token sc-preview__token--next">
+            <strong>15</strong><span>Up next · Mrs. Reddy</span>
+          </div>
+          <div class="sc-preview__token sc-preview__token--wait">
+            <strong>16</strong><span>Waiting · 12 m</span>
+          </div>
+          <div class="sc-preview__token sc-preview__token--wait">
+            <strong>17</strong><span>Waiting · 18 m</span>
+          </div>
+          <div class="sc-preview__token sc-preview__token--wait">
+            <strong>18</strong><span>Waiting · 24 m</span>
+          </div>
+        </div>
+      </gw-card>
+
+      <!-- Handover chat mockup -->
+      <gw-card elevation="md" padding="none" class="sc-preview__card">
+        <div class="sc-preview__card-head">
+          <gw-badge variant="success" tone="soft" size="sm">Shift handover</gw-badge>
+          <span>Bed ICU-3 · Riya Verma</span>
+        </div>
+        <div class="sc-preview__chat">
+          <div class="sc-preview__msg sc-preview__msg--out">
+            <header>
+              <gw-avatar name="Anjali Sharma" size="xs" />
+              <strong>Anjali Sharma</strong> · 14:32
+            </header>
+            <div class="sc-preview__bubble sc-preview__bubble--out">
+              Stable post-op. IV Ceftriaxone Q8H. Drain 30 ml since AM.
+            </div>
+          </div>
+          <div class="sc-preview__msg sc-preview__msg--in">
+            <header>
+              <span class="sc-preview__ack"><lucide-icon name="check-circle" [size]="10" /> Acknowledged</span>
+              <strong>Shilpa Patel</strong> · 14:38
+              <gw-avatar name="Shilpa Patel" size="xs" />
+            </header>
+            <div class="sc-preview__bubble sc-preview__bubble--in">
+              Will check drain at 18:00. Escalate if &gt; 100 ml.
+            </div>
+          </div>
+        </div>
+      </gw-card>
+
+      <!-- Permissions mockup -->
+      <gw-card elevation="md" padding="none" class="sc-preview__card">
+        <div class="sc-preview__card-head">
+          <gw-badge variant="purple" tone="soft" size="sm">Permissions</gw-badge>
+          <span>Live · saved in &lt; 1 s</span>
+        </div>
+        <div class="sc-preview__perms">
+          <div class="sc-preview__perm-row sc-preview__perm-row--head">
+            <span>Module</span><span>View</span><span>Create</span><span>Edit</span><span>Approve</span>
+          </div>
+          @for (mod of ['Patients','Billing','Prescriptions','IPD','Labs']; track mod; let i = $index) {
+            <div class="sc-preview__perm-row">
+              <span>{{ mod }}</span>
+              <span class="sc-preview__check sc-preview__check--on">✓</span>
+              <span class="sc-preview__check" [class.sc-preview__check--on]="i !== 1">✓</span>
+              <span class="sc-preview__check" [class.sc-preview__check--on]="i < 3">✓</span>
+              <span class="sc-preview__check" [class.sc-preview__check--on]="i === 0">✓</span>
+            </div>
+          }
+        </div>
+      </gw-card>
+    </div>
+  </section>
+
+  <!-- ─── Problem ─────────────────────────────────────────── -->
+  <section class="sc-section sc-problem">
+    <div class="sc-section__head">
+      <gw-badge variant="danger" tone="soft" [dot]="true">The problem</gw-badge>
+      <h2>Why your current HMS is hurting your clinical staff.</h2>
+      <p class="sc-section__sub">
+        Three failures we hear in every hospital walkthrough — and the reason staff quietly
+        revert to WhatsApp and Excel.
+      </p>
+    </div>
+
+    <div class="sc-problem__grid">
+      <gw-card elevation="sm" padding="lg" class="sc-problem__card">
+        <div class="sc-problem__icon sc-problem__icon--danger">
+          <lucide-icon name="alert-triangle" [size]="22" />
+        </div>
+        <h3>Fragmented data</h3>
+        <p>
+          Patient records in Excel, billing in Tally, lab results on WhatsApp,
+          prescriptions on Word. Nothing reconciles.
+        </p>
+      </gw-card>
+
+      <gw-card elevation="sm" padding="lg" class="sc-problem__card">
+        <div class="sc-problem__icon sc-problem__icon--warning">
+          <lucide-icon name="message-square" [size]="22" />
+        </div>
+        <h3>Paper handovers</h3>
+        <p>
+          Critical clinical information passed verbally between shifts or scribbled on
+          slips. Lost at every change. Liability at every audit.
+        </p>
+      </gw-card>
+
+      <gw-card elevation="sm" padding="lg" class="sc-problem__card">
+        <div class="sc-problem__icon sc-problem__icon--info">
+          <lucide-icon name="search" [size]="22" />
+        </div>
+        <h3>No audit trail</h3>
+        <p>
+          When NABH asks who acknowledged the cardiologist's instruction at 02:14, nobody
+          can answer. Every shift handover is an audit gap.
+        </p>
+      </gw-card>
+    </div>
+  </section>
+
+  <!-- ─── Features grid ───────────────────────────────────── -->
+  <section class="sc-section sc-features" id="features">
+    <div class="sc-section__head">
+      <gw-badge variant="primary" tone="soft" [dot]="true">One platform</gw-badge>
+      <h2>Everything your clinic does, in one place.</h2>
+      <p class="sc-section__sub">
+        Sixteen modules, designed to work together. No integration projects, no
+        spreadsheets bridging the gaps.
+      </p>
+    </div>
+
+    <div class="sc-features__grid">
+      @for (f of features; track f.title) {
+        <gw-card elevation="sm" padding="md" class="sc-features__card">
+          <div class="sc-features__icon" [attr.data-group]="f.group">
+            <lucide-icon [name]="f.icon" [size]="20" />
+          </div>
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.desc }}</p>
+        </gw-card>
+      }
+    </div>
+
+    <div class="sc-features__modules">
+      <p class="sc-features__modules-label">All sixteen modules included:</p>
+      <div class="sc-features__modules-grid">
+        @for (m of modules; track m.label) {
+          <div class="sc-features__module">
+            <lucide-icon [name]="m.icon" [size]="14" />
+            <span>{{ m.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Clinical hierarchy ──────────────────────────────── -->
+  <section class="sc-section sc-hierarchy" id="hierarchy">
+    <div class="sc-section__head">
+      <gw-badge variant="info" tone="soft" [dot]="true">Differentiator</gw-badge>
+      <h2>Built for the way clinical orders actually flow.</h2>
+      <p class="sc-section__sub">
+        Most HMS tools treat the hospital as a single role. We modelled the real chain —
+        consultant instructions, RMO orders, nursing tasks, attendant duties — and made
+        every hop signed, timed, and traceable.
+      </p>
+    </div>
+
+    <div class="sc-hierarchy__chain">
+      @for (s of hierarchy; track s.role; let i = $index) {
+        <div class="sc-hierarchy__stage">
+          <div class="sc-hierarchy__node" [style.--node-accent]="s.color">
+            <span class="sc-hierarchy__role">{{ s.role }}</span>
+            <gw-avatar [name]="s.name" size="lg" />
+            <span class="sc-hierarchy__name">{{ s.name }}</span>
+          </div>
+          <div class="sc-hierarchy__msg">
+            <div class="sc-hierarchy__action">{{ s.action }}</div>
+            <div class="sc-hierarchy__detail">"{{ s.detail }}"</div>
+          </div>
+          @if (i < hierarchy.length - 1) {
+            <div class="sc-hierarchy__arrow" aria-hidden="true">
+              <lucide-icon name="arrow-right" [size]="18" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="sc-hierarchy__proof">
+      <gw-alert variant="success">
+        <strong>Every step links back to the consultant's original instruction.</strong>
+        At any point in the chain, click an attendant task and trace upward through the
+        nursing order, the RMO acknowledgement, and the consultant round — exactly the
+        audit trail NABH inspectors look for.
+      </gw-alert>
+    </div>
+  </section>
+
+  <!-- ─── Design system ───────────────────────────────────── -->
+  <section class="sc-section sc-design" id="design">
+    <div class="sc-section__head">
+      <gw-badge variant="purple" tone="soft" [dot]="true">The craft</gw-badge>
+      <h2>Software that doesn't look like a 2010 medical CD-ROM.</h2>
+      <p class="sc-section__sub">
+        We built our own component library — 150 primitives, dark mode, real keyboard
+        accessibility, Inter typography — so every screen feels like 2026.
+      </p>
+    </div>
+
+    <div class="sc-design__demo">
+      <gw-card elevation="md" padding="lg" class="sc-design__panel">
+        <header class="sc-design__panel-head">
+          <h4>Add patient</h4>
+          <gw-badge variant="neutral" tone="outline" size="sm">Form preview</gw-badge>
+        </header>
+        <div class="sc-design__fields">
+          <gw-form-field label="Full name" [required]="true">
+            <gw-input placeholder="Riya Verma" />
+          </gw-form-field>
+          <gw-form-field label="Phone" [required]="true">
+            <gw-input placeholder="+91 99999 99999" type="tel" />
+          </gw-form-field>
+          <gw-form-field label="Email">
+            <gw-input placeholder="you@clinic.com" type="email" />
+          </gw-form-field>
+        </div>
+        <footer class="sc-design__panel-foot">
+          <gw-button variant="ghost">Cancel</gw-button>
+          <gw-button variant="primary">Register patient</gw-button>
+        </footer>
+      </gw-card>
+
+      <div class="sc-design__chips">
+        <div class="sc-design__chip-row">
+          <span class="sc-design__chip-label">Status</span>
+          <gw-badge variant="success" tone="soft" [dot]="true">Admitted</gw-badge>
+          <gw-badge variant="warning" tone="soft" [dot]="true">Pending</gw-badge>
+          <gw-badge variant="danger"  tone="soft" [dot]="true">Critical</gw-badge>
+          <gw-badge variant="info"    tone="soft" [dot]="true">Reviewed</gw-badge>
+        </div>
+        <div class="sc-design__chip-row">
+          <span class="sc-design__chip-label">Buttons</span>
+          <gw-button variant="primary" size="sm">Primary</gw-button>
+          <gw-button variant="secondary" size="sm">Secondary</gw-button>
+          <gw-button variant="ghost" size="sm">Ghost</gw-button>
+          <gw-button variant="danger" size="sm">Destructive</gw-button>
+        </div>
+        <div class="sc-design__chip-row">
+          <span class="sc-design__chip-label">Avatars</span>
+          <gw-avatar name="Anjali Sharma" size="sm" status="online" />
+          <gw-avatar name="Karan Mehta"   size="sm" status="busy" />
+          <gw-avatar name="Riya Verma"    size="sm" status="away" />
+          <gw-avatar name="Vivaan Kapoor" size="sm" />
+        </div>
+      </div>
+    </div>
+
+    <div class="sc-design__principles">
+      <div class="sc-design__principle">
+        <lucide-icon name="zap" [size]="18" />
+        <div>
+          <strong>Fast</strong>
+          <span>13 px body type, 36 px controls, every render under 100 ms.</span>
+        </div>
+      </div>
+      <div class="sc-design__principle">
+        <lucide-icon name="check-circle-2" [size]="18" />
+        <div>
+          <strong>Accessible</strong>
+          <span>Real keyboard nav, focus rings, ARIA, prefers-reduced-motion.</span>
+        </div>
+      </div>
+      <div class="sc-design__principle">
+        <lucide-icon name="layout-dashboard" [size]="18" />
+        <div>
+          <strong>Consistent</strong>
+          <span>One token system, one component library, every screen.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Compliance ──────────────────────────────────────── -->
+  <section class="sc-section sc-compliance" id="compliance">
+    <div class="sc-section__head">
+      <gw-badge variant="success" tone="soft" [dot]="true">India-ready</gw-badge>
+      <h2>Compliance built in, not bolted on.</h2>
+      <p class="sc-section__sub">
+        NABH, ABDM, GST, multi-language — the things every Indian hospital needs, shipped
+        as first-class features.
+      </p>
+    </div>
+
+    <div class="sc-compliance__grid">
+      <gw-card elevation="sm" padding="lg" class="sc-compliance__card">
+        <div class="sc-compliance__head">
+          <div class="sc-compliance__icon sc-compliance__icon--success">
+            <lucide-icon name="check-circle-2" [size]="20" />
+          </div>
+          <h3>NABH compliance</h3>
+        </div>
+        <ul>
+          <li>Daily patient-safety checklist by ward</li>
+          <li>Monthly audit report, exportable as PDF</li>
+          <li>Gate-entry + bag-check log for staff</li>
+          <li>Clinical hierarchy sign-offs with timestamps</li>
+        </ul>
+      </gw-card>
+
+      <gw-card elevation="sm" padding="lg" class="sc-compliance__card">
+        <div class="sc-compliance__head">
+          <div class="sc-compliance__icon sc-compliance__icon--primary">
+            <lucide-icon name="shield-check" [size]="20" />
+          </div>
+          <h3>ABDM / ABHA</h3>
+        </div>
+        <ul>
+          <li>Patient ABHA identity creation + linking</li>
+          <li>Consent ledger with HIU/HIP flows</li>
+          <li>Care-context push to ABDM</li>
+          <li>FHIR-compliant record bundles</li>
+        </ul>
+      </gw-card>
+
+      <gw-card elevation="sm" padding="lg" class="sc-compliance__card">
+        <div class="sc-compliance__head">
+          <div class="sc-compliance__icon sc-compliance__icon--warning">
+            <lucide-icon name="indian-rupee" [size]="20" />
+          </div>
+          <h3>India-ready</h3>
+        </div>
+        <ul>
+          <li>GST-compliant invoicing, partial payments</li>
+          <li>Multi-language UI (English, हिन्दी, मराठी)</li>
+          <li>IST defaults, ₹ currency, DD-MMM-YYYY dates</li>
+          <li>Multi-branch chains with branch-scoped data</li>
+        </ul>
+      </gw-card>
+    </div>
+  </section>
+
+  <!-- ─── Final CTA ──────────────────────────────────────── -->
+  <section class="sc-cta" id="demo">
+    <div class="sc-cta__glow" aria-hidden="true"></div>
+    <div class="sc-cta__inner">
+      <h2>Ready to give your floor a tool worth using?</h2>
+      <p>
+        Walk us through your current workflows. We'll show you the equivalent in MedPilot,
+        live, with your data shape.
+      </p>
+      <div class="sc-cta__actions">
+        <gw-button variant="primary" size="lg" trailingIcon="arrow-right">
+          Book a 30-minute demo
+        </gw-button>
+        <gw-button variant="secondary" size="lg" (click)="goLogin()">
+          Try the demo workspace
+        </gw-button>
+      </div>
+      <p class="sc-cta__fine">
+        No commitment. No credit card. We bring the tool, you bring the questions.
+      </p>
+
+      <div class="sc-cta__contact">
+        <a class="sc-cta__contact-item" href="tel:+918600137191">
+          <lucide-icon name="phone" [size]="16" />
+          <span>+91 86001 37191</span>
+        </a>
+        <span class="sc-cta__contact-sep" aria-hidden="true"></span>
+        <a class="sc-cta__contact-item" href="mailto:hello&#64;gotwell.org">
+          <lucide-icon name="mail" [size]="16" />
+          <span>hello&#64;gotwell.org</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ──────────────────────────────────────────── -->
+  <footer class="sc-foot">
+    <div class="sc-foot__brand">
+      <span class="sc-nav__glyph">M</span>
+      <span>MedPilot · Modern hospital management for India.</span>
+    </div>
+    <div class="sc-foot__contact">
+      <a href="tel:+918600137191">
+        <lucide-icon name="phone" [size]="13" />
+        +91 86001 37191
+      </a>
+      <a href="mailto:hello&#64;gotwell.org">
+        <lucide-icon name="mail" [size]="13" />
+        hello&#64;gotwell.org
+      </a>
+    </div>
+    <div class="sc-foot__meta">
+      © 2026 GotWell · Crafted in India
+    </div>
+  </footer>
+</div>
