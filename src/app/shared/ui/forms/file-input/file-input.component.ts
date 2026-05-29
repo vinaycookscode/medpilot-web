@@ -29,7 +29,7 @@ export class GwFileInputComponent implements ControlValueAccessor {
   @Input() invalid = false;
   @Input() inputId: string | null = null;
   @Input() hint = 'Drag & drop or click to select';
-  @Input() icon = 'upload-cloud';
+  @Input() icon = 'cloud-upload';
   /** Max file size in MB; warn if exceeded (we don't enforce — let the form do it). */
   @Input() maxMb: number | null = null;
 

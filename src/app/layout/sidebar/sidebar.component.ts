@@ -93,7 +93,8 @@ export class SidebarComponent {
     {
       title: 'Patient Care',
       items: [
-        { label: 'Patients',      route: '/patients',      icon: 'users',          module: 'patients' },
+        { label: 'Patients',      route: '/patients',      icon: 'users',          module: 'patients',
+          roles: ['admin', 'doctor', 'consultant', 'rmo', 'nursing', 'receptionist', 'billing_staff', 'ot_staff', 'attendant'] },
         { label: 'Appointments',  route: '/appointments',  icon: 'calendar',       module: 'appointments' },
         { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'], module: 'opd' },
         { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'], module: 'ipd' },

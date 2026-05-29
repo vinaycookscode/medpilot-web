@@ -85,73 +85,83 @@
   }
 }
 
-// ── Table ──────────────────────────────────────────────────────────────────
-.inv-table {
-  &__head, &__row {
-    display: grid;
-    grid-template-columns: 110px 1.5fr 1fr 90px 120px 100px 90px 180px;
-    gap: 12px;
-    padding: 10px 16px;
-    align-items: center;
-    font-size: 12px;
+// ── Table cell helpers (used inside gw-table ng-template cells) ────────────
+.inv-cell-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inv-cell-patient {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inv-cell-secondary {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.inv-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+// ── Action chips (Accept / Collect / Report) ─────────────────────────────────
+.inv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity var(--t-fast) ease, box-shadow var(--t-fast) ease;
+  white-space: nowrap;
+  height: 22px;
+
+  &:hover  { opacity: 0.82; box-shadow: 0 1px 3px rgba(0,0,0,0.10); }
+  &:active { opacity: 1; box-shadow: none; }
+
+  &--accept {
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    border-color: rgba(37, 99, 235, 0.25);
   }
 
-  &__head {
-    background: var(--surface-input);
-    color: var(--text-tertiary);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  &--collect {
+    background: var(--color-warning-subtle);
+    color: var(--color-warning);
+    border-color: rgba(217, 119, 6, 0.25);
   }
 
-  &__row {
-    border-top: 1px solid var(--border);
-    color: var(--text-primary);
-    font-size: 13px;
-    &:hover { background: var(--surface-input); }
+  &--report {
+    background: var(--color-success-subtle);
+    color: var(--color-success);
+    border-color: rgba(22, 163, 74, 0.25);
   }
 
-  &__order-no {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-secondary);
-    font-weight: 600;
-  }
-
-  &__patient {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__doctor {
-    color: var(--text-secondary);
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__date { color: var(--text-secondary); font-size: 12px; }
-
-  &__row-actions {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    justify-content: flex-end;
-  }
-
-  @media (max-width: 1100px) {
-    &__head, &__row {
-      grid-template-columns: 100px 1.2fr 1fr 80px 1fr 90px;
-    }
-    .inv-table__date, .inv-table__doctor { display: none; }
+  &--file {
+    background: rgba(37, 99, 235, 0.06);
+    color: var(--color-primary);
+    border-color: rgba(37, 99, 235, 0.20);
+    lucide-icon { flex-shrink: 0; }
   }
 }
+
 
 // ── Modal internals ───────────────────────────────────────────────────────
 .inv-modal {
@@ -270,11 +280,18 @@
     strong { color: var(--text-primary); }
   }
 
-  &__items { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  // Scrollable wrapper so wide result tables don't clip inside the dialog
+  &__items-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  &__items { min-width: 560px; }
 
   &__items-head {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 80px 1fr;
+    grid-template-columns: 1.5fr 1fr 72px 1fr;
     gap: 8px;
     padding: 8px 12px;
     background: var(--surface-input);
@@ -283,15 +300,40 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-tertiary);
+    white-space: nowrap;
   }
 
   &__item-row {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 80px 1fr;
+    grid-template-columns: 1.5fr 1fr 72px 1fr;
     gap: 8px;
     padding: 10px 12px;
     border-top: 1px solid var(--border);
     align-items: center;
+  }
+
+  &__manual-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  &__manual-hint {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin: 0 0 8px;
+    font-style: italic;
+  }
+
+  // 5-column layout for manually-entered tests (has delete button)
+  &__items-head--manual,
+  &__item-row--manual {
+    grid-template-columns: 1.3fr 1fr 72px 1fr 34px;
   }
 
   &__test-name {
@@ -303,6 +345,196 @@
       color: var(--text-tertiary);
       font-weight: 400;
     }
+  }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+.inv-dash {
+  &__section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    lucide-icon { color: var(--color-primary); }
+  }
+}
+
+
+// ── View report (read-only) ───────────────────────────────────────────────
+.inv-report {
+  &__view-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 100px 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    align-items: center;
+    font-size: 13px;
+  }
+
+  &__abnormal { color: var(--color-danger); font-weight: 600; }
+  &__normal   { color: var(--text-tertiary); font-size: 12px; }
+  &__remarks  { color: var(--text-secondary); font-size: 12px; }
+
+  // Prominent file banner shown at top of view modal for any order with an attachment
+  &__file-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--color-primary-subtle);
+    border: 1px solid rgba(37,99,235,0.20);
+    border-radius: var(--radius-md);
+    flex-wrap: wrap;
+  }
+
+  &__file-banner-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    lucide-icon { color: var(--color-primary); flex-shrink: 0; }
+  }
+
+  &__file-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-all;
+  }
+
+  &__file-type {
+    display: block;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+  }
+
+  &__file-banner-actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  // ── chip variant for file attachment in table ──────────────
+  &__file {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--color-primary-subtle);
+    border: 1px solid rgba(37,99,235,0.15);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    lucide-icon { color: var(--color-primary); flex-shrink: 0; }
+  }
+
+  &__file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: 0;
+    &:hover { text-decoration: underline; }
+  }
+
+  &__file-dl {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding-left: 10px;
+    border-left: 1px solid rgba(37,99,235,0.2);
+    &:hover { color: var(--color-primary); }
+  }
+
+  &__upload-view {
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    &:hover { opacity: 0.8; }
+  }
+
+  &__notes-view {
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--surface-input);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  &__notes-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    margin: 0 0 6px;
+  }
+  &__empty { color: var(--text-tertiary); font-style: italic; font-size: 13px; }
+
+  &__upload-section {
+    padding: 12px;
+    background: var(--surface-input);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  &__upload-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 10px;
+    span { font-weight: 400; color: var(--text-tertiary); }
+  }
+
+  &__upload-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 8px 0;
+  }
+
+  &__upload-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--color-success-subtle);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    lucide-icon { color: var(--color-success); flex-shrink: 0; }
+    a { color: var(--color-primary); font-weight: 600; text-decoration: none;
+        &:hover { text-decoration: underline; } }
+  }
+
+  // 5-column head for view mode
+  &__items-head--view {
+    grid-template-columns: 1.4fr 1fr 1fr 100px 1fr;
   }
 }
 
@@ -341,3 +573,136 @@
 }
 
 .ml-1 { margin-left: 4px; }
+
+// ── Full-screen file viewer ───────────────────────────────────────────────
+.inv-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 700; // above --z-modal: 600
+  background: rgba(9, 9, 11, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: viewer-fade-in 160ms ease-out;
+
+  &__shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: calc(100vh - 32px);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-page);
+    flex-shrink: 0;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    lucide-icon { color: var(--color-primary); flex-shrink: 0; }
+  }
+
+  &__actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: background var(--t-fast) ease, color var(--t-fast) ease;
+
+    &--dl {
+      background: var(--surface-input);
+      color: var(--text-primary);
+      &:hover { background: var(--surface-page); }
+    }
+
+    &--close {
+      background: var(--surface-page);
+      color: var(--text-secondary);
+      &:hover { background: var(--color-danger-subtle); color: var(--color-danger); border-color: var(--color-danger); }
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow: hidden;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  &__iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  &__img-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: auto;
+  }
+
+  &__img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@keyframes viewer-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

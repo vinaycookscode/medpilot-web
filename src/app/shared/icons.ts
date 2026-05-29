@@ -41,6 +41,8 @@ import {
   Star, Quote, ChevronsRight,
   // Investigations + Pharmacy
   ScanLine, Scan, CircleDot, Inbox, Store, Upload,
+  // File viewer + file-input component
+  Download, Image, CloudUpload, File as FileIcon,
 } from 'lucide-angular';
 
 @NgModule({
@@ -74,6 +76,8 @@ import {
   Star, Quote, ChevronsRight,
   // Investigations + Pharmacy
   ScanLine, Scan, CircleDot, Inbox, Store, Upload,
+  // File viewer + file-input component icons
+  Download, Image, CloudUpload, FileIcon,
     }),
   ],
   exports: [LucideAngularModule],

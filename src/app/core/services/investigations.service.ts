@@ -82,6 +82,7 @@ export interface CreateInvestigationOrderPayload {
 
 export interface ReportPayload {
   items?: { itemId: string; result?: string; isAbnormal?: boolean; remarks?: string }[];
+  newItems?: { testName: string; result?: string; unit?: string; normalRange?: string; isAbnormal?: boolean; remarks?: string }[];
   reportFileUrl?: string;
   reportNotes?: string;
 }
@@ -102,6 +103,13 @@ export class InvestigationsService {
   private readonly base = `${environment.apiUrl}/investigations`;
 
   constructor(private http: HttpClient) {}
+
+  getStats() {
+    return this.http.get<ApiResponse<{
+      stats: { pending: number; orderedToday: number; inProgressToday: number; reportedToday: number; billedToday: number };
+      recentHistory: InvestigationOrder[];
+    }>>(`${this.base}/stats`);
+  }
 
   getOrders(params?: Record<string, string>) {
     return this.http.get<PaginatedResponse<InvestigationOrder>>(`${this.base}/orders`, { params: this.toParams(params) });
@@ -129,6 +137,14 @@ export class InvestigationsService {
 
   collectSample(id: string) {
     return this.http.patch<ApiResponse<InvestigationOrder>>(`${this.base}/orders/${id}/collect-sample`, {});
+  }
+
+  uploadReportFile(orderId: string, file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<ApiResponse<{ fileUrl: string }>>(
+      `${this.base}/orders/${orderId}/upload-report`, form,
+    );
   }
 
   submitReport(id: string, payload: ReportPayload) {
