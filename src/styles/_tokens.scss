@@ -124,24 +124,25 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --radius-xl:   #{$radius-xl};  --radius-2xl: #{$radius-2xl};
   --radius-full: #{$radius-full};
 
-  // Shadows — bumped up one stop: deeper rings + heavier drop shadows.
-  // Cards default to --shadow-md, dialogs/drawers to --shadow-xl.
-  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.06);
-  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.06),
-               0 2px 4px rgba(9, 9, 11, 0.05);
-  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.07),
+  // Shadows — restrained ring + soft glow. Heaviest tier reserved for
+  // dialogs/drawers/popovers. Day-to-day cards stay closer to a hairline.
+  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 1px 2px rgba(9, 9, 11, 0.04);
+  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 2px 4px rgba(9, 9, 11, 0.05),
+               0 4px 8px rgba(9, 9, 11, 0.04);
+  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.06),
                0 4px 8px rgba(9, 9, 11, 0.06),
-               0 8px 16px rgba(9, 9, 11, 0.06);
-  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.07),
+               0 12px 24px rgba(9, 9, 11, 0.06);
+  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.06),
                0 8px 16px rgba(9, 9, 11, 0.08),
-               0 20px 40px rgba(9, 9, 11, 0.08);
-  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.08),
-               0 12px 24px rgba(9, 9, 11, 0.10),
-               0 32px 64px rgba(9, 9, 11, 0.12);
-  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.18);
-  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.08),
-                      0 8px 20px rgba(9, 9, 11, 0.10),
-                      0 24px 48px rgba(9, 9, 11, 0.10);
+               0 24px 48px rgba(9, 9, 11, 0.10);
+  // Focus: tight 2 px ring at low opacity. Not a halo.
+  --shadow-focus: 0 0 0 2px rgba(37, 99, 235, 0.20);
+  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.07),
+                      0 4px 12px rgba(9, 9, 11, 0.08),
+                      0 12px 32px rgba(9, 9, 11, 0.08);
 
   // Typography
   --font-family: #{$font-family};
