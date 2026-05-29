@@ -458,80 +458,63 @@
                            [size]="18" />
             </header>
 
-            <!-- Timeline of all handovers for this patient -->
+            <!-- Two-party chat: handover on left, ack on right, date dividers between days. -->
             @if (historyExpanded() === g.admissionId) {
-              <div class="nh-timeline">
+              <div class="nh-chat">
                 @for (h of g.handovers; track h.id; let i = $index) {
-                  <div class="nh-timeline__event" [class.nh-timeline__event--pending]="!h.acknowledgedAt">
-                    <div class="nh-timeline__rail">
-                      <div class="nh-timeline__dot"
-                           [class.nh-timeline__dot--ack]="!!h.acknowledgedAt"
-                           [class.nh-timeline__dot--pending]="!h.acknowledgedAt"></div>
-                      @if (i < g.handovers.length - 1) { <div class="nh-timeline__line"></div> }
+
+                  @if (i === 0 || !sameDay(h.createdAt, g.handovers[i - 1].createdAt)) {
+                    <div class="nh-chat__date">
+                      <span>{{ h.createdAt | date:'EEEE, MMM d' }}</span>
                     </div>
+                  }
 
-                    <div class="nh-timeline__content">
-                      <!-- Transfer line: outgoing → incoming + timestamp -->
-                      <div class="nh-timeline__transfer">
-                        <span class="nh-history__pill">{{ h.outgoingNurse?.firstName }} {{ h.outgoingNurse?.lastName }}</span>
-                        <lucide-icon name="arrow-right" [size]="13" />
-                        <span class="nh-history__pill">{{ h.incomingNurse?.firstName }} {{ h.incomingNurse?.lastName }}</span>
-                        <span class="nh-timeline__when">{{ h.createdAt | date:'mediumDate' }} · {{ h.createdAt | date:'shortTime' }}</span>
-                        @if (h.acknowledgedAt) {
-                          <span class="nh-msg__role nh-msg__role--ack">
-                            <lucide-icon name="check-circle" [size]="11" /> Ack {{ h.acknowledgedAt | date:'shortTime' }}
-                          </span>
-                        } @else {
-                          <span class="nh-msg__role nh-msg__role--pending">Pending</span>
-                        }
+                  <!-- Outgoing handover (LEFT, neutral bubble) -->
+                  <div class="nh-chat__row nh-chat__row--out">
+                    <div class="nh-chat__msg">
+                      <header class="nh-chat__meta">
+                        <gw-avatar [name]="fullName(h.outgoingNurse)" size="xs" />
+                        <span class="nh-chat__author">{{ h.outgoingNurse?.firstName }} {{ h.outgoingNurse?.lastName }}</span>
+                        <span class="nh-chat__sep">·</span>
+                        <span class="nh-chat__time">{{ h.createdAt | date:'shortTime' }}</span>
+                        <span class="nh-chat__role">Outgoing</span>
+                      </header>
+                      <div class="nh-chat__bubble nh-chat__bubble--out">
+                        {{ h.handoverNotes }}
                       </div>
-
-                      <!-- Outgoing note bubble -->
-                      <div class="nh-msg nh-msg--out">
-                        <div class="nh-msg__avatar"
-                             [style.background]="'hsl(' + patientHue(h.outgoingNurse?.id) + ' 55% 86%)'"
-                             [style.color]="'hsl(' + patientHue(h.outgoingNurse?.id) + ' 55% 32%)'">
-                          {{ initials(h.outgoingNurse) }}
-                        </div>
-                        <div class="nh-msg__body">
-                          <div class="nh-msg__head">
-                            <strong>{{ h.outgoingNurse?.firstName }} {{ h.outgoingNurse?.lastName }}</strong>
-                            <span class="nh-msg__role">Outgoing</span>
-                          </div>
-                          <div class="nh-msg__bubble nh-msg__bubble--out">{{ h.handoverNotes }}</div>
-                        </div>
-                      </div>
-
-                      <!-- Acknowledgement reply -->
-                      @if (h.acknowledgedAt) {
-                        <div class="nh-msg nh-msg--in">
-                          <div class="nh-msg__avatar"
-                               [style.background]="'hsl(' + patientHue(h.incomingNurse?.id) + ' 55% 86%)'"
-                               [style.color]="'hsl(' + patientHue(h.incomingNurse?.id) + ' 55% 32%)'">
-                            {{ initials(h.incomingNurse) }}
-                          </div>
-                          <div class="nh-msg__body">
-                            <div class="nh-msg__head">
-                              <strong>{{ h.incomingNurse?.firstName }} {{ h.incomingNurse?.lastName }}</strong>
-                              <span class="nh-msg__role nh-msg__role--ack">
-                                <lucide-icon name="check-circle" [size]="11" /> Acknowledged
-                              </span>
-                            </div>
-                            @if (h.acknowledgedNotes) {
-                              <div class="nh-msg__bubble nh-msg__bubble--in">{{ h.acknowledgedNotes }}</div>
-                            } @else {
-                              <div class="nh-msg__no-reply">Signed off without additional notes.</div>
-                            }
-                          </div>
-                        </div>
-                      } @else {
-                        <div class="nh-thread__waiting">
-                          <lucide-icon name="clock" [size]="13" />
-                          Waiting for <strong>{{ h.incomingNurse?.firstName }} {{ h.incomingNurse?.lastName }}</strong> to acknowledge
-                        </div>
-                      }
                     </div>
                   </div>
+
+                  <!-- Acknowledgement (RIGHT, primary-tinted bubble) or pending pill -->
+                  @if (h.acknowledgedAt) {
+                    <div class="nh-chat__row nh-chat__row--in">
+                      <div class="nh-chat__msg nh-chat__msg--right">
+                        <header class="nh-chat__meta nh-chat__meta--right">
+                          <span class="nh-chat__role nh-chat__role--ack">
+                            <lucide-icon name="check-circle" [size]="11" /> Acknowledged
+                          </span>
+                          <span class="nh-chat__author">{{ h.incomingNurse?.firstName }} {{ h.incomingNurse?.lastName }}</span>
+                          <span class="nh-chat__sep">·</span>
+                          <span class="nh-chat__time">{{ h.acknowledgedAt | date:'shortTime' }}</span>
+                          <gw-avatar [name]="fullName(h.incomingNurse)" size="xs" />
+                        </header>
+                        <div class="nh-chat__bubble nh-chat__bubble--in">
+                          @if (h.acknowledgedNotes) {
+                            {{ h.acknowledgedNotes }}
+                          } @else {
+                            <span class="nh-chat__no-text">Signed off without additional notes.</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="nh-chat__row nh-chat__row--pending">
+                      <div class="nh-chat__pending">
+                        <lucide-icon name="clock" [size]="12" />
+                        Awaiting acknowledgement from <strong>{{ h.incomingNurse?.firstName }} {{ h.incomingNurse?.lastName }}</strong>
+                      </div>
+                    </div>
+                  }
                 }
               </div>
             }

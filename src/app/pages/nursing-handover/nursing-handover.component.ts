@@ -11,13 +11,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwAvatarComponent } from '../../shared/ui/display/avatar/avatar.component';
 
 type Tab = 'handover' | 'pending' | 'orders' | 'tasks' | 'history';
 
 @Component({
   selector: 'app-nursing-handover',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent, GwBadgeComponent],
+  imports: [CommonModule, FormsModule, IconsModule, DatePipe, GwButtonComponent, GwBadgeComponent, GwAvatarComponent],
   templateUrl: './nursing-handover.component.html',
   styleUrl: './nursing-handover.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -409,5 +410,15 @@ export class NursingHandoverComponent implements OnInit, OnDestroy {
     let h = 0;
     for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
     return h % 360;
+  }
+
+  fullName(p: { firstName?: string; lastName?: string } | null | undefined): string {
+    if (!p) return '';
+    return `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim();
+  }
+
+  sameDay(a?: string | Date | null, b?: string | Date | null): boolean {
+    if (!a || !b) return false;
+    return new Date(a).toDateString() === new Date(b).toDateString();
   }
 }
