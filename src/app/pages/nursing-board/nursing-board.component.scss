@@ -1,0 +1,87 @@
+.nb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+}
+
+.nb__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.nb__title { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--text-primary); }
+.nb__subtitle { color: var(--text-secondary); font-size: .82rem; margin: var(--sp-1) 0 0; }
+
+.nb__loading { display: flex; align-items: center; justify-content: center; min-height: 40vh; }
+
+.nb__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--sp-3);
+}
+
+.nb__section { display: flex; flex-direction: column; gap: var(--sp-3); }
+.nb__section-title {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-tertiary); margin: 0;
+}
+.nb__empty { color: var(--text-tertiary); font-size: .85rem; margin: 0; }
+
+/* Unassigned queue */
+.nb__queue { display: flex; flex-direction: column; gap: var(--sp-2); }
+.nb__queue-item {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
+}
+.nb__queue-info { display: flex; align-items: center; gap: var(--sp-3); }
+
+/* Roster grid */
+.nb__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-3);
+}
+.nb__card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.nb__card--inactive { opacity: .55; }
+.nb__card-head { display: flex; align-items: center; justify-content: space-between; }
+.nb__nurse { display: flex; align-items: center; gap: var(--sp-3); }
+.nb__avatar {
+  width: 38px; height: 38px; border-radius: var(--radius-full);
+  background: var(--color-primary-subtle); color: var(--color-primary);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem;
+}
+.nb__nurse-name { font-weight: 650; color: var(--text-primary); margin-bottom: 2px; }
+
+.nb__patients { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+.nb__patient {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-2);
+  border-top: 1px solid var(--border);
+}
+.nb__patient:first-child { border-top: none; }
+.nb__patient-link { color: var(--color-primary); text-decoration: none; font-weight: 600; font-size: .85rem; flex: 1; }
+.nb__patient-link:hover { text-decoration: underline; }
+.nb__meta { color: var(--text-tertiary); font-size: .75rem; }
+.nb__reassign {
+  background: none; border: none; color: var(--text-secondary); cursor: pointer;
+  padding: 4px; border-radius: var(--radius-xs); display: inline-flex;
+}
+.nb__reassign:hover { background: var(--bg-hover); color: var(--color-primary); }
+.nb__card-empty { color: var(--text-tertiary); font-size: .8rem; margin: 0; }
+
+/* Modal */
+.nb__form { display: flex; flex-direction: column; gap: var(--sp-4); }
+.nb__form-footer { display: flex; align-items: center; gap: var(--sp-2); width: 100%; }
+.nb__spacer { flex: 1; }
+
+@media (max-width: 640px) {
+  .nb__queue-item { flex-direction: column; align-items: stretch; }
+}

@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
 import { IpdService } from '../../core/services/ipd.service';
 import { AppointmentsService } from '../../core/services/appointments.service';
@@ -33,7 +34,10 @@ export class OpdComponent implements OnInit {
   private ipdSvc   = inject(IpdService);
   private apptSvc  = inject(AppointmentsService);
   private toast    = inject(ToastService);
+  private router   = inject(Router);
   readonly auth    = inject(AuthService);
+
+  goToJourney() { this.router.navigate(['/journey']); }
 
   readonly queue      = signal<Appointment[]>([]);
   readonly stats      = signal<OpdQueueStats>({ waiting: 0, inProgress: 0, completed: 0, triaged: 0 });

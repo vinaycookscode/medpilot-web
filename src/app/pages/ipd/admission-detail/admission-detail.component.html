@@ -11,11 +11,18 @@
         </p>
       </div>
     </div>
-    @if (isAdmitted()) {
-      <button class="btn btn--danger" (click)="openDischarge()">
-        <lucide-icon name="log-out" [size]="15" /> Discharge Patient
-      </button>
-    }
+    <div class="d-flex items-center gap-2">
+      @if (linkedEncounter(); as enc) {
+        <a class="btn btn--ghost btn--sm" [routerLink]="['/journey', enc.id]" title="View patient journey">
+          <lucide-icon name="route" [size]="15" /> Patient Journey
+        </a>
+      }
+      @if (isAdmitted()) {
+        <button class="btn btn--danger" (click)="openDischarge()">
+          <lucide-icon name="log-out" [size]="15" /> Discharge Patient
+        </button>
+      }
+    </div>
   </div>
 
   @if (loading()) {

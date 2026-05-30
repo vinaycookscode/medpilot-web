@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angu
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IconsModule } from '../../../shared/icons';
 import { IpdService } from '../../../core/services/ipd.service';
+import { EncountersService, PatientEncounter } from '../../../core/services/encounters.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AppMetaService } from '../../../core/services/app-meta.service';
@@ -26,6 +27,7 @@ type DetailTab = 'notes' | 'charges' | 'procedures' | 'summary';
 export class AdmissionDetailComponent implements OnInit {
   private route    = inject(ActivatedRoute);
   private ipdSvc   = inject(IpdService);
+  private encSvc   = inject(EncountersService);
   private toast    = inject(ToastService);
   readonly auth    = inject(AuthService);
   readonly appMeta = inject(AppMetaService);
@@ -38,6 +40,8 @@ export class AdmissionDetailComponent implements OnInit {
   readonly procedures = signal<IpdProcedure[]>([]);
   readonly loading    = signal(true);
   readonly tab        = signal<DetailTab>('notes');
+  /** Originating patient-journey encounter, if this admission came from one. */
+  readonly linkedEncounter = signal<PatientEncounter | null>(null);
 
   // Note form
   readonly noteModal  = signal(false);
@@ -106,19 +110,32 @@ export class AdmissionDetailComponent implements OnInit {
       procedures: this.ipdSvc.getProcedures(id),
     }).subscribe({
       next: ({ admission, notes, charges, procedures }) => {
-        this.admission.set((admission as any).data);
+        const adm = (admission as any).data;
+        this.admission.set(adm);
         this.notes.set((notes as any).data ?? []);
         const cd = (charges as any).data ?? {};
         this.charges.set(cd.charges ?? []);
         this.chargeTotal.set(cd.total ?? 0);
         this.procedures.set((procedures as any).data ?? []);
         this.loading.set(false);
+        this.resolveJourney(adm);
       },
       error: () => this.loading.set(false),
     });
   }
 
   reload() { const id = this.admission()?.id; if (id) this.loadAll(id); }
+
+  /** Find the patient-journey encounter that produced this admission (best-effort). */
+  private resolveJourney(adm: IpdAdmission | null) {
+    this.linkedEncounter.set(null);
+    const patientId = adm?.patient?.id ?? (adm as any)?.patientId;
+    if (!patientId || !adm?.id) return;
+    this.encSvc.getForPatient(patientId).subscribe({
+      next: (r) => this.linkedEncounter.set((r.data ?? []).find(e => e.admissionId === adm.id) ?? null),
+      error: () => {},
+    });
+  }
 
   // ─── Notes ───────────────────────────────────────────────────────────────
 

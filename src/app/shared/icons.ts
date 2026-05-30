@@ -43,6 +43,8 @@ import {
   ScanLine, Scan, CircleDot, Inbox, Store, Upload,
   // File viewer + file-input component
   Download, Image, CloudUpload, File as FileIcon,
+  // Patient Journey
+  Route,
 } from 'lucide-angular';
 
 @NgModule({
@@ -78,6 +80,8 @@ import {
   ScanLine, Scan, CircleDot, Inbox, Store, Upload,
   // File viewer + file-input component icons
   Download, Image, CloudUpload, FileIcon,
+  // Patient Journey
+  Route,
     }),
   ],
   exports: [LucideAngularModule],

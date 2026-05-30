@@ -1,0 +1,105 @@
+<div class="nb">
+  <header class="nb__head">
+    <div>
+      <h1 class="nb__title">Nursing Board</h1>
+      <p class="nb__subtitle">Nurse roster, current patient loads, and who's free to take the next patient.</p>
+    </div>
+    <gw-button variant="secondary" size="sm" leadingIcon="refresh-cw" (click)="load()">Refresh</gw-button>
+  </header>
+
+  @if (loading()) {
+    <div class="nb__loading"><gw-spinner size="lg" /></div>
+  } @else if (board(); as b) {
+    <!-- Summary -->
+    <div class="nb__stats">
+      <gw-stat-card label="Nurses on roster" [value]="b.summary.totalNurses" icon="users" />
+      <gw-stat-card label="Available now" [value]="b.summary.availableNurses" icon="user-check" />
+      <gw-stat-card label="Awaiting assignment" [value]="b.summary.unassignedCount" icon="inbox" />
+      <gw-stat-card label="Patients in care" [value]="b.summary.assignedPatients" icon="bed" />
+    </div>
+
+    <!-- Awaiting assignment -->
+    <section class="nb__section">
+      <h2 class="nb__section-title">
+        Awaiting assignment
+        @if (b.unassigned.length) { <gw-badge variant="warning" size="sm">{{ b.unassigned.length }}</gw-badge> }
+      </h2>
+      @if (b.unassigned.length) {
+        <div class="nb__queue">
+          @for (u of b.unassigned; track u.encounterId) {
+            <div class="nb__queue-item">
+              <div class="nb__queue-info">
+                <a class="nb__patient-link" [routerLink]="['/journey', u.encounterId]">{{ u.patientName }}</a>
+                <span class="nb__meta">{{ u.encounterNumber }}</span>
+                <gw-badge [variant]="urgencyVariant(u.urgency)" tone="soft" size="sm">{{ u.urgency }}</gw-badge>
+              </div>
+              <gw-button variant="primary" size="sm" leadingIcon="user-check" (click)="openAssign(u)">Assign nurse</gw-button>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="nb__empty">No patients waiting for a nurse.</p>
+      }
+    </section>
+
+    <!-- Nurse roster -->
+    <section class="nb__section">
+      <h2 class="nb__section-title">Nurse roster</h2>
+      @if (b.nurses.length) {
+        <div class="nb__grid">
+          @for (n of b.nurses; track n.id) {
+            <div class="nb__card" [class.nb__card--inactive]="!n.isActive">
+              <div class="nb__card-head">
+                <div class="nb__nurse">
+                  <div class="nb__avatar">{{ n.firstName[0] }}{{ n.lastName[0] }}</div>
+                  <div>
+                    <div class="nb__nurse-name">{{ n.firstName }} {{ n.lastName }}</div>
+                    <gw-badge [variant]="availabilityVariant(n)" tone="soft" size="sm">{{ availabilityLabel(n) }}</gw-badge>
+                  </div>
+                </div>
+              </div>
+
+              @if (n.patients.length) {
+                <ul class="nb__patients">
+                  @for (p of n.patients; track p.encounterId) {
+                    <li class="nb__patient">
+                      <a class="nb__patient-link" [routerLink]="['/journey', p.encounterId]">{{ p.patientName }}</a>
+                      <gw-badge [variant]="stageVariant(p.stage)" tone="soft" size="sm">{{ stageLabels[p.stage] }}</gw-badge>
+                      <button class="nb__reassign" title="Reassign to another nurse" (click)="openReassign(n, p)">
+                        <lucide-icon name="refresh-cw" [size]="13" />
+                      </button>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="nb__card-empty">No patients — free to take the next one.</p>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <gw-empty-state icon="users" title="No nurses" description="No nursing staff found for this clinic." />
+      }
+    </section>
+  }
+</div>
+
+<!-- Assign / Reassign modal -->
+<gw-dialog [open]="modalOpen()" (openChange)="modalOpen.set($event)" size="md"
+           [title]="mode() === 'assign' ? 'Assign nurse' : 'Reassign nurse'"
+           [description]="targetLabel()">
+  <div class="nb__form">
+    <gw-form-field label="Nurse" [required]="true" hint="Counts show current load — pick the lightest.">
+      <gw-select [options]="nurseOptions()" placeholder="Select nurse"
+                 [(ngModel)]="form.nurseId" [ngModelOptions]="{ standalone: true }" />
+    </gw-form-field>
+    <gw-form-field label="Handover notes">
+      <gw-textarea [(ngModel)]="form.handoverNotes" [ngModelOptions]="{ standalone: true }" placeholder="Optional notes for the nurse…" />
+    </gw-form-field>
+  </div>
+  <div gw-dialog-footer class="nb__form-footer">
+    <span class="nb__spacer"></span>
+    <gw-button variant="secondary" (click)="modalOpen.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="busy()" (click)="submit()">{{ mode() === 'assign' ? 'Assign' : 'Reassign' }}</gw-button>
+  </div>
+</gw-dialog>

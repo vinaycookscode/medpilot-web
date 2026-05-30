@@ -1,4 +1,4 @@
-export type UserRole = 'super_admin' | 'admin' | 'doctor' | 'receptionist' | 'consultant' | 'rmo' | 'nursing' | 'attendant' | 'ot_staff' | 'lab_tech' | 'radiology_tech' | 'pharmacist' | 'billing_staff' | 'security';
+export type UserRole = 'super_admin' | 'admin' | 'doctor' | 'receptionist' | 'consultant' | 'rmo' | 'nursing' | 'matron' | 'attendant' | 'ot_staff' | 'lab_tech' | 'radiology_tech' | 'pharmacist' | 'billing_staff' | 'security';
 
 export interface LoginRequest {
   email: string;

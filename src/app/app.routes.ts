@@ -130,6 +130,24 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/insurance/insurance.component').then(m => m.InsuranceComponent),
       },
       {
+        path: 'journey',
+        canActivate: [permissionGuard],
+        data: { module: 'encounters' },
+        loadComponent: () => import('./pages/journey/journey.component').then(m => m.JourneyComponent),
+      },
+      {
+        path: 'journey/:id',
+        canActivate: [permissionGuard],
+        data: { module: 'encounters' },
+        loadComponent: () => import('./pages/journey/journey-detail.component').then(m => m.JourneyDetailComponent),
+      },
+      {
+        path: 'nursing/board',
+        canActivate: [permissionGuard],
+        data: { module: 'encounters' },
+        loadComponent: () => import('./pages/nursing-board/nursing-board.component').then(m => m.NursingBoardComponent),
+      },
+      {
         path: 'opd',
         canActivate: [permissionGuard],
         data: { module: 'opd' },
