@@ -112,6 +112,18 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/labs/labs.component').then(m => m.LabsComponent),
       },
       {
+        path: 'investigations',
+        canActivate: [permissionGuard],
+        data: { module: 'investigations' },
+        loadComponent: () => import('./pages/investigations/investigations.component').then(m => m.InvestigationsComponent),
+      },
+      {
+        path: 'pharmacy',
+        canActivate: [permissionGuard],
+        data: { module: 'pharmacy' },
+        loadComponent: () => import('./pages/pharmacy/pharmacy.component').then(m => m.PharmacyComponent),
+      },
+      {
         path: 'insurance',
         canActivate: [permissionGuard],
         data: { module: 'insurance' },

@@ -93,7 +93,8 @@ export class SidebarComponent {
     {
       title: 'Patient Care',
       items: [
-        { label: 'Patients',      route: '/patients',      icon: 'users',          module: 'patients' },
+        { label: 'Patients',      route: '/patients',      icon: 'users',          module: 'patients',
+          roles: ['admin', 'doctor', 'consultant', 'rmo', 'nursing', 'receptionist', 'billing_staff', 'ot_staff', 'attendant'] },
         { label: 'Appointments',  route: '/appointments',  icon: 'calendar',       module: 'appointments' },
         { label: 'OPD Queue',     route: '/opd',           icon: 'clipboard-list', roles: ['admin', 'receptionist', 'doctor'], module: 'opd' },
         { label: 'IPD',           route: '/ipd',           icon: 'bed',            roles: ['admin', 'doctor'], module: 'ipd' },
@@ -107,8 +108,9 @@ export class SidebarComponent {
     {
       title: 'Clinical',
       items: [
-        { label: 'Prescriptions', route: '/prescriptions', icon: 'file-text',     roles: ['admin', 'doctor'], module: 'prescriptions' },
-        { label: 'Labs',          route: '/labs',           icon: 'flask-conical', roles: ['admin', 'doctor'], module: 'labs' },
+        { label: 'Prescriptions',   route: '/prescriptions',   icon: 'file-text',     roles: ['admin', 'doctor', 'consultant', 'rmo'], module: 'prescriptions' },
+        { label: 'Investigations', route: '/investigations',  icon: 'scan-line',     roles: ['admin', 'doctor', 'consultant', 'rmo', 'lab_tech', 'radiology_tech', 'billing_staff'], module: 'investigations' },
+        { label: 'Pharmacy',       route: '/pharmacy',        icon: 'pill',          roles: ['admin', 'pharmacist', 'billing_staff', 'nursing', 'doctor', 'consultant', 'rmo'], module: 'pharmacy' },
       ],
     },
     {

@@ -1,0 +1,621 @@
+<div class="inv-page">
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <header class="inv-page__header">
+    <div class="inv-page__title">
+      <lucide-icon name="scan-line" [size]="20" />
+      <h1>Investigations</h1>
+    </div>
+    <div class="inv-page__actions">
+      @if (isDeptUser()) {
+        <gw-button [variant]="viewMode() === 'dashboard' ? 'primary' : 'secondary'" size="sm" leadingIcon="layout-dashboard"
+          (click)="switchView('dashboard')">Dashboard</gw-button>
+        <gw-button [variant]="viewMode() === 'orders' ? 'primary' : 'secondary'" size="sm" leadingIcon="clipboard-list"
+          (click)="switchView('orders')">
+          Orders
+          @if (pendingQueueCount()) {
+            <gw-badge variant="warning" size="sm" class="ml-1">{{ pendingQueueCount() }}</gw-badge>
+          }
+        </gw-button>
+      }
+      <!-- Only ordering users (doctor/RMO/consultant/admin) can place orders -->
+      @if (isOrderingUser()) {
+        <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openCreateModal()">
+          Order investigation
+        </gw-button>
+      }
+      @if (isBillingUser() && pendingBillingCount()) {
+        <gw-badge variant="warning" [dot]="true">{{ pendingBillingCount() }} pending billing</gw-badge>
+      }
+    </div>
+  </header>
+
+  <!-- ── Department tabs (role-scoped) ─────────────────────── -->
+  <div class="inv-page__tabs">
+    @for (dept of visibleDepts(); track dept) {
+      <button class="inv-tab" [class.inv-tab--active]="activeTab() === dept"
+        (click)="switchTab(dept)">
+        <lucide-icon [name]="deptIcons[dept]" [size]="15" />
+        {{ deptLabels[dept] }}
+      </button>
+    }
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  DASHBOARD view (dept users default)                     -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  @if (viewMode() === 'dashboard') {
+    @if (dashLoading()) {
+      <div class="inv-page__loading"><gw-spinner size="md" /></div>
+    } @else {
+      <!-- Stats strip -->
+      <div class="inv-page__stats">
+        <gw-stat-card label="Pending queue"   [value]="dashStats()?.pending ?? 0"       icon="inbox" />
+        <gw-stat-card label="Ordered today"   [value]="dashStats()?.orderedToday ?? 0"  icon="clipboard-list" />
+        <gw-stat-card label="Reported today"  [value]="dashStats()?.reportedToday ?? 0" icon="check-circle-2" />
+        <gw-stat-card label="Billed today"    [value]="dashStats()?.billedToday ?? 0"   icon="indian-rupee" />
+      </div>
+
+      <!-- Pending queue section -->
+      @if (pendingQueueCount()) {
+        <div class="inv-dash__section-title">
+          <lucide-icon name="inbox" [size]="15" />
+          Pending queue — {{ pendingQueueCount() }} order{{ pendingQueueCount() !== 1 ? 's' : '' }} need action
+        </div>
+        <gw-button variant="secondary" size="sm" (click)="switchView('orders')">
+          View all pending orders →
+        </gw-button>
+      }
+
+      <!-- Recent history -->
+      <div class="inv-dash__section-title" style="margin-top:28px">
+        <lucide-icon name="history" [size]="15" />
+        Recent completed reports
+      </div>
+
+      <gw-table [columns]="historyColumns" [data]="dashHistory()" [loading]="dashLoading()"
+        emptyText="No completed reports yet">
+
+        <ng-template gwCell="patient" let-row>
+          <span class="inv-cell-patient">
+            <gw-avatar [name]="fullName(row.patient)" size="xs" />
+            {{ fullName(row.patient) }}
+          </span>
+        </ng-template>
+
+        <ng-template gwCell="department" let-row>
+          <gw-badge variant="primary" tone="soft" size="sm">{{ deptLabel(row.departmentType) }}</gw-badge>
+        </ng-template>
+
+        <ng-template gwCell="orderedBy" let-row>
+          <span class="inv-cell-secondary">{{ fullName(row.orderedBy) }}</span>
+        </ng-template>
+
+        <ng-template gwCell="reportedAt" let-row>
+          <span class="inv-cell-secondary">{{ row.reportedAt ? (row.reportedAt | date:'dd MMM, HH:mm') : '—' }}</span>
+        </ng-template>
+
+        <ng-template gwCell="status" let-row>
+          <gw-badge [variant]="statusVariant(row.status)" tone="soft" size="sm">{{ titleCase(row.status) }}</gw-badge>
+        </ng-template>
+
+        <ng-template gwCell="viewAction" let-row>
+          <div class="inv-actions">
+            @if (row.reportFileUrl) {
+              <button class="inv-chip inv-chip--file" type="button"
+                (click)="openFileViewer(row.reportFileUrl, row.reportFileUrl?.split('/')?.pop())">
+                <lucide-icon name="file-text" [size]="12" />File
+              </button>
+            }
+            <gw-button variant="ghost" size="sm" leadingIcon="eye" (click)="openViewModal(row)">View</gw-button>
+          </div>
+        </ng-template>
+      </gw-table>
+    }
+  }
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  ORDERS view                                             -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  @if (viewMode() === 'orders') {
+    <!-- Stats strip -->
+    <div class="inv-page__stats">
+      <gw-stat-card label="Ordered" [value]="count('ordered')" icon="clipboard-list" />
+      <gw-stat-card label="In progress" [value]="count('in_progress') + count('sample_collected')" icon="activity" />
+      <gw-stat-card label="Reported" [value]="count('reported')" icon="check-circle-2" />
+      <gw-stat-card label="Pending billing" [value]="pendingBillingCount()" icon="indian-rupee" />
+    </div>
+
+    <gw-table [columns]="orderColumns" [data]="orders()" [loading]="loading()"
+      [emptyText]="'No ' + deptLabels[activeTab()] + ' orders found'">
+
+      <ng-template gwCell="orderNumber" let-row>
+        <span class="inv-cell-mono">{{ row.orderNumber }}</span>
+      </ng-template>
+
+      <ng-template gwCell="patient" let-row>
+        <span class="inv-cell-patient">
+          <gw-avatar [name]="fullName(row.patient)" size="xs" />
+          {{ fullName(row.patient) }}
+        </span>
+      </ng-template>
+
+      <ng-template gwCell="orderedBy" let-row>
+        <span class="inv-cell-secondary">{{ fullName(row.orderedBy) }}</span>
+      </ng-template>
+
+      <ng-template gwCell="urgency" let-row>
+        <gw-badge [variant]="urgencyVariant(row.urgency)" tone="soft" size="sm">
+          {{ titleCase(row.urgency) }}
+        </gw-badge>
+      </ng-template>
+
+      <ng-template gwCell="expectedAt" let-row>
+        <span class="inv-cell-secondary">
+          {{ row.expectedReportAt ? (row.expectedReportAt | date:'dd MMM, HH:mm') : '—' }}
+        </span>
+      </ng-template>
+
+      <ng-template gwCell="status" let-row>
+        <gw-badge [variant]="statusVariant(row.status)" tone="soft" size="sm">
+          {{ titleCase(row.status) }}
+        </gw-badge>
+      </ng-template>
+
+      <ng-template gwCell="billing" let-row>
+        <gw-badge [variant]="row.billingStatus === 'cleared' ? 'success' : 'neutral'" tone="soft" size="sm">
+          {{ titleCase(row.billingStatus) }}
+        </gw-badge>
+      </ng-template>
+
+      <ng-template gwCell="actions" let-row>
+        <div class="inv-actions">
+          <!-- Dept user: status transition chips -->
+          @if (isDeptUser()) {
+            @if (canAccept(row)) {
+              <button class="inv-chip inv-chip--accept" type="button" (click)="acceptOrder(row)">
+                <lucide-icon name="check" [size]="12" />Accept
+              </button>
+            }
+            @if (canCollect(row)) {
+              <button class="inv-chip inv-chip--collect" type="button" (click)="collectSample(row)">
+                <lucide-icon name="flask-conical" [size]="12" />Collect
+              </button>
+            }
+            @if (canReport(row)) {
+              <button class="inv-chip inv-chip--report" type="button" (click)="openReportModal(row)">
+                <lucide-icon name="upload" [size]="12" />Report
+              </button>
+            }
+          }
+
+          <!-- File attachment chip — visible to ALL roles when a file is attached -->
+          @if (row.reportFileUrl) {
+            <button class="inv-chip inv-chip--file" type="button"
+              (click)="openFileViewer(row.reportFileUrl, row.reportFileUrl?.split('/')?.pop())">
+              <lucide-icon name="file-text" [size]="12" />File
+            </button>
+          }
+
+          <!-- View results (text/pathology) -->
+          @if (isReported(row)) {
+            <gw-button variant="ghost" size="sm" leadingIcon="eye" (click)="openViewModal(row)">View</gw-button>
+          }
+
+          <!-- Billing clearance -->
+          @if (isBillingUser() && canBill(row)) {
+            <gw-button variant="secondary" size="sm" leadingIcon="indian-rupee" (click)="openBillingModal(row)">
+              Clear billing
+            </gw-button>
+          }
+
+          @if (canCancel(row)) {
+            <gw-icon-button icon="x" ariaLabel="Cancel order" variant="ghost" size="sm" (click)="cancelOrder(row)" />
+          }
+        </div>
+      </ng-template>
+
+    </gw-table>
+  }
+
+  <!-- ── Modal: Create Order ───────────────────────────────── -->
+  <gw-dialog [open]="showCreateModal()" size="lg"
+    [title]="'Order ' + deptLabels[activeTab()] + ' Investigation'"
+    (closed)="showCreateModal.set(false)">
+
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <gw-form-field label="Patient" [required]="true" style="position:relative; margin-bottom:16px">
+        @if (!selectedPatient()) {
+          <gw-input placeholder="Search by name or phone…"
+            [(ngModel)]="patientSearch" [ngModelOptions]="{standalone:true}"
+            (ngModelChange)="onPatientSearch($event)" />
+          @if (patientResults().length) {
+            <div class="inv-modal__dropdown">
+              @for (p of patientResults(); track p.id) {
+                <button type="button" class="inv-modal__dropdown-item" (click)="selectPatient(p)">
+                  <gw-avatar [name]="p.firstName + ' ' + p.lastName" size="xs" />
+                  {{ p.firstName }} {{ p.lastName }}
+                  <span class="inv-modal__dropdown-sub">{{ p.phone }}</span>
+                </button>
+              }
+            </div>
+          }
+        } @else {
+          <div class="inv-modal__patient-chip">
+            <gw-avatar [name]="fullName(selectedPatient())" size="sm" />
+            <span>{{ fullName(selectedPatient()) }}</span>
+            <gw-icon-button icon="x" ariaLabel="Clear" variant="ghost" size="sm" (click)="clearPatient()" />
+          </div>
+        }
+      </gw-form-field>
+
+      <div class="inv-modal__row">
+        <gw-form-field label="Clinical indication" [required]="true" class="inv-modal__grow">
+          <gw-textarea formControlName="clinicalIndication" placeholder="Reason for investigation…" [rows]="2" />
+        </gw-form-field>
+        <gw-form-field label="Urgency">
+          <gw-select formControlName="urgency" [options]="urgencyOptions" />
+        </gw-form-field>
+      </div>
+
+      <gw-form-field label="Expected report by">
+        <gw-datetime-input formControlName="expectedReportAt" />
+      </gw-form-field>
+
+      @if (activeTab() === 'pathology' && catalog().length) {
+        <div class="inv-modal__tests">
+          <p class="inv-modal__tests-label">Tests to be ordered ({{ catalog().length }})</p>
+          <div class="inv-modal__tests-grid">
+            @for (item of catalog(); track item.id) {
+              <div class="inv-modal__test-chip">
+                <lucide-icon name="flask-conical" [size]="13" />
+                {{ item.name }}
+                <span class="inv-modal__test-price">₹{{ item.defaultAmount | number }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'cathlab') {
+        <gw-form-field label="Procedure type">
+          <gw-input formControlName="procedureType" placeholder="e.g. Angiography, Angioplasty" />
+        </gw-form-field>
+      }
+
+      <div class="inv-modal__footer">
+        <gw-button variant="ghost" type="button" (click)="showCreateModal.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" type="submit" [loading]="saving()">Place order</gw-button>
+      </div>
+    </form>
+  </gw-dialog>
+
+  <!-- ── Modal: Enter Report ───────────────────────────────── -->
+  <gw-dialog [open]="showReportModal()" size="lg"
+    [title]="'Enter Report — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showReportModal.set(false)">
+
+    @if (reportLoading()) {
+      <div class="inv-page__loading"><gw-spinner size="md" /></div>
+    } @else if (selectedOrder(); as order) {
+      <div class="inv-report">
+        <div class="inv-report__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          <span><strong>Ordered by:</strong> {{ fullName(order.orderedBy) }}</span>
+          <span><strong>Indication:</strong> {{ order.clinicalIndication }}</span>
+        </div>
+
+        <!-- Pathology: per-item result entry -->
+        @if (!isImaging(order)) {
+          @if (order.items?.length) {
+            <div class="inv-report__items-wrap">
+              <div class="inv-report__items">
+                <div class="inv-report__items-head">
+                  <span>Test</span><span>Result</span><span>Abnormal?</span><span>Remarks</span>
+                </div>
+                @for (item of order.items; track item.id) {
+                  <div class="inv-report__item-row">
+                    <span class="inv-report__test-name">
+                      {{ item.testName }}
+                      @if (item.normalRange) {
+                        <small>Normal: {{ item.normalRange }}{{ item.unit ? ' ' + item.unit : '' }}</small>
+                      }
+                    </span>
+                    <gw-input size="sm" placeholder="Result"
+                      [ngModel]="editedItems()[item.id]?.result ?? ''"
+                      [ngModelOptions]="{standalone:true}"
+                      (ngModelChange)="setItemField(item.id, 'result', $event)" />
+                    <gw-toggle
+                      [ngModel]="editedItems()[item.id]?.isAbnormal ?? false"
+                      [ngModelOptions]="{standalone:true}"
+                      (ngModelChange)="setItemField(item.id, 'isAbnormal', $event)" />
+                    <gw-input size="sm" placeholder="Remarks"
+                      [ngModel]="editedItems()[item.id]?.remarks ?? ''"
+                      [ngModelOptions]="{standalone:true}"
+                      (ngModelChange)="setItemField(item.id, 'remarks', $event)" />
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="inv-report__manual-header">
+              <span>Enter test results manually</span>
+              <gw-button variant="secondary" size="sm" leadingIcon="plus" (click)="addManualItem()">
+                Add test
+              </gw-button>
+            </div>
+            @if (!manualItems().length) {
+              <p class="inv-report__manual-hint">
+                Click "Add test" to enter each test result below.
+              </p>
+            }
+            @if (manualItems().length) {
+              <div class="inv-report__items-wrap">
+                <div class="inv-report__items">
+                  <div class="inv-report__items-head inv-report__items-head--manual">
+                    <span>Test name</span><span>Result</span><span>Abnormal?</span><span>Remarks</span><span></span>
+                  </div>
+                  @for (item of manualItems(); track $index; let i = $index) {
+                    <div class="inv-report__item-row inv-report__item-row--manual">
+                      <gw-input size="sm" placeholder="e.g. Haemoglobin"
+                        [ngModel]="item.testName" [ngModelOptions]="{standalone:true}"
+                        (ngModelChange)="updateManualItem(i, 'testName', $event)" />
+                      <gw-input size="sm" placeholder="Value"
+                        [ngModel]="item.result" [ngModelOptions]="{standalone:true}"
+                        (ngModelChange)="updateManualItem(i, 'result', $event)" />
+                      <gw-toggle
+                        [ngModel]="item.isAbnormal" [ngModelOptions]="{standalone:true}"
+                        (ngModelChange)="updateManualItem(i, 'isAbnormal', $event)" />
+                      <gw-input size="sm" placeholder="Remarks"
+                        [ngModel]="item.remarks" [ngModelOptions]="{standalone:true}"
+                        (ngModelChange)="updateManualItem(i, 'remarks', $event)" />
+                      <gw-icon-button icon="trash-2" ariaLabel="Remove" variant="ghost" size="sm"
+                        (click)="removeManualItem(i)" />
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+        }
+
+        <!-- Imaging: notes only (file uploaded via upload button above) -->
+        @if (isImaging(order)) {
+          <gw-form-field label="Report notes / findings">
+            <gw-textarea
+              [ngModel]="reportNotes()"
+              [ngModelOptions]="{standalone:true}"
+              (ngModelChange)="reportNotes.set($event)"
+              placeholder="Radiologist findings, impressions, recommendations…"
+              [rows]="4" />
+          </gw-form-field>
+        }
+
+        <!-- File upload — available for ALL order types (scan/attach report PDF or image) -->
+        <div class="inv-report__upload-section">
+          <p class="inv-report__upload-label">
+            Attach report file <span>(PDF or image, max 20 MB — optional)</span>
+          </p>
+          <gw-file-input accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp"
+            [ngModel]="null" [ngModelOptions]="{standalone:true}"
+            (ngModelChange)="onReportFileSelected($event)" />
+
+          @if (uploadProgress()) {
+            <div class="inv-report__upload-status">
+              <gw-spinner size="sm" />
+              <span>Uploading…</span>
+            </div>
+          }
+          @if (reportFileUrl() && !uploadProgress()) {
+            <div class="inv-report__upload-done">
+              <lucide-icon name="check-circle-2" [size]="16" />
+              <span>Uploaded</span>
+              <button type="button" class="inv-report__upload-view"
+                (click)="openFileViewer(reportFileUrl(), uploadedFile()?.name)">
+                View file
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="inv-modal__footer">
+        <gw-button variant="ghost" (click)="showReportModal.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" (click)="submitReport()">Submit report</gw-button>
+      </div>
+    }
+  </gw-dialog>
+
+  <!-- ── Modal: View Report (read-only) ───────────────────── -->
+  <gw-dialog [open]="showViewModal()" size="lg"
+    [title]="'Report — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showViewModal.set(false)">
+
+    @if (reportLoading()) {
+      <div class="inv-page__loading"><gw-spinner size="md" /></div>
+    } @else if (selectedOrder(); as order) {
+      <div class="inv-report">
+        <div class="inv-report__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          <span><strong>Dept:</strong> {{ deptLabels[order.departmentType] }}</span>
+          <span><strong>Indication:</strong> {{ order.clinicalIndication }}</span>
+          @if (order.reportedBy) {
+            <span><strong>Reported by:</strong> {{ fullName(order.reportedBy) }}</span>
+          }
+          @if (order.reportedAt) {
+            <span><strong>Reported at:</strong> {{ order.reportedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+          }
+        </div>
+
+        <!-- Attached file — shown prominently for ALL order types that have one -->
+        @if (order.reportFileUrl) {
+          <div class="inv-report__file-banner">
+            <div class="inv-report__file-banner-left">
+              <lucide-icon name="file-text" [size]="20" />
+              <div>
+                <span class="inv-report__file-name">{{ order.reportFileUrl.split('/').pop() }}</span>
+                <span class="inv-report__file-type">
+                  {{ isPdf(order.reportFileUrl) ? 'PDF document' : 'Image file' }}
+                </span>
+              </div>
+            </div>
+            <div class="inv-report__file-banner-actions">
+              <button type="button" class="inv-viewer__btn inv-viewer__btn--dl"
+                (click)="openFileViewer(order.reportFileUrl, order.reportFileUrl.split('/').pop())">
+                <lucide-icon name="eye" [size]="15" />
+                Open full view
+              </button>
+              <a [href]="fileUrl(order.reportFileUrl ?? '')" download
+                class="inv-viewer__btn inv-viewer__btn--dl">
+                <lucide-icon name="download" [size]="15" />
+                Download
+              </a>
+            </div>
+          </div>
+        }
+
+        <!-- Pathology results -->
+        @if (!isImaging(order) && order.items?.length) {
+          <div class="inv-report__items">
+            <div class="inv-report__items-head inv-report__items-head--view">
+              <span>Test</span><span>Result</span><span>Normal range</span><span>Abnormal</span><span>Remarks</span>
+            </div>
+            @for (item of order.items; track item.id) {
+              <div class="inv-report__view-row">
+                <span class="inv-report__test-name">{{ item.testName }}</span>
+                <span [class.inv-report__abnormal]="item.isAbnormal">
+                  {{ item.result || '—' }}
+                  @if (item.unit) { <small>{{ item.unit }}</small> }
+                </span>
+                <span class="inv-report__normal">{{ item.normalRange || '—' }}</span>
+                <span>
+                  @if (item.isAbnormal) {
+                    <gw-badge variant="danger" tone="soft" size="sm">Abnormal</gw-badge>
+                  } @else {
+                    <gw-badge variant="success" tone="soft" size="sm">Normal</gw-badge>
+                  }
+                </span>
+                <span class="inv-report__remarks">{{ item.remarks || '—' }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Imaging notes (file is shown in the banner above) -->
+        @if (order.reportNotes) {
+          <div class="inv-report__notes-view">
+            <p class="inv-report__notes-label">Findings / Notes</p>
+            <p>{{ order.reportNotes }}</p>
+          </div>
+        }
+
+        @if (!order.reportFileUrl && !order.reportNotes && !order.items?.length) {
+          <p class="inv-report__empty">No report content available yet.</p>
+        }
+      </div>
+
+      <div class="inv-modal__footer">
+        <gw-button variant="ghost" (click)="showViewModal.set(false)">Close</gw-button>
+      </div>
+    }
+  </gw-dialog>
+
+  <!-- ── Modal: Billing Clearance ─────────────────────────── -->
+  <gw-dialog [open]="showBillingModal()" size="md"
+    [title]="'Billing Clearance — ' + (selectedOrder()?.orderNumber ?? '')"
+    (closed)="showBillingModal.set(false)">
+    @if (selectedOrder(); as order) {
+      <form [formGroup]="billingForm" (ngSubmit)="submitBillingClearance()">
+        <div class="inv-billing__meta">
+          <span><strong>Patient:</strong> {{ fullName(order.patient) }}</span>
+          <span><strong>Dept:</strong> {{ deptLabels[order.departmentType] }}</span>
+        </div>
+
+        <gw-form-field label="Total investigation amount" [required]="true">
+          <gw-currency-input formControlName="totalAmount" />
+        </gw-form-field>
+
+        <div class="inv-billing__split">
+          <gw-form-field label="Hospital payable">
+            <gw-currency-input formControlName="hospitalPayable" />
+          </gw-form-field>
+          <gw-form-field label="Customer payable">
+            <gw-currency-input formControlName="customerPayable" />
+          </gw-form-field>
+          <gw-form-field label="Insurance payable">
+            <gw-currency-input formControlName="insurancePayable" />
+          </gw-form-field>
+        </div>
+
+        @if ((billingForm.value.insurancePayable ?? 0) > 0) {
+          <div class="inv-billing__insurance">
+            <gw-form-field label="Insurance provider ID">
+              <gw-input formControlName="insuranceProviderId" placeholder="Provider UUID" />
+            </gw-form-field>
+            <gw-form-field label="Policy number">
+              <gw-input formControlName="policyNumber" />
+            </gw-form-field>
+            <gw-form-field label="Member name">
+              <gw-input formControlName="memberName" />
+            </gw-form-field>
+          </div>
+        }
+
+        <gw-form-field label="Billing notes">
+          <gw-textarea formControlName="billingNotes" [rows]="2" />
+        </gw-form-field>
+
+        <div class="inv-modal__footer">
+          <gw-button variant="ghost" type="button" (click)="showBillingModal.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Clear &amp; post to invoice</gw-button>
+        </div>
+      </form>
+    }
+  </gw-dialog>
+
+</div>
+
+<!-- ── Full-screen file viewer ─────────────────────────────────────── -->
+@if (showFileViewer()) {
+  <div class="inv-viewer" (click)="closeFileViewer()">
+    <div class="inv-viewer__shell" (click)="$event.stopPropagation()">
+
+      <header class="inv-viewer__header">
+        <div class="inv-viewer__title">
+          <lucide-icon [name]="isPdf(viewerFileUrl()) ? 'file-text' : 'image'" [size]="18" />
+          <span>{{ viewerFileName() }}</span>
+        </div>
+        <div class="inv-viewer__actions">
+          <a [href]="viewerFileUrl()" download class="inv-viewer__btn inv-viewer__btn--dl">
+            <lucide-icon name="download" [size]="16" />
+            Download
+          </a>
+          <button class="inv-viewer__btn inv-viewer__btn--close" type="button"
+            (click)="closeFileViewer()">
+            <lucide-icon name="x" [size]="18" />
+            Close
+          </button>
+        </div>
+      </header>
+
+      <div class="inv-viewer__body">
+        @if (viewerLoading()) {
+          <div class="inv-viewer__spinner">
+            <gw-spinner size="lg" />
+            <p>Loading file…</p>
+          </div>
+        } @else if (viewerBlobUrl()) {
+          @if (isPdf(viewerFileUrl())) {
+            <iframe [src]="safeUrl(viewerBlobUrl())" class="inv-viewer__iframe"
+              type="application/pdf" title="Report viewer"></iframe>
+          } @else {
+            <div class="inv-viewer__img-wrap">
+              <img [src]="viewerBlobUrl()" [alt]="viewerFileName()" class="inv-viewer__img" />
+            </div>
+          }
+        }
+      </div>
+
+    </div>
+  </div>
+}

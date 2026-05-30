@@ -39,6 +39,10 @@ import {
   // Showcase / reports
   BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
   Star, Quote, ChevronsRight,
+  // Investigations + Pharmacy
+  ScanLine, Scan, CircleDot, Inbox, Store, Upload,
+  // File viewer + file-input component
+  Download, Image, CloudUpload, File as FileIcon,
 } from 'lucide-angular';
 
 @NgModule({
@@ -70,6 +74,10 @@ import {
   // Showcase / reports
   BarChart2, History, ServerCrash, ChartLine, Smartphone, Globe, Sun, Moon,
   Star, Quote, ChevronsRight,
+  // Investigations + Pharmacy
+  ScanLine, Scan, CircleDot, Inbox, Store, Upload,
+  // File viewer + file-input component icons
+  Download, Image, CloudUpload, FileIcon,
     }),
   ],
   exports: [LucideAngularModule],
