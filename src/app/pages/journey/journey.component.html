@@ -1,0 +1,151 @@
+<div class="jrn">
+  <!-- Header -->
+  <header class="jrn__head">
+    <div>
+      <h1 class="jrn__title">Patient Journey</h1>
+      <p class="jrn__subtitle">Track every patient from reception to discharge — one guided flow.</p>
+    </div>
+    @if (canIntake()) {
+      <gw-button variant="primary" leadingIcon="plus" (click)="openIntake()">New Patient Intake</gw-button>
+    }
+  </header>
+
+  <!-- Stats -->
+  @if (stats(); as s) {
+    <div class="jrn__stats">
+      <gw-stat-card label="Awaiting Consult" [value]="s.awaitingConsult" icon="stethoscope" />
+      <gw-stat-card label="Admission Form" [value]="s.admissionForm" icon="clipboard-list" />
+      <gw-stat-card label="At Counter" [value]="s.counter" icon="receipt" />
+      <gw-stat-card label="Nurse Assignment" [value]="s.nurseAssignment" icon="user-check" />
+      <gw-stat-card label="Medication" [value]="s.medication" icon="pill" />
+      <gw-stat-card label="In Care" [value]="s.inCare" icon="bed" />
+    </div>
+  }
+
+  <!-- Scope toggle -->
+  <div class="jrn__toolbar">
+    <gw-segmented [options]="scopeOptions" [ngModel]="scope()" (ngModelChange)="setScope($event)"
+                  [ngModelOptions]="{ standalone: true }" />
+  </div>
+
+  <!-- Worklist table -->
+  <gw-table [columns]="columns" [data]="rows()" [loading]="loading()"
+            emptyText="No patients in your worklist" (rowClick)="open($event)">
+    <ng-template gwCell="encounterNumber" let-row>
+      <span class="jrn__enc">{{ row.encounterNumber }}</span>
+    </ng-template>
+
+    <ng-template gwCell="patient" let-row>
+      <div class="jrn__patient">
+        <span class="jrn__patient-name">{{ row.patient?.firstName }} {{ row.patient?.lastName }}</span>
+        @if (row.patient?.patientCode) { <span class="jrn__patient-uhid">{{ row.patient?.patientCode }}</span> }
+      </div>
+    </ng-template>
+
+    <ng-template gwCell="chiefComplaint" let-row>
+      <span class="jrn__complaint">{{ row.chiefComplaint }}</span>
+    </ng-template>
+
+    <ng-template gwCell="stage" let-row>
+      <gw-badge [variant]="stageVariant(row.stage)" tone="soft" size="sm">{{ stageLabel(row.stage) }}</gw-badge>
+    </ng-template>
+
+    <ng-template gwCell="urgency" let-row>
+      <gw-badge [variant]="urgencyVariant(row.urgency)" tone="soft" size="sm">{{ row.urgency }}</gw-badge>
+    </ng-template>
+
+    <ng-template gwCell="waiting" let-row>
+      <span class="jrn__waiting">{{ waitingSince(row.createdAt) }}</span>
+    </ng-template>
+
+    <ng-template gwCell="action" let-row>
+      <gw-button variant="ghost" size="sm" trailingIcon="arrow-right" (click)="open(row); $event.stopPropagation()">Open</gw-button>
+    </ng-template>
+  </gw-table>
+</div>
+
+<!-- ─── Intake modal ─────────────────────────────────────────────────────── -->
+<gw-dialog [open]="intakeOpen()" (openChange)="intakeOpen.set($event)" size="lg"
+           title="New Patient Intake" description="Capture the complaint and route to a doctor.">
+  <div class="intake">
+    <!-- Patient picker -->
+    <div class="intake__patient">
+      <div class="intake__patient-head">
+        <span class="intake__label">Patient</span>
+        <button type="button" class="intake__toggle" (click)="toggleNewPatient()">
+          {{ newPatientMode() ? 'Search existing' : '+ Register new' }}
+        </button>
+      </div>
+
+      @if (!newPatientMode()) {
+        @if (selectedPatient(); as p) {
+          <div class="intake__chosen">
+            <div>
+              <strong>{{ p.firstName }} {{ p.lastName }}</strong>
+              <span class="intake__chosen-meta">{{ p.phone }}{{ p.patientCode ? ' · ' + p.patientCode : '' }}</span>
+            </div>
+            <gw-button variant="ghost" size="sm" leadingIcon="x" (click)="clearPatient()">Change</gw-button>
+          </div>
+        } @else {
+          <gw-search-input placeholder="Search by name or phone…" [debounceMs]="300"
+                           (debouncedChange)="searchPatients($event)" />
+          @if (patientResults().length) {
+            <ul class="intake__results">
+              @for (p of patientResults(); track p.id) {
+                <li class="intake__result" (click)="pickPatient(p)">
+                  <span>{{ p.firstName }} {{ p.lastName }}</span>
+                  <span class="intake__result-meta">{{ p.phone }}</span>
+                </li>
+              }
+            </ul>
+          }
+        }
+      } @else {
+        <div class="intake__newgrid">
+          <gw-form-field label="First name" [required]="true">
+            <gw-input [(ngModel)]="newPatient.firstName" [ngModelOptions]="{ standalone: true }" />
+          </gw-form-field>
+          <gw-form-field label="Last name" [required]="true">
+            <gw-input [(ngModel)]="newPatient.lastName" [ngModelOptions]="{ standalone: true }" />
+          </gw-form-field>
+          <gw-form-field label="Phone" [required]="true">
+            <gw-input [(ngModel)]="newPatient.phone" [ngModelOptions]="{ standalone: true }" />
+          </gw-form-field>
+          <gw-form-field label="Gender">
+            <gw-select [options]="genderOptions" [(ngModel)]="newPatient.gender" [ngModelOptions]="{ standalone: true }" />
+          </gw-form-field>
+        </div>
+      }
+    </div>
+
+    <gw-form-field label="Chief complaint" [required]="true" hint="What is the patient going through?">
+      <gw-textarea [(ngModel)]="form.chiefComplaint" [ngModelOptions]="{ standalone: true }"
+                   placeholder="e.g. severe abdominal pain since morning" />
+    </gw-form-field>
+
+    <div class="intake__row">
+      <gw-form-field label="Urgency">
+        <gw-segmented [options]="urgencyOptions" [(ngModel)]="form.urgency" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <gw-form-field label="Visit type">
+        <gw-segmented [options]="visitOptions" [(ngModel)]="form.visitType" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+    </div>
+
+    <div class="intake__row">
+      <gw-form-field label="Department">
+        <gw-select [options]="departmentOptions()" placeholder="Select department"
+                   [(ngModel)]="form.department" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <gw-form-field label="Route to doctor" [required]="true">
+        <gw-select [options]="doctorOptions()" placeholder="Select doctor"
+                   [(ngModel)]="form.assignedDoctorId" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+    </div>
+  </div>
+
+  <div gw-dialog-footer class="intake__footer">
+    <gw-button variant="secondary" (click)="intakeOpen.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="saving()" (click)="submitIntake()">Register & Route</gw-button>
+  </div>
+</gw-dialog>

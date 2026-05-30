@@ -1,0 +1,281 @@
+@if (loading()) {
+  <div class="jd__loading"><gw-spinner size="lg" /></div>
+} @else if (encounter(); as e) {
+  <div class="jd">
+    <!-- Header -->
+    <header class="jd__head">
+      <button class="jd__back" (click)="back()"><lucide-icon name="arrow-left" [size]="16" /> Journeys</button>
+      <div class="jd__head-right">
+        @if (canCancel()) {
+          <gw-button variant="ghost" size="sm" leadingIcon="x" (click)="openModal('cancel')">Cancel</gw-button>
+        }
+      </div>
+    </header>
+
+    <!-- Patient banner -->
+    <section class="jd__banner">
+      <div class="jd__patient">
+        <div class="jd__avatar">{{ (e.patient?.firstName || '?')[0] }}{{ (e.patient?.lastName || '')[0] }}</div>
+        <div>
+          <h1 class="jd__name">{{ e.patient?.firstName }} {{ e.patient?.lastName }}</h1>
+          <div class="jd__meta">
+            <span>{{ e.encounterNumber }}</span>
+            @if (e.patient?.patientCode) { <span>· {{ e.patient?.patientCode }}</span> }
+            @if (e.patient?.dateOfBirth) { <span>· {{ age(e.patient?.dateOfBirth) }}</span> }
+            @if (e.patient?.gender) { <span>· {{ e.patient?.gender }}</span> }
+          </div>
+        </div>
+      </div>
+      <div class="jd__tags">
+        <gw-badge [variant]="stageVariant(e.stage)" tone="soft">{{ stageLabels[e.stage] }}</gw-badge>
+        <gw-badge [variant]="e.urgency === 'emergency' ? 'danger' : e.urgency === 'urgent' ? 'warning' : 'neutral'" tone="soft">{{ e.urgency }}</gw-badge>
+        @if (e.payerType) { <gw-badge variant="info" tone="soft">{{ payerLabel(e.payerType) }}</gw-badge> }
+      </div>
+    </section>
+
+    <!-- Stepper -->
+    <section class="jd__stepper">
+      <gw-stepper [steps]="steps()" [active]="activeStep()" />
+    </section>
+
+    <div class="jd__grid">
+      <!-- Left: details + action -->
+      <div class="jd__col">
+        <!-- Action card -->
+        @if (myAction(); as a) {
+          <div class="jd__action">
+            <div class="jd__action-text">
+              <lucide-icon [name]="a.icon" [size]="18" />
+              <div>
+                <strong>It's your turn</strong>
+                <span>{{ a.label }} to move this patient forward.</span>
+              </div>
+            </div>
+            <gw-button variant="primary" [leadingIcon]="a.icon" [loading]="busy()" (click)="runAction()">{{ a.label }}</gw-button>
+          </div>
+        } @else if (e.stage === 'in_care') {
+          <div class="jd__action jd__action--info">
+            <div class="jd__action-text">
+              <lucide-icon name="bed" [size]="18" />
+              <div><strong>Admitted &amp; under care</strong><span>Ongoing care is managed in the IPD admission record.</span></div>
+            </div>
+            @if (e.admissionId && canViewIpd()) {
+              <a [routerLink]="['/ipd/admission', e.admissionId]"><gw-button variant="secondary" trailingIcon="arrow-right">Open admission</gw-button></a>
+            }
+          </div>
+        } @else if (e.stage === 'closed' || e.stage === 'discharged' || e.stage === 'cancelled') {
+          <div class="jd__action jd__action--muted">
+            <div class="jd__action-text">
+              <lucide-icon name="check-circle" [size]="18" />
+              <div><strong>{{ stageLabels[e.stage] }}</strong><span>This journey is complete.</span></div>
+            </div>
+          </div>
+        }
+
+        <!-- Detail facts -->
+        <div class="jd__card">
+          <h3 class="jd__card-title">Encounter details</h3>
+          <dl class="jd__facts">
+            <div><dt>Chief complaint</dt><dd>{{ e.chiefComplaint }}</dd></div>
+            <div><dt>Routed to</dt><dd>{{ e.assignedDoctor ? 'Dr. ' + e.assignedDoctor.firstName + ' ' + e.assignedDoctor.lastName : '—' }}</dd></div>
+            @if (e.department) { <div><dt>Department</dt><dd>{{ e.department }}</dd></div> }
+            @if (e.disposition) { <div><dt>Disposition</dt><dd>{{ e.disposition }}</dd></div> }
+            @if (e.admissionDiagnosis) { <div><dt>Admission diagnosis</dt><dd>{{ e.admissionDiagnosis }}</dd></div> }
+            @if (e.caseFileNumber) { <div><dt>Case file</dt><dd>{{ e.caseFileNumber }}</dd></div> }
+            @if (e.checkoutAmount != null) { <div><dt>OPD fee collected</dt><dd>₹{{ e.checkoutAmount }}{{ e.paymentMode ? ' · ' + e.paymentMode : '' }}</dd></div> }
+            @if (e.assignedNurse) { <div><dt>Assigned nurse</dt><dd>{{ e.assignedNurse.firstName }} {{ e.assignedNurse.lastName }}</dd></div> }
+            @if (e.attendantName) { <div><dt>Attendant</dt><dd>{{ e.attendantName }}{{ e.attendantPhone ? ' · ' + e.attendantPhone : '' }}</dd></div> }
+          </dl>
+          <div class="jd__links">
+            @if (e.admissionId && canViewIpd()) { <a [routerLink]="['/ipd/admission', e.admissionId]" class="jd__link"><lucide-icon name="bed" [size]="14" /> IPD admission</a> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: timeline -->
+      <div class="jd__col">
+        <div class="jd__card">
+          <h3 class="jd__card-title">Timeline</h3>
+          @if (e.events?.length) {
+            <gw-timeline>
+              @for (ev of e.events; track ev.id) {
+                <gw-timeline-item [title]="eventTitle(ev)" [time]="ev.createdAt | date:'MMM d, h:mm a'" [tone]="eventTone(ev)">
+                  <span class="jd__ev-actor">{{ actorName(ev) }}</span>
+                  @if (ev.note) { <p class="jd__ev-note">{{ ev.note }}</p> }
+                </gw-timeline-item>
+              }
+            </gw-timeline>
+          } @else {
+            <p class="jd__empty">No events yet.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Disposition modal ───────────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'disposition'" (openChange)="closeModal()" size="md"
+             title="Record disposition" description="Decide what happens next for this patient.">
+    <div class="jd__form">
+      <gw-form-field label="Decision">
+        <gw-segmented [options]="dispositionOptions" [(ngModel)]="dispForm.disposition" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <gw-form-field label="Clinical note">
+        <gw-textarea [(ngModel)]="dispForm.note" [ngModelOptions]="{ standalone: true }" placeholder="Reason / advice…" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <gw-button variant="ghost" leadingIcon="printer" (click)="printSlip()">Print slip</gw-button>
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitDisposition()">Save</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Checkout modal (OPD fee → close) ─────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'checkout'" (openChange)="closeModal()" size="md"
+             title="Checkout" description="Collect the OPD fee and close the visit.">
+    <div class="jd__form">
+      <div class="jd__form-row">
+        <gw-form-field label="OPD fee">
+          <gw-currency-input [(ngModel)]="checkoutForm.amount" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+        <gw-form-field label="Payment mode">
+          <gw-segmented [options]="paymentModeOptions" [(ngModel)]="checkoutForm.paymentMode" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+      </div>
+      <gw-form-field label="Note">
+        <gw-textarea [(ngModel)]="checkoutForm.note" [ngModelOptions]="{ standalone: true }" placeholder="Optional…" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitCheckout()">Checkout &amp; close</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Admission form modal ────────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'admission'" (openChange)="closeModal()" size="md"
+             title="Admission form" description="Capture admission details before the counter step.">
+    <div class="jd__form">
+      <gw-form-field label="Admission diagnosis" [required]="true">
+        <gw-textarea [(ngModel)]="admForm.admissionDiagnosis" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <div class="jd__form-row">
+        <gw-form-field label="Attendant name"><gw-input [(ngModel)]="admForm.attendantName" [ngModelOptions]="{ standalone: true }" /></gw-form-field>
+        <gw-form-field label="Attendant phone"><gw-input [(ngModel)]="admForm.attendantPhone" [ngModelOptions]="{ standalone: true }" /></gw-form-field>
+      </div>
+      <gw-form-field label="Relation"><gw-input [(ngModel)]="admForm.attendantRelation" [ngModelOptions]="{ standalone: true }" placeholder="e.g. Son, Spouse" /></gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitAdmission()">Save &amp; send to counter</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Case file modal ─────────────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'casefile'" (openChange)="closeModal()" size="md"
+             title="Generate case file" description="Classify the payer and assign a bed — this admits the patient.">
+    <div class="jd__form">
+      <gw-form-field label="Payer type">
+        <gw-segmented [options]="payerOptions" [(ngModel)]="caseForm.payerType" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <div class="jd__form-row">
+        <gw-form-field label="Ward" [required]="true">
+          <gw-select [options]="wardOptions()" placeholder="Select ward"
+                     [ngModel]="caseForm.wardId" (ngModelChange)="onWardChange($event)" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+        <gw-form-field label="Bed" [required]="true">
+          <gw-select [options]="bedOptions()" placeholder="Select bed"
+                     [(ngModel)]="caseForm.bedId" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+      </div>
+      <gw-form-field label="Admission type">
+        <gw-select [options]="admissionTypeOptions" [(ngModel)]="caseForm.admissionType" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitCaseFile()">Generate &amp; admit</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Assign nurse modal ──────────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'nurse'" (openChange)="closeModal()" size="md"
+             title="Assign nurse" description="Hand the patient over from the casualty doctor to a nurse.">
+    <div class="jd__form">
+      <gw-form-field label="Nurse" [required]="true">
+        <gw-select [options]="nurseOptions()" placeholder="Select nurse"
+                   [(ngModel)]="nurseForm.nurseId" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <gw-form-field label="Handover notes">
+        <gw-textarea [(ngModel)]="nurseForm.handoverNotes" [ngModelOptions]="{ standalone: true }" placeholder="Casualty doctor → nurse handover…" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitNurse()">Assign</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Order medication modal ──────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'medication'" (openChange)="closeModal()" size="lg"
+             title="Order medication" description="Order pharmacy from the casualty doctor's prescription.">
+    <div class="jd__form">
+      <div class="jd__form-row">
+        <gw-form-field label="Pharmacy">
+          <gw-segmented [options]="pharmacyTypeOptions" [(ngModel)]="medForm.pharmacyType" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+        <gw-form-field label="From prescription">
+          <gw-select [options]="prescriptionOptions()" placeholder="Select prescription"
+                     [ngModel]="medForm.prescriptionId" (ngModelChange)="loadPrescriptionItems($event)" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+      </div>
+
+      <div class="jd__meds">
+        <div class="jd__meds-head">
+          <span>Medicines</span>
+          <gw-button variant="ghost" size="sm" leadingIcon="plus" (click)="addMedItem()">Add</gw-button>
+        </div>
+        @if (medItems().length) {
+          @for (item of medItems(); track $index) {
+            <div class="jd__med-row">
+              <gw-input [(ngModel)]="item.medicineName" [ngModelOptions]="{ standalone: true }" placeholder="Medicine" />
+              <gw-input [(ngModel)]="item.dosage" [ngModelOptions]="{ standalone: true }" placeholder="Dosage" />
+              <gw-input [(ngModel)]="item.frequency" [ngModelOptions]="{ standalone: true }" placeholder="Frequency" />
+              <button type="button" class="jd__med-del" (click)="removeMedItem($index)"><lucide-icon name="trash-2" [size]="15" /></button>
+            </div>
+          }
+        } @else {
+          <p class="jd__empty">Pick a prescription or add medicines manually.</p>
+        }
+      </div>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitMedication()">Order &amp; complete</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Cancel modal ────────────────────────────────────────────────────── -->
+  <gw-dialog [open]="modal() === 'cancel'" (openChange)="closeModal()" size="sm"
+             title="Cancel encounter" description="This ends the patient journey.">
+    <div class="jd__form">
+      <gw-form-field label="Reason">
+        <gw-textarea [(ngModel)]="dispForm.note" [ngModelOptions]="{ standalone: true }" placeholder="Why is this being cancelled?" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="jd__form-footer">
+      <span class="jd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Back</gw-button>
+      <gw-button variant="danger" [loading]="busy()" (click)="submitCancel()">Cancel encounter</gw-button>
+    </div>
+  </gw-dialog>
+} @else {
+  <div class="jd__loading">Encounter not found.</div>
+}

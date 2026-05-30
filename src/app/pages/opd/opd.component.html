@@ -10,6 +10,7 @@
       </p>
     </div>
     <div class="d-flex gap-2 items-center">
+      <gw-button variant="secondary" size="sm" leadingIcon="route" (click)="goToJourney()">Patient Journey</gw-button>
       <div style="width:155px">
         <gw-date-input [ngModel]="date()" (ngModelChange)="onDateChange($event)" />
       </div>
