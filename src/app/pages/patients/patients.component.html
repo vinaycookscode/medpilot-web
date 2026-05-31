@@ -64,7 +64,11 @@
                       {{ patient.firstName[0] }}{{ patient.lastName[0] }}
                     </div>
                     <div>
-                      <div class="patients__name">{{ patient.firstName }} {{ patient.lastName }}</div>
+                      <div class="patients__name patients__name--link"
+                           (click)="openHistory(patient)"
+                           (mouseenter)="onNameEnter(patient, $any($event.currentTarget))"
+                           (mouseleave)="onNameLeave()"
+                           title="View full history">{{ patient.firstName }} {{ patient.lastName }}</div>
                       <div class="patients__email">{{ patient.email || '—' }}</div>
                     </div>
                   </div>
@@ -76,9 +80,13 @@
                 <td>{{ patient.createdAt | date:'dd MMM yyyy' }}</td>
                 <td>
                   <div class="patients__actions">
-                    <button class="btn btn--ghost btn--icon btn--sm" title="View"
+                    <button class="btn btn--ghost btn--icon btn--sm" title="Quick view"
                             (click)="openDetail(patient)">
                       <lucide-icon name="eye" [size]="15" />
+                    </button>
+                    <button class="btn btn--ghost btn--icon btn--sm" title="Full history"
+                            (click)="openHistory(patient)">
+                      <lucide-icon name="history" [size]="15" />
                     </button>
                     @if (canDelete()) {
                       <button class="btn btn--ghost btn--icon btn--sm patients__delete"
@@ -135,12 +143,44 @@
           <p class="text-xs text-tertiary">{{ selectedPatient()!.patientCode }} · {{ selectedPatient()!.phone }}</p>
         </div>
       </div>
-      <button class="btn btn--ghost btn--icon" (click)="closeDetail()">
-        <lucide-icon name="x" [size]="18" />
-      </button>
+      <div class="d-flex items-center gap-2">
+        <button class="btn btn--secondary btn--sm" (click)="openHistory(selectedPatient()!)">
+          <lucide-icon name="history" [size]="14" /> Full history
+        </button>
+        <button class="btn btn--ghost btn--icon" (click)="closeDetail()">
+          <lucide-icon name="x" [size]="18" />
+        </button>
+      </div>
     </div>
 
     <div class="patients__drawer-body">
+      <!-- Current treatment summary -->
+      @if (drawerOverview(); as ov) {
+        <div class="patients__treat" [class.patients__treat--active]="ov.currentStatus !== 'inactive'">
+          @if (ov.activeAdmission; as a) {
+            <div class="patients__treat-row">
+              <span class="badge badge--success">Admitted</span>
+              <span>{{ a.admissionNumber }} · {{ a.ward }}/{{ a.bed }} · {{ a.lengthOfStay }}d</span>
+            </div>
+            <p class="patients__treat-dx">{{ a.diagnosis }} · Dr. {{ a.doctor }}</p>
+          } @else if (ov.activeEncounter; as e) {
+            <div class="patients__treat-row">
+              <span class="badge badge--primary">OPD in progress</span>
+              <span>{{ e.encounterNumber }}</span>
+            </div>
+            <p class="patients__treat-dx">{{ e.chiefComplaint }} · Dr. {{ e.doctor }}</p>
+          } @else {
+            <span class="text-sm text-tertiary">No active treatment</span>
+          }
+          <div class="patients__treat-counts">
+            <span>{{ ov.counts.admissions }} admissions</span>
+            <span>{{ ov.counts.opdVisits }} OPD visits</span>
+            <span>{{ ov.counts.prescriptions }} prescriptions</span>
+            <span>{{ ov.counts.investigations }} investigations</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+      }
       <!-- Demographics -->
       <div>
         <p class="label mb-3">Patient Info</p>
@@ -376,6 +416,39 @@
       </div>
     </div>
   </div>
+}
+
+<!-- ── Hover preview popover ── -->
+@if (hoverAnchor()) {
+  <gw-popover [anchor]="hoverAnchor()!" [open]="true" placement="bottom" align="start" [showArrow]="true" [dismissOnOutsideClick]="false"
+              (mouseenter)="cancelHoverClose()" (mouseleave)="onNameLeave()">
+    <div class="patients__hover">
+      @if (hoverData(); as ov) {
+        @if (ov.activeAdmission; as a) {
+          <div class="patients__hover-status"><span class="badge badge--success">Admitted</span><span>{{ a.admissionNumber }}</span></div>
+          <div class="patients__hover-line"><lucide-icon name="bed" [size]="13" /> {{ a.ward }} · {{ a.bed }} · {{ a.lengthOfStay }} day(s)</div>
+          <div class="patients__hover-line"><lucide-icon name="stethoscope" [size]="13" /> Dr. {{ a.doctor }}</div>
+          <div class="patients__hover-dx">{{ a.diagnosis }}</div>
+        } @else if (ov.activeEncounter; as e) {
+          <div class="patients__hover-status"><span class="badge badge--primary">OPD in progress</span><span>{{ e.encounterNumber }}</span></div>
+          <div class="patients__hover-line"><lucide-icon name="stethoscope" [size]="13" /> Dr. {{ e.doctor }}</div>
+          <div class="patients__hover-dx">{{ e.chiefComplaint }}</div>
+        } @else {
+          <div class="patients__hover-status"><span class="badge badge--neutral">No active treatment</span></div>
+        }
+        <div class="patients__hover-counts">
+          <span>{{ ov.counts.admissions }} adm</span>
+          <span>{{ ov.counts.opdVisits }} OPD</span>
+          <span>{{ ov.counts.prescriptions }} Rx</span>
+          <span>{{ ov.counts.investigations }} inv</span>
+        </div>
+        <gw-button variant="primary" size="sm" [block]="true" leadingIcon="history"
+                   (click)="openHistoryById(hoverPatientId()!)">View full history</gw-button>
+      } @else {
+        <div class="patients__hover-loading"><gw-spinner size="sm" /> Loading…</div>
+      }
+    </div>
+  </gw-popover>
 }
 
 <!-- Create Patient Modal -->

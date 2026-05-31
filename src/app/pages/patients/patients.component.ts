@@ -1,8 +1,9 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IconsModule } from '../../shared/icons';
-import { PatientsService } from '../../core/services/patients.service';
+import { PatientsService, PatientOverview } from '../../core/services/patients.service';
 import { PrescriptionsService } from '../../core/services/prescriptions.service';
 import { Patient, CreatePatientDto, Gender } from '../../core/models/patient.models';
 import { Prescription } from '../../core/models/prescription.models';
@@ -21,6 +22,7 @@ import { GwSelectComponent } from '../../shared/ui/forms/select/select.component
 import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.component';
 import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
 import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
+import { GwPopoverComponent } from '../../shared/ui/overlays/popover/popover.component';
 
 @Component({
   selector: 'app-patients',
@@ -30,7 +32,7 @@ import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.compon
     GwButtonComponent, GwIconButtonComponent,
     GwBadgeComponent, GwSpinnerComponent, GwEmptyStateComponent,
     GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent, GwDateInputComponent,
-    GwDialogComponent,
+    GwDialogComponent, GwPopoverComponent,
   ],
   templateUrl: './patients.component.html',
   styleUrl: './patients.component.scss',
@@ -41,6 +43,7 @@ export class PatientsComponent implements OnInit {
   private toast       = inject(ToastService);
   readonly auth       = inject(AuthService);
   private appMeta     = inject(AppMetaService);
+  private router      = inject(Router);
   private fb          = inject(FormBuilder);
 
   readonly canCreate  = computed(() => this.appMeta.canDo('patients', 'canCreate'));
@@ -75,6 +78,15 @@ export class PatientsComponent implements OnInit {
   readonly selectedPatient    = signal<Patient | null>(null);
   readonly patientPrescriptions = signal<Prescription[]>([]);
   readonly rxLoading            = signal(false);
+  readonly drawerOverview       = signal<PatientOverview | null>(null);
+
+  // Hover preview popover
+  readonly hoverAnchor  = signal<HTMLElement | null>(null);
+  readonly hoverData    = signal<PatientOverview | null>(null);
+  readonly hoverPatientId = signal<string | null>(null);
+  private overviewCache = new Map<string, PatientOverview>();
+  private hoverTimer: any = null;
+  private hoverCloseTimer: any = null;
 
   // Prescription detail modal
   readonly selectedRx = signal<Prescription | null>(null);
@@ -124,13 +136,59 @@ export class PatientsComponent implements OnInit {
     this.selectedPatient.set(patient);
     this.rxLoading.set(true);
     this.patientPrescriptions.set([]);
+    this.drawerOverview.set(this.overviewCache.get(patient.id) ?? null);
     this.rxSvc.list({ patientId: patient.id, limit: 50 }).subscribe({
       next: r => { this.patientPrescriptions.set(r.data); this.rxLoading.set(false); },
       error: () => this.rxLoading.set(false),
     });
+    this.patientsSvc.overview(patient.id).subscribe({
+      next: r => { this.overviewCache.set(patient.id, r.data); this.drawerOverview.set(r.data); },
+      error: () => {},
+    });
   }
 
-  closeDetail() { this.selectedPatient.set(null); this.selectedRx.set(null); }
+  closeDetail() { this.selectedPatient.set(null); this.selectedRx.set(null); this.drawerOverview.set(null); }
+
+  /** Navigate to the full unified history page. */
+  openHistory(patient: Patient) {
+    this.closeDetail();
+    this.router.navigate(['/patients', patient.id, 'history']);
+  }
+
+  // ─── Hover preview ───────────────────────────────────────────────────────
+  openHistoryById(id: string) {
+    this.onNameLeave();
+    this.router.navigate(['/patients', id, 'history']);
+  }
+
+  onNameEnter(patient: Patient, el: HTMLElement) {
+    clearTimeout(this.hoverTimer);
+    clearTimeout(this.hoverCloseTimer);
+    this.hoverPatientId.set(patient.id);
+    this.hoverTimer = setTimeout(() => {
+      this.hoverAnchor.set(el);
+      const cached = this.overviewCache.get(patient.id);
+      if (cached) { this.hoverData.set(cached); return; }
+      this.hoverData.set(null);
+      this.patientsSvc.overview(patient.id).subscribe({
+        next: r => {
+          this.overviewCache.set(patient.id, r.data);
+          if (this.hoverAnchor() === el) this.hoverData.set(r.data);
+        },
+        error: () => {},
+      });
+    }, 250);
+  }
+  cancelHoverClose() { clearTimeout(this.hoverCloseTimer); }
+  onNameLeave() {
+    clearTimeout(this.hoverTimer);
+    clearTimeout(this.hoverCloseTimer);
+    this.hoverCloseTimer = setTimeout(() => {
+      this.hoverAnchor.set(null);
+      this.hoverData.set(null);
+      this.hoverPatientId.set(null);
+    }, 180);
+  }
 
   openRxDetail(rx: Prescription) { this.selectedRx.set(rx); }
   closeRxDetail() { this.selectedRx.set(null); }

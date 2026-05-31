@@ -24,6 +24,7 @@ import { GwSelectComponent, GwSelectOption } from '../../shared/ui/forms/select/
 import { GwSegmentedComponent, GwSegmentOption } from '../../shared/ui/forms/segmented/segmented.component';
 import { GwSearchInputComponent } from '../../shared/ui/forms/search-input/search-input.component';
 import { GwEmptyStateComponent } from '../../shared/ui/display/empty-state/empty-state.component';
+import { PatientLinkComponent } from '../../shared/patient-link/patient-link.component';
 
 type Scope = 'mine' | 'all';
 
@@ -35,7 +36,7 @@ type Scope = 'mine' | 'all';
     GwButtonComponent, GwBadgeComponent, GwTableComponent, GwCellDirective,
     GwStatCardComponent, GwDialogComponent, GwFormFieldComponent, GwInputComponent,
     GwTextareaComponent, GwSelectComponent, GwSegmentedComponent, GwSearchInputComponent,
-    GwEmptyStateComponent,
+    GwEmptyStateComponent, PatientLinkComponent,
   ],
   templateUrl: './journey.component.html',
   styleUrl: './journey.component.scss',

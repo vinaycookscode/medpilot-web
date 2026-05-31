@@ -43,6 +43,17 @@ export interface ChargeMasterAudit {
 
 export const CHARGE_CATEGORIES = ['room', 'ot', 'investigation', 'medicine', 'service', 'consultation', 'procedure', 'other'];
 
+/** Lightweight, active-only catalog item returned by /charge-master/lookup (for pricing pickers). */
+export interface ChargeMasterLookupItem {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  unit?: string | null;
+  basePrice: number;
+  gstRate: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChargeMasterService {
   private readonly api = `${environment.apiUrl}/charge-master`;
@@ -68,6 +79,12 @@ export class ChargeMasterService {
     let params = new HttpParams();
     if (category) params = params.set('category', category);
     return this.http.get<ApiResponse<ChargeMaster[]>>(this.api, { params }).pipe(map(r => r.data));
+  }
+  /** Active-only catalog for charge-entry / billing pickers (clinical + billing roles). */
+  lookup(category?: string) {
+    let params = new HttpParams();
+    if (category) params = params.set('category', category);
+    return this.http.get<ApiResponse<ChargeMasterLookupItem[]>>(`${this.api}/lookup`, { params }).pipe(map(r => r.data));
   }
   create(body: Partial<ChargeMaster>) {
     return this.http.post<ApiResponse<ChargeMaster>>(this.api, body).pipe(map(r => r.data));

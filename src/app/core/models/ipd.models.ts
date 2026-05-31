@@ -209,11 +209,13 @@ export interface CreateDailyNoteDto {
 
 export interface AddChargeDto {
   chargeDate?: string;
-  chargeType: ChargeType;
-  description: string;
-  quantity?: number;
-  unitPrice: number;
+  /** Charge-master id — price + category are sourced from it on the server. */
   serviceId?: string;
+  /** Optional overrides / ad-hoc charge fields (price comes from the master when serviceId is set). */
+  chargeType?: ChargeType;
+  description?: string;
+  quantity?: number;
+  unitPrice?: number;
   departmentId?: string;
   notes?: string;
 }

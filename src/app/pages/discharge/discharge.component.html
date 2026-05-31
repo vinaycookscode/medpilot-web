@@ -1,0 +1,35 @@
+<div class="dis">
+  <header class="dis__head">
+    <div>
+      <h1 class="dis__title">Discharge</h1>
+      <p class="dis__subtitle">Consultant → discharge card → billing → final file.</p>
+    </div>
+    <gw-segmented [options]="scopeOptions" [ngModel]="scope()" (ngModelChange)="setScope($event)"
+                  [ngModelOptions]="{ standalone: true }" />
+  </header>
+
+  <gw-table [columns]="columns" [data]="rows()" [loading]="loading()"
+            emptyText="No discharges in your worklist" (rowClick)="open($event)">
+    <ng-template gwCell="patient" let-row>
+      <div class="dis__patient">
+        <app-patient-link [patientId]="row.admission?.patient?.id || ''" [name]="(row.admission?.patient?.firstName || '') + ' ' + (row.admission?.patient?.lastName || '')" />
+        @if (row.admission?.patient?.patientCode) { <span class="dis__uhid">{{ row.admission?.patient?.patientCode }}</span> }
+      </div>
+    </ng-template>
+    <ng-template gwCell="admission" let-row>
+      <span class="dis__mono">{{ row.admission?.admissionNumber }}</span>
+    </ng-template>
+    <ng-template gwCell="stage" let-row>
+      <gw-badge [variant]="stageVariant(row.stage)" tone="soft" size="sm">{{ stageLabel(row.stage) }}</gw-badge>
+    </ng-template>
+    <ng-template gwCell="initiatedBy" let-row>
+      {{ row.initiatedBy?.firstName }} {{ row.initiatedBy?.lastName }}
+    </ng-template>
+    <ng-template gwCell="waiting" let-row>
+      <span class="dis__since">{{ waitingSince(row.createdAt) }}</span>
+    </ng-template>
+    <ng-template gwCell="action" let-row>
+      <gw-button variant="ghost" size="sm" trailingIcon="arrow-right" (click)="open(row); $event.stopPropagation()">Open</gw-button>
+    </ng-template>
+  </gw-table>
+</div>

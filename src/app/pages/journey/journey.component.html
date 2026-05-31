@@ -37,7 +37,7 @@
 
     <ng-template gwCell="patient" let-row>
       <div class="jrn__patient">
-        <span class="jrn__patient-name">{{ row.patient?.firstName }} {{ row.patient?.lastName }}</span>
+        <app-patient-link [patientId]="row.patientId" [name]="(row.patient?.firstName || '') + ' ' + (row.patient?.lastName || '')" />
         @if (row.patient?.patientCode) { <span class="jrn__patient-uhid">{{ row.patient?.patientCode }}</span> }
       </div>
     </ng-template>

@@ -1,0 +1,91 @@
+.ph {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.ph__loading { display: flex; align-items: center; justify-content: center; min-height: 50vh; color: var(--text-secondary); }
+
+.ph__back {
+  display: inline-flex; align-items: center; gap: var(--sp-2); align-self: flex-start;
+  background: none; border: none; color: var(--text-secondary); font-size: .82rem; font-weight: 600; cursor: pointer; padding: 0;
+}
+.ph__back:hover { color: var(--text-primary); }
+
+.ph__hero {
+  display: flex; align-items: center; gap: var(--sp-4);
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg, 8px);
+  padding: var(--sp-4) var(--sp-5);
+}
+.ph__avatar {
+  width: 60px; height: 60px; flex-shrink: 0; border-radius: var(--radius-full);
+  background: var(--color-primary-subtle); color: var(--color-primary);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem;
+}
+.ph__name { margin: 0; font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+.ph__meta { display: flex; flex-wrap: wrap; gap: 4px; color: var(--text-secondary); font-size: .85rem; margin-top: 2px; }
+.ph__tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-top: var(--sp-2); }
+.ph__last { font-size: .78rem; color: var(--text-tertiary); }
+
+.ph__active {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: var(--color-success-subtle); border: 1px solid var(--color-success);
+  border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-4);
+}
+.ph__active--opd { background: var(--color-primary-subtle); border-color: var(--color-primary); }
+.ph__active lucide-icon { color: var(--color-success); flex-shrink: 0; }
+.ph__active--opd lucide-icon { color: var(--color-primary); }
+.ph__active > div { flex: 1; min-width: 0; }
+.ph__active strong { display: block; font-size: .9rem; color: var(--text-primary); }
+.ph__active span { display: block; font-size: .8rem; color: var(--text-secondary); }
+
+.ph__stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--sp-3); }
+
+.ph__section { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ph__section-title {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-tertiary); margin: var(--sp-2) 0 0;
+}
+.ph__section-title lucide-icon { color: var(--color-primary); }
+
+/* Admission cards */
+.ph__adm { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-4); }
+.ph__adm-head { display: flex; align-items: center; gap: var(--sp-3); cursor: pointer; }
+.ph__adm-id { display: flex; align-items: center; gap: var(--sp-2); }
+.ph__adm-no { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.ph__adm-meta { flex: 1; font-size: .8rem; color: var(--text-secondary); }
+.ph__adm-dx { font-size: .85rem; color: var(--text-primary); margin-top: var(--sp-1); }
+.ph__adm-body { margin-top: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.ph__kv { display: flex; flex-direction: column; gap: 2px; }
+.ph__kv label { font-size: .7rem; text-transform: uppercase; letter-spacing: .03em; color: var(--text-tertiary); }
+.ph__kv p { margin: 0; font-size: .85rem; color: var(--text-primary); }
+.ph__meds { margin: 0; padding-left: 1.1rem; font-size: .85rem; color: var(--text-primary); }
+.ph__meds li { margin-bottom: 2px; }
+
+.ph__adm-bill { display: inline-flex; align-items: center; gap: 3px; font-size: .72rem; font-weight: 600; color: var(--color-success); background: color-mix(in srgb, var(--color-success) 12%, transparent); padding: 1px 7px; border-radius: var(--radius-full); font-variant-numeric: tabular-nums; }
+
+/* Discharge file: downloadable bill + clinical record for a discharged stay */
+.ph__docs { margin-top: var(--sp-1); padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-hover); }
+.ph__docs-head { display: flex; align-items: center; gap: var(--sp-2); font-size: .78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: var(--sp-2); }
+.ph__docs-head lucide-icon { color: var(--color-primary); }
+.ph__docs-total { margin-left: auto; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.ph__docs-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+.ph__link { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--color-primary); font-size: .82rem; font-weight: 600; text-decoration: none; margin-top: var(--sp-1); }
+.ph__rowlink { color: var(--color-primary); font-weight: 600; text-decoration: none; }
+.ph__rowlink:hover { text-decoration: underline; }
+
+/* Prescription cards */
+.ph__rx { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4); }
+.ph__rx-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); }
+.ph__rx-dx { font-weight: 600; color: var(--text-primary); font-size: .9rem; }
+.ph__rx-meta { font-size: .78rem; color: var(--text-tertiary); }
+
+@media (max-width: 640px) {
+  .ph__hero { flex-direction: column; align-items: flex-start; }
+  .ph__adm-head { flex-wrap: wrap; }
+}

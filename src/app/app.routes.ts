@@ -40,6 +40,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/patients/patients.component').then(m => m.PatientsComponent),
       },
       {
+        path: 'patients/:id/history',
+        canActivate: [permissionGuard],
+        data: { module: 'patients' },
+        loadComponent: () => import('./pages/patient-history/patient-history.component').then(m => m.PatientHistoryComponent),
+      },
+      {
         path: 'appointments',
         canActivate: [permissionGuard],
         data: { module: 'appointments' },
@@ -146,6 +152,18 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { module: 'encounters' },
         loadComponent: () => import('./pages/nursing-board/nursing-board.component').then(m => m.NursingBoardComponent),
+      },
+      {
+        path: 'discharge',
+        canActivate: [permissionGuard],
+        data: { module: 'discharge' },
+        loadComponent: () => import('./pages/discharge/discharge.component').then(m => m.DischargeComponent),
+      },
+      {
+        path: 'discharge/:id',
+        canActivate: [permissionGuard],
+        data: { module: 'discharge' },
+        loadComponent: () => import('./pages/discharge/discharge-detail.component').then(m => m.DischargeDetailComponent),
       },
       {
         path: 'opd',
