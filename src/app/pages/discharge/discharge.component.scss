@@ -1,0 +1,20 @@
+.dis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+}
+.dis__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.dis__title { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--text-primary); }
+.dis__subtitle { color: var(--text-secondary); font-size: .82rem; margin: var(--sp-1) 0 0; }
+
+.dis__patient { display: flex; flex-direction: column; }
+.dis__patient-name { font-weight: 600; color: var(--text-primary); }
+.dis__uhid { font-size: .68rem; color: var(--text-tertiary); }
+.dis__mono { font-variant-numeric: tabular-nums; font-weight: 600; }
+.dis__since { color: var(--text-secondary); font-size: .8rem; font-variant-numeric: tabular-nums; }

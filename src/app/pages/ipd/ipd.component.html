@@ -110,7 +110,7 @@
                     <span class="adm-num">{{ a.admissionNumber }}</span>
                   </td>
                   <td>
-                    <div class="fw-medium">{{ a.patient?.firstName }} {{ a.patient?.lastName }}</div>
+                    <div class="fw-medium"><app-patient-link [patientId]="a.patient?.id || ''" [name]="(a.patient?.firstName || '') + ' ' + (a.patient?.lastName || '')" /></div>
                     <div class="text-muted text-sm">{{ a.patient?.phone }}</div>
                   </td>
                   <td>

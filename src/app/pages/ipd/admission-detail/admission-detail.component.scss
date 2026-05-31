@@ -58,3 +58,98 @@
   .med-row { align-items: end; margin-bottom: .5rem; }
   .checkbox-group { display: flex; align-items: center; gap: .5rem; label { margin: 0; } }
 }
+
+.init-dis { display: flex; flex-direction: column; gap: var(--sp-3); }
+.init-dis__meds-head { display: flex; align-items: center; justify-content: space-between; font-size: .82rem; font-weight: 600; color: var(--text-primary); }
+
+/* One responsive block per medicine: name full-width, then dose/freq/duration */
+.init-dis__med {
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--sp-3);
+  background: var(--bg-hover);
+}
+.init-dis__med-top { display: flex; align-items: center; gap: var(--sp-2); }
+.init-dis__med-top gw-input { flex: 1 1 auto; min-width: 0; }
+.init-dis__med-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2);
+}
+.init-dis__med-grid gw-input { min-width: 0; }
+.init-dis__del {
+  flex: 0 0 auto; background: none; border: none; color: var(--color-danger);
+  cursor: pointer; padding: var(--sp-1); display: inline-flex; align-items: center;
+}
+.init-dis__footer { display: flex; align-items: center; gap: var(--sp-2); width: 100%; }
+
+@media (max-width: 540px) {
+  .init-dis__med-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Redesigned admission detail ─── */
+.ad-hero {
+  display: flex; align-items: stretch; justify-content: space-between; gap: var(--sp-4);
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg, 8px);
+  padding: var(--sp-4) var(--sp-5); margin-bottom: var(--sp-4);
+}
+.ad-hero__id { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.ad-hero__avatar {
+  width: 52px; height: 52px; flex-shrink: 0; border-radius: var(--radius-full);
+  background: var(--color-primary-subtle); color: var(--color-primary);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.15rem;
+}
+.ad-hero__name { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+.ad-hero__meta { display: flex; flex-wrap: wrap; gap: 4px; color: var(--text-secondary); font-size: .8rem; margin-top: 2px; }
+.ad-hero__tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-2); }
+
+.ad-hero__bill {
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+  text-align: right; padding-left: var(--sp-4); border-left: 1px solid var(--border); min-width: 180px;
+}
+.ad-hero__bill-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary); }
+.ad-hero__bill-amount { font-size: 1.8rem; font-weight: 750; color: var(--color-primary); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ad-hero__bill-sub { font-size: .72rem; color: var(--text-tertiary); margin-top: 2px; }
+
+.ad-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--sp-3); margin-bottom: var(--sp-4); }
+
+.ad-diagnosis {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-4);
+}
+.ad-diagnosis__label { font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; color: var(--text-tertiary); }
+.ad-diagnosis__value { font-size: .9rem; font-weight: 500; color: var(--text-primary); }
+
+.ad-section-title { font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary); margin: var(--sp-4) 0 var(--sp-2); }
+.ad-hint { font-size: .75rem; color: var(--text-tertiary); margin: var(--sp-2) 0 0; }
+
+/* Billing summary panel */
+.bill-summary {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: var(--sp-4) var(--sp-5); margin-bottom: var(--sp-3);
+}
+.bill-summary__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+.bill-summary__label { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary); }
+.bill-summary__total { display: block; font-size: 1.9rem; font-weight: 750; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.bill-summary__cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--sp-2); margin-top: var(--sp-4); }
+.bill-cat {
+  display: flex; align-items: center; gap: var(--sp-2);
+  background: var(--bg-hover); border-radius: var(--radius-sm); padding: var(--sp-2) var(--sp-3);
+}
+.bill-cat__icon { display: inline-flex; color: var(--color-primary); }
+.bill-cat__name { flex: 1; font-size: .8rem; color: var(--text-secondary); }
+.bill-cat__amt { font-size: .85rem; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* Add-charge modal: rate panel sourced from the charge master */
+.charge-form { display: flex; flex-direction: column; gap: var(--sp-3); }
+.charge-rate { background: var(--bg-hover); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--sp-2) var(--sp-3); display: flex; flex-direction: column; gap: 3px; }
+.charge-rate__row { display: flex; justify-content: space-between; align-items: baseline; font-size: .85rem; }
+.charge-rate__row--total { border-top: 1px dashed var(--border); margin-top: var(--sp-1); padding-top: var(--sp-1); }
+.charge-rate__label { color: var(--text-secondary); }
+.charge-rate__val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.charge-rate__val small { font-weight: 500; color: var(--text-tertiary); }
+.charge-rate__row--total .charge-rate__val { color: var(--color-primary); font-size: 1rem; }
+.charge-rate__code { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; color: var(--text-tertiary); margin-top: 2px; }
+
+@media (max-width: 720px) {
+  .ad-hero { flex-direction: column; }
+  .ad-hero__bill { align-items: flex-start; text-align: left; padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: var(--sp-3); }
+}

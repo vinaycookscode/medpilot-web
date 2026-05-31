@@ -1,0 +1,186 @@
+@if (loading()) {
+  <div class="dd__loading"><gw-spinner size="lg" /></div>
+} @else if (proc(); as p) {
+  <div class="dd">
+    <header class="dd__head">
+      <button class="dd__back" (click)="back()"><lucide-icon name="arrow-left" [size]="16" /> Discharges</button>
+      @if (canCancel()) {
+        <gw-button variant="ghost" size="sm" leadingIcon="x" (click)="modal.set('cancel')">Cancel</gw-button>
+      }
+    </header>
+
+    <!-- Banner -->
+    <section class="dd__banner">
+      <div>
+        <h1 class="dd__name">{{ p.admission?.patient?.firstName }} {{ p.admission?.patient?.lastName }}</h1>
+        <div class="dd__meta">
+          <span>{{ p.admission?.admissionNumber }}</span>
+          @if (p.admission?.patient?.patientCode) { <span>· {{ p.admission?.patient?.patientCode }}</span> }
+          <span>· initiated by {{ p.initiatedBy?.firstName }} {{ p.initiatedBy?.lastName }}</span>
+        </div>
+      </div>
+      <gw-badge [variant]="stageVariant(p.stage)" tone="soft">{{ stageLabels[p.stage] }}</gw-badge>
+    </section>
+
+    <!-- Stepper -->
+    <section class="dd__stepper">
+      <gw-stepper [steps]="steps()" [active]="activeStep()" />
+    </section>
+
+    <div class="dd__grid">
+      <div class="dd__col">
+        <!-- Action zone -->
+        @switch (p.stage) {
+          @case ('rmo_card') {
+            @if (canCard()) {
+              <div class="dd__action">
+                <div class="dd__action-text">
+                  <lucide-icon name="clipboard-check" [size]="18" />
+                  <div><strong>It's your turn</strong><span>Compile the discharge card and send it to billing.</span></div>
+                </div>
+                <gw-button variant="primary" leadingIcon="clipboard-check" (click)="openCard()">Create Discharge Card</gw-button>
+              </div>
+            } @else {
+              <div class="dd__action dd__action--muted">
+                <div class="dd__action-text"><lucide-icon name="clock" [size]="18" /><div><strong>Awaiting discharge card</strong><span>The RMO is compiling the discharge card.</span></div></div>
+              </div>
+            }
+          }
+          @case ('billing') {
+            @if (canBill()) {
+              <div class="dd__card">
+                <h3 class="dd__card-title">Activity Sheet — consolidated bill</h3>
+                @if (sheet(); as s) {
+                  <gw-table [columns]="sheetColumns" [data]="s.lineItems" emptyText="No charges">
+                    <ng-template gwCell="category" let-row><gw-badge variant="neutral" tone="soft" size="sm">{{ row.category }}</gw-badge></ng-template>
+                    <ng-template gwCell="quantity" let-row>{{ row.quantity }}</ng-template>
+                    <ng-template gwCell="unitPrice" let-row>{{ row.unitPrice | number:'1.2-2' }}</ng-template>
+                    <ng-template gwCell="amount" let-row>{{ row.amount | number:'1.2-2' }}</ng-template>
+                  </gw-table>
+                  <div class="dd__total">Grand total <strong>₹{{ s.grandTotal | number:'1.2-2' }}</strong></div>
+                  <div class="dd__action-row">
+                    <gw-button variant="primary" leadingIcon="receipt" [loading]="busy()" (click)="generateBill()">Generate Bill &amp; Discharge</gw-button>
+                  </div>
+                } @else {
+                  <gw-spinner />
+                }
+              </div>
+            } @else {
+              <div class="dd__action dd__action--muted">
+                <div class="dd__action-text"><lucide-icon name="clock" [size]="18" /><div><strong>Awaiting billing</strong><span>The bill is being generated at the billing counter.</span></div></div>
+              </div>
+            }
+          }
+          @case ('completed') {
+            <div class="dd__action dd__action--done">
+              <div class="dd__action-text">
+                <lucide-icon name="check-circle" [size]="18" />
+                <div><strong>Discharge completed</strong><span>Bill ₹{{ p.billAmount | number:'1.2-2' }} · patient discharged. Two attachments for the patient / insurance:</span></div>
+              </div>
+              <div class="dd__downloads">
+                <gw-button variant="primary" leadingIcon="receipt" (click)="downloadBill()">Bill (PDF)</gw-button>
+                <gw-button variant="secondary" leadingIcon="file-text" (click)="downloadClinicalRecord()">Clinical Record (PDF)</gw-button>
+              </div>
+            </div>
+          }
+          @case ('cancelled') {
+            <div class="dd__action dd__action--muted">
+              <div class="dd__action-text"><lucide-icon name="x" [size]="18" /><div><strong>Cancelled</strong><span>{{ p.cancelReason || 'This discharge was cancelled.' }}</span></div></div>
+            </div>
+          }
+        }
+
+        <!-- Discharge card facts -->
+        <div class="dd__card">
+          <h3 class="dd__card-title">Discharge details</h3>
+          <dl class="dd__facts">
+            @if (p.finalDiagnosis) { <div><dt>Final diagnosis</dt><dd>{{ p.finalDiagnosis }}</dd></div> }
+            @if (p.dischargeType) { <div><dt>Discharge type</dt><dd>{{ p.dischargeType }}</dd></div> }
+            @if (p.conditionAtDischarge) { <div><dt>Condition</dt><dd>{{ p.conditionAtDischarge }}</dd></div> }
+            @if (p.clinicalSummary) { <div><dt>Clinical summary</dt><dd>{{ p.clinicalSummary }}</dd></div> }
+            @if (p.treatmentGiven) { <div><dt>Treatment given</dt><dd>{{ p.treatmentGiven }}</dd></div> }
+            @if (p.followUpInstructions || p.followUpDate) { <div><dt>Follow-up</dt><dd>{{ p.followUpDate ? (p.followUpDate | date:'mediumDate') : '' }} {{ p.followUpInstructions }}</dd></div> }
+            @if (p.dischargeAdvice) { <div><dt>Advice</dt><dd>{{ p.dischargeAdvice }}</dd></div> }
+          </dl>
+          @if (p.admission?.id) {
+            <div class="dd__links"><a class="dd__link" [routerLink]="['/ipd/admission', p.admission?.id]"><lucide-icon name="bed" [size]="14" /> IPD admission</a></div>
+          }
+        </div>
+      </div>
+
+      <!-- Discharge medications -->
+      <div class="dd__col">
+        <div class="dd__card">
+          <h3 class="dd__card-title">Discharge medications</h3>
+          @if (p.dischargeMedications?.length) {
+            <ul class="dd__meds">
+              @for (m of p.dischargeMedications; track $index) {
+                <li class="dd__med">
+                  <span class="dd__med-name">{{ m.name }}</span>
+                  <span class="dd__med-detail">{{ m.dose }} · {{ m.frequency }} · {{ m.duration }}</span>
+                  @if (m.instructions) { <span class="dd__med-note">{{ m.instructions }}</span> }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="dd__empty">No discharge medications recorded.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Discharge card modal (RMO) ─── -->
+  <gw-dialog [open]="modal() === 'card'" (openChange)="closeModal()" size="lg"
+             title="Discharge card" description="Compile the NABH discharge summary, then send to billing.">
+    <div class="dd__form">
+      <gw-form-field label="Final diagnosis" [required]="true">
+        <gw-textarea [(ngModel)]="cardForm.finalDiagnosis" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <div class="dd__form-row">
+        <gw-form-field label="Discharge type" [required]="true">
+          <gw-select [options]="dischargeTypeOptions()" placeholder="Select" [(ngModel)]="cardForm.dischargeType" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+        <gw-form-field label="Condition at discharge" [required]="true">
+          <gw-select [options]="conditionOptions()" placeholder="Select" [(ngModel)]="cardForm.conditionAtDischarge" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+      </div>
+      <gw-form-field label="Clinical summary" [required]="true">
+        <gw-textarea [(ngModel)]="cardForm.clinicalSummary" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <gw-form-field label="Treatment given">
+        <gw-textarea [(ngModel)]="cardForm.treatmentGiven" [ngModelOptions]="{ standalone: true }" />
+      </gw-form-field>
+      <div class="dd__form-row">
+        <gw-form-field label="Follow-up date">
+          <gw-date-input [(ngModel)]="cardForm.followUpDate" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+        <gw-form-field label="Follow-up instructions">
+          <gw-input [(ngModel)]="cardForm.followUpInstructions" [ngModelOptions]="{ standalone: true }" />
+        </gw-form-field>
+      </div>
+    </div>
+    <div gw-dialog-footer class="dd__form-footer">
+      <span class="dd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Cancel</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="submitCard()">Submit → Billing</gw-button>
+    </div>
+  </gw-dialog>
+
+  <!-- ─── Cancel modal ─── -->
+  <gw-dialog [open]="modal() === 'cancel'" (openChange)="closeModal()" size="sm"
+             title="Cancel discharge" description="This stops the discharge process.">
+    <div class="dd__form">
+      <gw-form-field label="Reason">
+        <gw-textarea [(ngModel)]="cancelReason" [ngModelOptions]="{ standalone: true }" placeholder="Why is this being cancelled?" />
+      </gw-form-field>
+    </div>
+    <div gw-dialog-footer class="dd__form-footer">
+      <span class="dd__spacer"></span>
+      <gw-button variant="secondary" (click)="closeModal()">Back</gw-button>
+      <gw-button variant="danger" [loading]="busy()" (click)="submitCancel()">Cancel discharge</gw-button>
+    </div>
+  </gw-dialog>
+} @else {
+  <div class="dd__loading">Discharge not found.</div>
+}

@@ -17,9 +17,14 @@
           <lucide-icon name="route" [size]="15" /> Patient Journey
         </a>
       }
-      @if (isAdmitted()) {
+      @if (isAdmitted() && canInitiateDischarge()) {
+        <button class="btn btn--primary" (click)="openInitiateDischarge()">
+          <lucide-icon name="file-text" [size]="15" /> Initiate Discharge
+        </button>
+      }
+      @if (isAdmitted() && auth.isAdmin()) {
         <button class="btn btn--danger" (click)="openDischarge()">
-          <lucide-icon name="log-out" [size]="15" /> Discharge Patient
+          <lucide-icon name="log-out" [size]="15" /> Quick Discharge
         </button>
       }
     </div>
@@ -28,44 +33,45 @@
   @if (loading()) {
     <div class="loading-state"><lucide-icon name="loader-2" [size]="28" class="spin" /></div>
   } @else if (admission()) {
-    <!-- Info cards -->
-    <div class="info-grid">
-      <div class="card info-card">
-        <div class="info-card__label">Patient</div>
-        <div class="info-card__value">{{ admission()!.patient?.firstName }} {{ admission()!.patient?.lastName }}</div>
-        <div class="info-card__sub">{{ admission()!.patient?.phone }}</div>
+    <!-- Patient hero -->
+    <section class="ad-hero">
+      <div class="ad-hero__id">
+        <div class="ad-hero__avatar">{{ (admission()!.patient?.firstName || '?')[0] }}{{ (admission()!.patient?.lastName || '')[0] }}</div>
+        <div class="ad-hero__who">
+          <h3 class="ad-hero__name">{{ admission()!.patient?.firstName }} {{ admission()!.patient?.lastName }}</h3>
+          <div class="ad-hero__meta">
+            <span>{{ admission()!.patient?.patientCode }}</span>
+            <span>· {{ admission()!.patient?.phone }}</span>
+            <span>· Dr. {{ admission()!.admittingDoctor?.firstName }} {{ admission()!.admittingDoctor?.lastName }}</span>
+          </div>
+          <div class="ad-hero__tags">
+            <gw-badge [variant]="admission()!.status === 'admitted' ? 'success' : 'neutral'" tone="soft" size="sm">{{ admission()!.status | titlecase }}</gw-badge>
+            <gw-badge variant="info" tone="soft" size="sm">{{ admission()!.ward?.name }} · {{ admission()!.bed?.bedNumber }}</gw-badge>
+            <gw-badge variant="neutral" tone="soft" size="sm">{{ admission()!.admissionType | titlecase }}</gw-badge>
+            <gw-badge variant="neutral" tone="soft" size="sm">Admitted {{ admission()!.admissionDate | date:'dd MMM' }}</gw-badge>
+          </div>
+        </div>
       </div>
-      <div class="card info-card">
-        <div class="info-card__label">Admission</div>
-        <div class="info-card__value">{{ admission()!.admissionDate | date:'dd MMM yyyy' }} · {{ admission()!.admissionTime }}</div>
-        <div class="info-card__sub">{{ admission()!.admissionType | titlecase }}</div>
+      <!-- Quick charges answer -->
+      <div class="ad-hero__bill">
+        <span class="ad-hero__bill-label">Charges till date</span>
+        <span class="ad-hero__bill-amount">{{ formatCurrency(chargesTillDate()) }}</span>
+        <span class="ad-hero__bill-sub">{{ los(admission()!) }} day{{ los(admission()!) !== 1 ? 's' : '' }} · view breakdown in Charges</span>
       </div>
-      <div class="card info-card">
-        <div class="info-card__label">Doctor</div>
-        <div class="info-card__value">Dr. {{ admission()!.admittingDoctor?.firstName }} {{ admission()!.admittingDoctor?.lastName }}</div>
-        <div class="info-card__sub">{{ admission()!.admittingDoctor?.specialization }}</div>
-      </div>
-      <div class="card info-card">
-        <div class="info-card__label">Length of Stay</div>
-        <div class="info-card__value">{{ los(admission()!) }} day{{ los(admission()!) !== 1 ? 's' : '' }}</div>
-        <div class="info-card__sub">Status: {{ admission()!.status | titlecase }}</div>
-      </div>
-      <div class="card info-card">
-        <div class="info-card__label">Total Charges</div>
-        <div class="info-card__value">{{ formatCurrency(chargeTotal()) }}</div>
-        <div class="info-card__sub">{{ charges().length }} line items</div>
-      </div>
-      <div class="card info-card">
-        <div class="info-card__label">Attendant</div>
-        <div class="info-card__value">{{ admission()!.attendantName ?? '—' }}</div>
-        <div class="info-card__sub">{{ admission()!.attendantRelation }} · {{ admission()!.attendantPhone }}</div>
-      </div>
+    </section>
+
+    <!-- Stat strip -->
+    <div class="ad-stats">
+      <gw-stat-card label="Length of stay" [value]="los(admission()!) + (los(admission()!) !== 1 ? ' days' : ' day')" icon="bed" />
+      <gw-stat-card label="Daily notes" [value]="notes().length" icon="file-text" />
+      <gw-stat-card label="Procedures" [value]="procedures().length" icon="activity" />
+      <gw-stat-card label="Attendant" [value]="admission()!.attendantName || '—'" icon="user" />
     </div>
 
     <!-- Admission diagnosis -->
-    <div class="card" style="margin-bottom:1.25rem;padding:1rem 1.25rem">
-      <div class="text-sm text-muted mb-1">Admission Diagnosis</div>
-      <div class="fw-medium">{{ admission()!.admissionDiagnosis }}</div>
+    <div class="ad-diagnosis">
+      <span class="ad-diagnosis__label">Admission diagnosis</span>
+      <span class="ad-diagnosis__value">{{ admission()!.admissionDiagnosis }}</span>
     </div>
 
     <!-- Tabs -->
@@ -136,90 +142,56 @@
 
     <!-- ─── Charges ──────────────────────────────────────────────────────── -->
     @if (tab() === 'charges') {
-      <div class="d-flex justify-end mb-3">
-        @if (isAdmitted()) {
-          <button class="btn btn--primary" (click)="openChargeModal()">
-            <lucide-icon name="plus" [size]="15" /> Add Charge
-          </button>
-        }
-      </div>
-      <div class="card card--flush">
-        <div class="table-wrap">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th class="text-right">Qty</th>
-                <th class="text-right">Rate</th>
-                <th class="text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (charges().length === 0) {
-                <tr><td colspan="6"><div class="empty-state"><p>No charges yet</p></div></td></tr>
-              }
-              @for (c of charges(); track c.id) {
-                <tr>
-                  <td>{{ c.chargeDate | date:'dd MMM' }}</td>
-                  <td><span class="badge" [class]="chargeTypeBadge(c.chargeType)">{{ chargeTypeLabel(c.chargeType) }}</span></td>
-                  <td>{{ c.description }}</td>
-                  <td class="text-right">{{ c.quantity }}</td>
-                  <td class="text-right">{{ formatCurrency(c.unitPrice) }}</td>
-                  <td class="text-right fw-medium">{{ formatCurrency(c.totalAmount) }}</td>
-                </tr>
-              }
-            </tbody>
-            @if (charges().length > 0) {
-              <tfoot>
-                <tr>
-                  <td colspan="5" class="text-right fw-medium">Total</td>
-                  <td class="text-right fw-bold">{{ formatCurrency(chargeTotal()) }}</td>
-                </tr>
-              </tfoot>
+      <!-- Consolidated billing summary (the quick "charges till date" answer) -->
+      @if (chargeSummary(); as cs) {
+        <div class="bill-summary">
+          <div class="bill-summary__head">
+            <div>
+              <span class="bill-summary__label">Total charges till date</span>
+              <span class="bill-summary__total">{{ formatCurrency(cs.grandTotal) }}</span>
+            </div>
+            @if (isAdmitted() && canAddCharge()) {
+              <gw-button variant="primary" size="sm" leadingIcon="plus" (click)="openChargeModal()">Add Charge</gw-button>
             }
-          </table>
+          </div>
+          <div class="bill-summary__cats">
+            @for (c of cs.byCategory; track c.category) {
+              <div class="bill-cat">
+                <span class="bill-cat__icon"><lucide-icon [name]="catIcon(c.category)" [size]="15" /></span>
+                <span class="bill-cat__name">{{ catLabel(c.category) }}</span>
+                <span class="bill-cat__amt">{{ formatCurrency(c.total) }}</span>
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      }
+
+      <!-- IPD charge line items -->
+      <h4 class="ad-section-title">IPD charge ledger</h4>
+      <gw-table [columns]="chargeColumns" [data]="charges()" emptyText="No IPD charges yet">
+        <ng-template gwCell="chargeDate" let-row>{{ row.chargeDate | date:'dd MMM' }}</ng-template>
+        <ng-template gwCell="chargeType" let-row>
+          <gw-badge variant="neutral" tone="soft" size="sm">{{ chargeTypeLabel(row.chargeType) }}</gw-badge>
+        </ng-template>
+        <ng-template gwCell="quantity" let-row>{{ row.quantity }}</ng-template>
+        <ng-template gwCell="unitPrice" let-row>{{ formatCurrency(row.unitPrice) }}</ng-template>
+        <ng-template gwCell="totalAmount" let-row><span class="fw-medium">{{ formatCurrency(row.totalAmount) }}</span></ng-template>
+      </gw-table>
+      <p class="ad-hint">Investigations, pharmacy and consultation are billed in their own modules and are included in the total above.</p>
     }
 
     <!-- ─── Procedures ───────────────────────────────────────────────────── -->
     @if (tab() === 'procedures') {
-      <div class="card card--flush">
-        <div class="table-wrap">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Procedure</th>
-                <th>Performed By</th>
-                <th>Date/Time</th>
-                <th>Anesthesia</th>
-                <th>Duration</th>
-                <th class="text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (procedures().length === 0) {
-                <tr><td colspan="6"><div class="empty-state"><p>No procedures recorded</p></div></td></tr>
-              }
-              @for (p of procedures(); track p.id) {
-                <tr>
-                  <td>
-                    <div class="fw-medium">{{ p.procedureName }}</div>
-                    @if (p.procedureCode) { <div class="text-muted text-sm">{{ p.procedureCode }}</div> }
-                  </td>
-                  <td>Dr. {{ p.performedBy?.firstName }} {{ p.performedBy?.lastName }}</td>
-                  <td>{{ p.performedAt | date:'dd MMM yyyy HH:mm' }}</td>
-                  <td>{{ p.anesthesiaType ?? '—' }}</td>
-                  <td>{{ p.durationMinutes ? p.durationMinutes + ' min' : '—' }}</td>
-                  <td class="text-right">{{ formatCurrency(p.amount) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <gw-table [columns]="procedureColumns" [data]="procedures()" emptyText="No procedures recorded">
+        <ng-template gwCell="procedureName" let-row>
+          <div class="fw-medium">{{ row.procedureName }}</div>
+          @if (row.procedureCode) { <div class="text-muted text-sm">{{ row.procedureCode }}</div> }
+        </ng-template>
+        <ng-template gwCell="performedBy" let-row>Dr. {{ row.performedBy?.firstName }} {{ row.performedBy?.lastName }}</ng-template>
+        <ng-template gwCell="performedAt" let-row>{{ row.performedAt | date:'dd MMM yyyy HH:mm' }}</ng-template>
+        <ng-template gwCell="duration" let-row>{{ row.durationMinutes ? row.durationMinutes + ' min' : '—' }}</ng-template>
+        <ng-template gwCell="amount" let-row>{{ formatCurrency(row.amount) }}</ng-template>
+      </gw-table>
     }
 
     <!-- ─── Discharge Summary ─────────────────────────────────────────────── -->
@@ -322,54 +294,44 @@
   </div>
 }
 
-<!-- ─── Add Charge Modal ────────────────────────────────────────────────── -->
-@if (chargeModal()) {
-  <div class="modal-backdrop" (click)="chargeModal.set(false)"></div>
-  <div class="modal modal--sm">
-    <div class="modal__header">
-      <h3 class="modal__title">Add Charge</h3>
-      <button class="modal__close" (click)="chargeModal.set(false)"><lucide-icon name="x" [size]="18" /></button>
-    </div>
-    <div class="modal__body">
-      <form [formGroup]="chargeForm">
-        <div class="form-grid form-grid--2">
-          <div class="form-group">
-            <label class="form-label">Date</label>
-            <input type="date" class="form-control" formControlName="chargeDate" />
-          </div>
-          <div class="form-group">
-            <label class="form-label required">Category</label>
-            <select class="form-control" formControlName="chargeType">
-              @for (t of chargeTypes(); track t.value) { <option [value]="t.value">{{ t.label }}</option> }
-            </select>
-          </div>
+<!-- ─── Add Charge Modal (priced from the super-admin charge master) ──────── -->
+<gw-dialog [open]="chargeModal()" (openChange)="chargeModal.set($event)" size="md" title="Add Charge">
+  <form [formGroup]="chargeForm" class="charge-form">
+    <gw-form-field label="Charge item" [hint]="masterLoading() ? 'Loading charge master…' : 'Rate is set by the charge master'" [required]="true">
+      <gw-select formControlName="serviceId" [options]="masterOptions()" placeholder="Select from the charge master…" />
+    </gw-form-field>
+
+    @if (selectedMaster(); as m) {
+      <div class="charge-rate">
+        <div class="charge-rate__row">
+          <span class="charge-rate__label">Rate (from master)</span>
+          <span class="charge-rate__val">{{ formatCurrency(m.basePrice) }}<small>/{{ m.unit || 'unit' }}</small></span>
         </div>
-        <div class="form-group">
-          <label class="form-label">Department</label>
-          <select class="form-control" formControlName="departmentId">
-            <option value="">— Select Department —</option>
-            @for (d of appMeta.departments(); track d.id) {
-              <option [value]="d.id">{{ d.name }}</option>
-            }
-          </select>
+        <div class="charge-rate__row charge-rate__row--total">
+          <span class="charge-rate__label">Line total</span>
+          <span class="charge-rate__val">{{ formatCurrency(chargeLineTotal()) }}</span>
         </div>
-        <div class="form-group"><label class="form-label required">Description</label><input class="form-control" formControlName="description" /></div>
-        <div class="form-grid form-grid--2">
-          <div class="form-group"><label class="form-label required">Quantity</label><input type="number" class="form-control" formControlName="quantity" step="0.001" /></div>
-          <div class="form-group"><label class="form-label required">Unit Price (₹)</label><input type="number" class="form-control" formControlName="unitPrice" /></div>
-        </div>
-        <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" rows="2" formControlName="notes"></textarea></div>
-      </form>
-    </div>
-    <div class="modal__footer">
-      <button class="btn btn--ghost" (click)="chargeModal.set(false)">Cancel</button>
-      <button class="btn btn--primary" (click)="saveCharge()" [disabled]="chargeForm.invalid || chargeSaving()">
-        @if (chargeSaving()) { <lucide-icon name="loader-2" [size]="15" class="spin" /> }
-        <span>Add Charge</span>
-      </button>
-    </div>
+        <span class="charge-rate__code"><lucide-icon name="hash" [size]="11" /> {{ m.code }} · {{ catLabel(m.category) }}</span>
+      </div>
+    }
+
+    <gw-form-field label="Quantity" [required]="true">
+      <gw-input type="number" formControlName="quantity" />
+    </gw-form-field>
+    <gw-form-field label="Description" [required]="true">
+      <gw-input formControlName="description" placeholder="Defaults to the item name" />
+    </gw-form-field>
+    <gw-form-field label="Notes">
+      <gw-textarea formControlName="notes" [rows]="2" />
+    </gw-form-field>
+  </form>
+
+  <div gw-dialog-footer>
+    <gw-button variant="ghost" (click)="chargeModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" leadingIcon="plus" [loading]="chargeSaving()"
+               [disabled]="chargeForm.invalid || !selectedMaster()" (click)="saveCharge()">Add Charge</gw-button>
   </div>
-}
+</gw-dialog>
 
 <!-- ─── Discharge Modal ──────────────────────────────────────────────────── -->
 @if (dischargeModal()) {
@@ -442,3 +404,35 @@
     </div>
   </div>
 }
+
+<!-- ─── Initiate staged discharge (consultant) ─── -->
+<gw-dialog [open]="initiateModal()" (openChange)="initiateModal.set($event)" size="lg"
+           title="Initiate discharge" description="Record post-discharge medications + advice, then hand over to the RMO.">
+  <div class="init-dis">
+    <div class="init-dis__meds-head">
+      <span>Discharge medications</span>
+      <gw-button variant="ghost" size="sm" leadingIcon="plus" (click)="addInitiateMed()">Add</gw-button>
+    </div>
+    @for (m of initiateMeds; track $index) {
+      <div class="init-dis__med">
+        <div class="init-dis__med-top">
+          <gw-input [(ngModel)]="m.name" [ngModelOptions]="{ standalone: true }" placeholder="Medicine name" />
+          <button type="button" class="init-dis__del" aria-label="Remove medicine" (click)="removeInitiateMed($index)"><lucide-icon name="trash-2" [size]="15" /></button>
+        </div>
+        <div class="init-dis__med-grid">
+          <gw-input [(ngModel)]="m.dose" [ngModelOptions]="{ standalone: true }" placeholder="Dose" />
+          <gw-input [(ngModel)]="m.frequency" [ngModelOptions]="{ standalone: true }" placeholder="Frequency" />
+          <gw-input [(ngModel)]="m.duration" [ngModelOptions]="{ standalone: true }" placeholder="Duration" />
+        </div>
+      </div>
+    }
+    <gw-form-field label="Discharge advice">
+      <gw-textarea [(ngModel)]="initiateForm.dischargeAdvice" [ngModelOptions]="{ standalone: true }" placeholder="Advice for the patient after discharge…" />
+    </gw-form-field>
+  </div>
+  <div gw-dialog-footer class="init-dis__footer">
+    <span style="flex:1"></span>
+    <gw-button variant="secondary" (click)="initiateModal.set(false)">Cancel</gw-button>
+    <gw-button variant="primary" [loading]="initiateSaving()" (click)="submitInitiateDischarge()">Initiate &amp; hand to RMO</gw-button>
+  </div>
+</gw-dialog>

@@ -1,0 +1,181 @@
+@if (loading()) {
+  <div class="ph__loading"><gw-spinner size="lg" /></div>
+} @else if (history(); as h) {
+  <div class="ph">
+    <button class="ph__back" (click)="back()"><lucide-icon name="arrow-left" [size]="16" /> Patients</button>
+
+    <!-- Hero -->
+    <section class="ph__hero">
+      <div class="ph__avatar">{{ (h.patient.firstName || '?')[0] }}{{ (h.patient.lastName || '')[0] }}</div>
+      <div class="ph__who">
+        <h1 class="ph__name">{{ h.patient.name }}</h1>
+        <div class="ph__meta">
+          <span>{{ h.patient.patientCode }}</span>
+          @if (h.patient.phone) { <span>· {{ h.patient.phone }}</span> }
+          @if (h.patient.gender) { <span>· {{ h.patient.gender }}</span> }
+          @if (h.patient.dateOfBirth) { <span>· {{ age(h.patient.dateOfBirth) }}</span> }
+          @if (h.patient.bloodGroup && h.patient.bloodGroup !== 'unknown') { <span>· {{ h.patient.bloodGroup }}</span> }
+        </div>
+        <div class="ph__tags">
+          <gw-badge [variant]="statusVariant(h.summary.currentStatus)" tone="soft" size="sm">{{ statusLabel(h.summary.currentStatus) }}</gw-badge>
+          @if (h.patient.allergies?.length) { <gw-badge variant="danger" tone="soft" size="sm">Allergies: {{ h.patient.allergies?.join(', ') }}</gw-badge> }
+          @if (h.summary.lastVisitAt) { <span class="ph__last">Last visit {{ h.summary.lastVisitAt | date:'mediumDate' }}</span> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Active treatment callout -->
+    @if (h.summary.activeAdmission; as a) {
+      <div class="ph__active">
+        <lucide-icon name="bed" [size]="18" />
+        <div>
+          <strong>Currently admitted · {{ a.admissionNumber }}</strong>
+          <span>{{ a.ward }} · {{ a.bed }} · {{ a.lengthOfStay }} day(s) · {{ a.admissionDiagnosis }}</span>
+        </div>
+        <a [routerLink]="['/ipd/admission', a.id]"><gw-button variant="secondary" size="sm" trailingIcon="arrow-right">Open</gw-button></a>
+      </div>
+    } @else if (h.summary.activeEncounter; as e) {
+      <div class="ph__active ph__active--opd">
+        <lucide-icon name="route" [size]="18" />
+        <div>
+          <strong>OPD in progress · {{ e.encounterNumber }}</strong>
+          <span>{{ e.chiefComplaint }} · {{ e.doctor }}</span>
+        </div>
+        <a [routerLink]="['/journey', e.id]"><gw-button variant="secondary" size="sm" trailingIcon="arrow-right">Open</gw-button></a>
+      </div>
+    }
+
+    <!-- Counts -->
+    <div class="ph__stats">
+      <gw-stat-card label="Admissions" [value]="h.summary.totalAdmissions" icon="bed" />
+      <gw-stat-card label="OPD visits" [value]="h.summary.totalOpdVisits" icon="route" />
+      <gw-stat-card label="Prescriptions" [value]="h.summary.totalPrescriptions" icon="file-text" />
+      <gw-stat-card label="Investigations" [value]="h.summary.totalInvestigations" icon="scan-line" />
+      <gw-stat-card label="Pharmacy orders" [value]="h.summary.totalPharmacy" icon="pill" />
+    </div>
+
+    <!-- Admissions -->
+    @if (h.admissions.length) {
+      <section class="ph__section">
+        <h2 class="ph__section-title"><lucide-icon name="bed" [size]="15" /> Admissions ({{ h.admissions.length }})</h2>
+        @for (a of h.admissions; track a.id) {
+          <div class="ph__adm">
+            <div class="ph__adm-head" (click)="toggle(a.id)">
+              <div class="ph__adm-id">
+                <span class="ph__adm-no">{{ a.admissionNumber }}</span>
+                <gw-badge [variant]="admissionVariant(a.status)" tone="soft" size="sm">{{ a.status | titlecase }}</gw-badge>
+                @if (a.hasBill) {
+                  <span class="ph__adm-bill"><lucide-icon name="receipt" [size]="12" /> {{ formatCurrency(a.billAmount) }}</span>
+                }
+              </div>
+              <div class="ph__adm-meta">
+                {{ a.admissionDate | date:'dd MMM yyyy' }}@if (a.dischargeDate) { → {{ a.dischargeDate | date:'dd MMM yyyy' }} } · {{ a.lengthOfStay }}d · {{ a.ward }}/{{ a.bed }} · {{ a.doctor }}
+              </div>
+              <lucide-icon [name]="isExpanded(a.id) ? 'chevron-up' : 'chevron-down'" [size]="16" />
+            </div>
+            <div class="ph__adm-dx">{{ a.admissionDiagnosis }}</div>
+            @if (isExpanded(a.id)) {
+              <div class="ph__adm-body">
+                @if (a.finalDiagnosis) { <div class="ph__kv"><label>Final diagnosis</label><p>{{ a.finalDiagnosis }}</p></div> }
+                @if (a.dischargeType) { <div class="ph__kv"><label>Discharge</label><p>{{ a.dischargeType | titlecase }} · condition {{ a.conditionAtDischarge | titlecase }}</p></div> }
+                @if (a.clinicalSummary) { <div class="ph__kv"><label>Clinical summary</label><p>{{ a.clinicalSummary }}</p></div> }
+                @if (a.treatmentGiven) { <div class="ph__kv"><label>Treatment given</label><p>{{ a.treatmentGiven }}</p></div> }
+                @if (a.dischargeMedications?.length) {
+                  <div class="ph__kv"><label>Discharge medications</label>
+                    <ul class="ph__meds">@for (m of a.dischargeMedications; track $index) { <li>{{ m.name }} — {{ m.dose }}, {{ m.frequency }}, {{ m.duration }}</li> }</ul>
+                  </div>
+                }
+                @if (a.followUpInstructions || a.followUpDate) { <div class="ph__kv"><label>Follow-up</label><p>{{ a.followUpDate ? (a.followUpDate | date:'mediumDate') : '' }} {{ a.followUpInstructions }}</p></div> }
+
+                @if (a.hasBill) {
+                  <div class="ph__docs">
+                    <div class="ph__docs-head">
+                      <lucide-icon name="file-stack" [size]="14" />
+                      <span>Discharge file</span>
+                      @if (a.billAmount != null) { <span class="ph__docs-total">Final bill {{ formatCurrency(a.billAmount) }}</span> }
+                    </div>
+                    <div class="ph__docs-actions">
+                      <gw-button variant="secondary" size="sm" leadingIcon="receipt"
+                        [loading]="downloading() === 'bill-' + a.id" (click)="downloadBill(a.id)">Bill (PDF)</gw-button>
+                      <gw-button variant="secondary" size="sm" leadingIcon="file-text"
+                        [loading]="downloading() === 'record-' + a.id" (click)="downloadRecord(a.id)">Clinical record (PDF)</gw-button>
+                    </div>
+                  </div>
+                }
+
+                <a class="ph__link" [routerLink]="['/ipd/admission', a.id]"><lucide-icon name="arrow-right" [size]="13" /> Open admission detail</a>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <!-- OPD visits -->
+    @if (h.opdVisits.length) {
+      <section class="ph__section">
+        <h2 class="ph__section-title"><lucide-icon name="route" [size]="15" /> OPD Visits ({{ h.opdVisits.length }})</h2>
+        <gw-table [columns]="visitColumns" [data]="h.opdVisits">
+          <ng-template gwCell="encounterNumber" let-row>
+            <a class="ph__rowlink" [routerLink]="['/journey', row.id]">{{ row.encounterNumber }}</a>
+          </ng-template>
+          <ng-template gwCell="createdAt" let-row>{{ row.createdAt | date:'dd MMM yyyy' }}</ng-template>
+          <ng-template gwCell="disposition" let-row>{{ row.disposition ? (row.disposition | titlecase) : (row.stage | titlecase) }}</ng-template>
+        </gw-table>
+      </section>
+    }
+
+    <!-- Prescriptions -->
+    @if (h.prescriptions.length) {
+      <section class="ph__section">
+        <h2 class="ph__section-title"><lucide-icon name="file-text" [size]="15" /> Prescriptions ({{ h.prescriptions.length }})</h2>
+        @for (rx of h.prescriptions; track rx.id) {
+          <div class="ph__rx">
+            <div class="ph__rx-head">
+              <span class="ph__rx-dx">{{ rx.diagnosis || 'Prescription' }}</span>
+              <span class="ph__rx-meta">{{ rx.createdAt | date:'dd MMM yyyy' }} · {{ rx.doctor }}</span>
+            </div>
+            @if (rx.medicines.length) {
+              <ul class="ph__meds">@for (m of rx.medicines; track $index) { <li>{{ m.name }}@if (m.dosage) { — {{ m.dosage }}, {{ m.frequency }}, {{ m.duration }} }</li> }</ul>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Investigations -->
+    @if (h.investigations.length) {
+      <section class="ph__section">
+        <h2 class="ph__section-title"><lucide-icon name="scan-line" [size]="15" /> Investigations ({{ h.investigations.length }})</h2>
+        <gw-table [columns]="invColumns" [data]="h.investigations">
+          <ng-template gwCell="departmentType" let-row><gw-badge variant="primary" tone="soft" size="sm">{{ row.departmentType | titlecase }}</gw-badge></ng-template>
+          <ng-template gwCell="createdAt" let-row>{{ row.createdAt | date:'dd MMM yyyy' }}</ng-template>
+          <ng-template gwCell="status" let-row><gw-badge variant="neutral" tone="soft" size="sm">{{ row.status | titlecase }}</gw-badge></ng-template>
+          <ng-template gwCell="amount" let-row>{{ formatCurrency(row.amount) }}</ng-template>
+          <ng-template gwCell="report" let-row>
+            @if (row.reportFileUrl) { <a class="ph__rowlink" [href]="fileUrl(row.reportFileUrl)" target="_blank">Report</a> }
+          </ng-template>
+        </gw-table>
+      </section>
+    }
+
+    <!-- Pharmacy -->
+    @if (h.pharmacy.length) {
+      <section class="ph__section">
+        <h2 class="ph__section-title"><lucide-icon name="pill" [size]="15" /> Pharmacy ({{ h.pharmacy.length }})</h2>
+        <gw-table [columns]="pharmaColumns" [data]="h.pharmacy">
+          <ng-template gwCell="createdAt" let-row>{{ row.createdAt | date:'dd MMM yyyy' }}</ng-template>
+          <ng-template gwCell="pharmacyType" let-row>{{ row.pharmacyType === 'in_house' ? 'In-house' : 'Out-house' }}</ng-template>
+          <ng-template gwCell="status" let-row><gw-badge variant="neutral" tone="soft" size="sm">{{ row.status | titlecase }}</gw-badge></ng-template>
+          <ng-template gwCell="totalAmount" let-row>{{ formatCurrency(row.totalAmount) }}</ng-template>
+        </gw-table>
+      </section>
+    }
+
+    @if (!h.admissions.length && !h.opdVisits.length && !h.prescriptions.length && !h.investigations.length && !h.pharmacy.length) {
+      <gw-empty-state icon="inbox" title="No history yet" description="This patient has no recorded visits, admissions, prescriptions or investigations." />
+    }
+  </div>
+} @else {
+  <div class="ph__loading">Patient not found.</div>
+}

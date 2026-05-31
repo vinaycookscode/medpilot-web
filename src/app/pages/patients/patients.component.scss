@@ -265,3 +265,27 @@
 
   &__full { grid-column: 1 / -1; }
 }
+
+/* Clickable patient name + history affordances */
+.patients__name--link { cursor: pointer; }
+.patients__name--link:hover { color: var(--color-primary); text-decoration: underline; }
+
+/* Drawer current-treatment summary */
+.patients__treat {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: var(--sp-3); background: var(--bg-hover); display: flex; flex-direction: column; gap: var(--sp-2);
+}
+.patients__treat--active { border-color: var(--color-primary); background: var(--color-primary-subtle); }
+.patients__treat-row { display: flex; align-items: center; gap: var(--sp-2); font-size: .82rem; color: var(--text-secondary); }
+.patients__treat-dx { margin: 0; font-size: .85rem; color: var(--text-primary); }
+.patients__treat-counts { display: flex; flex-wrap: wrap; gap: var(--sp-3); font-size: .75rem; color: var(--text-tertiary); }
+
+/* Hover preview popover */
+.patients__hover { min-width: 230px; max-width: 280px; display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-1); }
+.patients__hover-status { display: flex; align-items: center; gap: var(--sp-2); font-size: .8rem; font-weight: 600; color: var(--text-primary); }
+.patients__hover-line { display: flex; align-items: center; gap: var(--sp-2); font-size: .8rem; color: var(--text-secondary); }
+.patients__hover-line lucide-icon { color: var(--text-tertiary); }
+.patients__hover-dx { font-size: .8rem; color: var(--text-primary); }
+.patients__hover-counts { display: flex; flex-wrap: wrap; gap: var(--sp-2); font-size: .72rem; color: var(--text-tertiary); border-top: 1px solid var(--border); padding-top: var(--sp-2); }
+.patients__hover-hint { font-size: .68rem; color: var(--color-primary); }
+.patients__hover-loading { display: flex; align-items: center; gap: var(--sp-2); font-size: .8rem; color: var(--text-secondary); }

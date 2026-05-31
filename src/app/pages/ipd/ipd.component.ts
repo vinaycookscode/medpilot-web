@@ -23,6 +23,7 @@ import { GwTextareaComponent } from '../../shared/ui/forms/textarea/textarea.com
 import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
 import { GwTimeInputComponent } from '../../shared/ui/forms/time-input/time-input.component';
 import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
+import { PatientLinkComponent } from '../../shared/patient-link/patient-link.component';
 
 type TabMode = 'admissions' | 'beds' | 'wards';
 
@@ -32,7 +33,7 @@ type TabMode = 'admissions' | 'beds' | 'wards';
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule, IconsModule, RouterLink, GwButtonComponent,
     GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwTextareaComponent,
-    GwDateInputComponent, GwTimeInputComponent, GwDialogComponent,
+    GwDateInputComponent, GwTimeInputComponent, GwDialogComponent, PatientLinkComponent,
   ],
   templateUrl: './ipd.component.html',
   styleUrl: './ipd.component.scss',

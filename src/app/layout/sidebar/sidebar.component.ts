@@ -105,6 +105,7 @@ export class SidebarComponent {
         { label: 'Nursing Handover', route: '/nursing/handover', icon: 'log-out',    roles: ['admin', 'super_admin', 'doctor', 'nursing'], module: 'ipd' },
         { label: 'RMO Handover',     route: '/rmo/handover',     icon: 'clipboard-check', roles: ['admin', 'super_admin', 'doctor', 'rmo', 'consultant'], module: 'ipd' },
         { label: 'Consultant Rounds',route: '/consultant/rounds',icon: 'stethoscope', roles: ['admin', 'super_admin', 'doctor', 'consultant'], module: 'ipd' },
+        { label: 'Discharge',        route: '/discharge',        icon: 'file-text',   roles: ['admin', 'super_admin', 'consultant', 'doctor', 'rmo', 'nursing', 'matron', 'billing_staff'], module: 'discharge' },
         { label: 'My Tasks',         route: '/attendant/tasks',  icon: 'clipboard-list', roles: ['admin', 'super_admin', 'attendant'], module: 'ipd' },
         { label: 'Follow-ups',    route: '/followups',     icon: 'calendar-check', roles: ['admin', 'receptionist'], module: 'appointments' },
       ],
