@@ -1,0 +1,11 @@
+{
+  // Cloudflare Workers — static-asset (SPA) deployment for the Angular build.
+  // No "main" worker script: this is an assets-only Worker, so Cloudflare just
+  // serves the files in `assets.directory`, with index.html as the SPA fallback.
+  "name": "medpilot-web",
+  "compatibility_date": "2024-11-01",
+  "assets": {
+    "directory": "./dist/medpilot-web/browser",
+    "not_found_handling": "single-page-application"
+  }
+}
